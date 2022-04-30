@@ -32,9 +32,14 @@
             };
             window.Draw(border);
 
+            var view = window.GetView();
+            var viewRect = new FloatRect(view.Center - (view.Size / 2), view.Size);
             foreach (var block in this.Map)
             {
-                block.Draw(window);
+                if (viewRect.Intersects(block.CollisionBox.GetGlobalBounds()))
+                {
+                    block.Draw(window);
+                }
             }
         }
 

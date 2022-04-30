@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using CellularAutomaton.Classes.Blocks;
+    using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
@@ -101,7 +102,7 @@
                 this.Window.Clear(new Color(100, 150, 255));
                 foreach (var chunk in this.Map)
                 {
-                    chunk.Draw(this.Window); // TODO: make it fast
+                    chunk.Draw(this.Window);
                 }
 
                 foreach (var entity in this.Entities)
