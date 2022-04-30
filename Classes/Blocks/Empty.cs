@@ -14,7 +14,7 @@
 
         public bool IsCollidable { get; set; } = false;
 
-        public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(0, 0));
+        public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
 
         public IWall Wall { get; set; }
 
