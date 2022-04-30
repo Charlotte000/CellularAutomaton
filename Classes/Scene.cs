@@ -10,7 +10,7 @@
 
     public class Scene
     {
-        public static Texture Texture = new Texture(@"..\..\..\Source\textures.png");
+        public static Texture Texture = new (@"..\..\..\Source\textures.png");
 
         public Scene(uint windowWidth, uint windowHeight)
         {
@@ -62,7 +62,7 @@
                 this.Window.DispatchEvents();
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
-                    this.SetBlock(new Solid() { Light = 255, }, this.GetMouseCoords());
+                    this.TrySetBlock(new Solid() { Light = 255, }, this.GetMouseCoords());
                 }
 
                 if (Mouse.IsButtonPressed(Mouse.Button.Right))
@@ -95,12 +95,10 @@
                     }
                 }
 
-                this.Window.Clear(new Color(100, 150, 255));
-
-                this.Camera.Center = this.Entities[0].CollisionBox.Position + (this.Entities[0].CollisionBox.Size / 2);
-                this.Window.SetView(this.Camera);
-
+                this.MoveCamera();
                 this.UpdateLights();
+
+                this.Window.Clear(new Color(100, 150, 255));
                 foreach (var chunk in this.Map)
                 {
                     chunk.Draw(this.Window); // TODO: make it fast
@@ -186,6 +184,27 @@
         public void SetBlock(IBlock block, int x, int y)
             => this.SetBlock(block, new Vector2i(x, y));
 
+        public void TrySetBlock(IBlock block, Vector2i coords)
+        {
+            block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
+
+            if (block.IsCollidable)
+            {
+                foreach (var entity in this.Entities)
+                {
+                    if (entity.CollisionBox.GetGlobalBounds().Intersects(block.CollisionBox.GetGlobalBounds()))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            this.SetBlock(block, coords);
+        }
+
+        public void TrySetBlock(IBlock block, int x, int y)
+            => this.TrySetBlock(block, new Vector2i(x, y));
+
         public IBlock[] GetAllBlocks()
         {
             var blocks = new List<IBlock>();
@@ -215,6 +234,33 @@
             var mouseWindow = new Vector2f(mousePos.X * scale.X, mousePos.Y * scale.Y);
             var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / IBlock.Size;
             return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
+        }
+
+        private void MoveCamera()
+        {
+            const int offsetX = 20;
+            const int offsetY = 20;
+            var follow = this.Entities[0].CollisionBox.Position + (this.Entities[0].CollisionBox.Size / 2);
+
+            if (follow.X - this.Camera.Center.X > offsetX)
+            {
+                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X - offsetX, 0));
+            }
+            else if (this.Camera.Center.X - follow.X > offsetX)
+            {
+                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X + offsetX, 0));
+            }
+
+            if (follow.Y - this.Camera.Center.Y > offsetY)
+            {
+                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y - offsetY));
+            }
+            else if (this.Camera.Center.Y - follow.Y > offsetY)
+            {
+                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y + offsetY));
+            }
+
+            this.Window.SetView(this.Camera);
         }
 
         private void MoveChunks()

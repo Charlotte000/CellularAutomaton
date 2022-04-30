@@ -43,28 +43,6 @@
             this.CollisionBox.Position += this.Vel;
         }
 
-        public void Collision(Scene scene)
-        {
-            this.IsOnGround = false;
-            this.IsOnWater = false;
-
-            var entities = new List<IEntity>();
-            var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / IBlock.Size;
-            for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
-            {
-                for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
-                {
-                    var block = scene.GetBlock(x, y);
-                    if (block is not null && block is not Empty)
-                    {
-                        entities.Add(block);
-                    }
-                }
-            }
-
-            AABBCollision.Collision(scene, this, entities);
-        }
-
         public void OnCollision(IEntity entity, Vector2f normal)
         {
             this.IsOnWater |= entity is Water;
@@ -92,6 +70,28 @@
             {
                 this.Vel += new Vector2f(0, 1f);
             }
+        }
+
+        private void Collision(Scene scene)
+        {
+            this.IsOnGround = false;
+            this.IsOnWater = false;
+
+            var entities = new List<IEntity>();
+            var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / IBlock.Size;
+            for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
+            {
+                for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
+                {
+                    var block = scene.GetBlock(x, y);
+                    if (block is not null && block is not Empty)
+                    {
+                        entities.Add(block);
+                    }
+                }
+            }
+
+            AABBCollision.Collision(scene, this, entities);
         }
     }
 }
