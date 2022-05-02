@@ -8,14 +8,14 @@
 
     public class Chunk
     {
+        public static Vector2i Size = new (20, 20);
+
         public Chunk(int x, int y)
         {
             this.Coord = new Vector2i(x, y);
 
             this.InitMap();
         }
-
-        public static Vector2i Size = new (20, 20);
 
         public Vector2i Coord { get; set; }
 
@@ -45,11 +45,18 @@
 
         public void Update(Scene scene)
         {
-            var newMap = (IBlock[,])this.Map.Clone();
-
-            foreach (var block in newMap)
+            foreach (var block in this.Map)
             {
-                block.Update(scene);
+                block.WasUpdated = false;
+            }
+
+            foreach (var block in this.Map)
+            {
+                if (!block.WasUpdated)
+                {
+                    block.WasUpdated = true;
+                    block.Update(scene);
+                }
             }
         }
 
@@ -105,10 +112,7 @@
                 oldBlock.Dispose();
             }
 
-            block.Coords = coords;
-            block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
-            block.Wall.CollisionBox.Position = block.CollisionBox.Position;
-            this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y] = block;
+            this.SetBlockStrong(block, coords.X, coords.Y);
         }
 
         public void SetBlock(IBlock block, int x, int y)
@@ -122,13 +126,24 @@
             }
         }
 
+        private void SetBlockStrong(IBlock block, Vector2i coords)
+        {
+            block.Coords = coords;
+            block.CollisionBox.Position = (Vector2f)coords * IBlock.Size;
+            block.Wall.CollisionBox.Position = block.CollisionBox.Position;
+            this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y] = block;
+        }
+
+        private void SetBlockStrong(IBlock block, int x, int y)
+            => this.SetBlockStrong(block, new Vector2i(x, y));
+
         private void InitMap()
         {
             for (int x = 0; x < Chunk.Size.X; x++)
             {
                 for (int y = 0; y < Chunk.Size.Y; y++)
                 {
-                    this.SetBlock(new Empty() { Wall = new EmptyWall() }, this.Coord.X + x, this.Coord.Y + y);
+                    this.SetBlockStrong(new Empty() { Wall = new EmptyWall() }, this.Coord.X + x, this.Coord.Y + y);
                 }
             }
         }

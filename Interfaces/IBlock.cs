@@ -14,6 +14,8 @@
 
         public IWall Wall { get; set; }
 
+        public bool WasUpdated { get; set; }
+
         public IBlock Copy();
 
         public void Dispose()

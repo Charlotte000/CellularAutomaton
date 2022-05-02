@@ -18,6 +18,8 @@
 
         public IWall Wall { get; set; }
 
+        public bool WasUpdated { get; set; } = false;
+
         public void Update(Scene scene)
         {
         }
@@ -26,6 +28,13 @@
             => this.Wall.Draw(window);
 
         public IBlock Copy()
-            => new Empty();
+            => new Empty()
+            {
+                CollisionBox = new RectangleShape(this.CollisionBox),
+                Coords = this.Coords,
+                Light = this.Light,
+                Wall = this.Wall.Copy(),
+                WasUpdated = this.WasUpdated,
+            };
     }
 }

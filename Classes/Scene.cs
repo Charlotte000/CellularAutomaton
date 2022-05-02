@@ -115,44 +115,6 @@
             }
         }
 
-        public void UpdateLights() // TODO: make it fast
-        {
-            // Sky is a light source
-            foreach (var block in this.GetAllBlocks())
-            {
-                block.Light = 255; // (byte)(block is Empty && block.Wall is EmptyWall ? 255 : 0);
-                block.Wall.Light = 255; // (byte)(block is Empty && block.Wall is EmptyWall ? 255 : 0);
-            }
-            return;
-
-            this.GetBlock((Vector2i)(this.Entities[0].CollisionBox.Position / IBlock.Size)).Light = 255;
-            this.GetBlock((Vector2i)(this.Entities[0].CollisionBox.Position / IBlock.Size)).Wall.Light = 255;
-
-            // Light fading
-            var neighborhood = new Vector2i[] { new Vector2i(-1, 0), new Vector2i(1, 0), new Vector2i(0, -1), new Vector2i(0, 1) };
-            for (byte currentLight = 255; currentLight >= 1; currentLight--)
-            {
-                foreach (var block in this.GetAllBlocks())
-                {
-                    if (block.Light == currentLight)
-                    {
-                        foreach (var delta in neighborhood)
-                        {
-                            var neighbour = this.GetBlock(block.Coords + delta);
-                            if (neighbour is not null)
-                            {
-                                if (neighbour.Light == 0)
-                                {
-                                    neighbour.Light = (byte)Math.Max(0, currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion :  neighbour.LightDiffusion));
-                                    neighbour.Wall.Light = neighbour.Light;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         public bool IsValidCoords(Vector2i coords)
         {
             var topLeftCoord = this.Map[0, 0].Coord;
@@ -235,6 +197,46 @@
             var mouseWindow = new Vector2f(mousePos.X * scale.X, mousePos.Y * scale.Y);
             var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / IBlock.Size;
             return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
+        }
+
+        private void UpdateLights() // TODO: make it fast
+        {
+            // Sky is a light source
+            foreach (var block in this.GetAllBlocks())
+            {
+                block.Light = 255; // (byte)(block is Empty && block.Wall is EmptyWall ? 255 : 0);
+                block.Wall.Light = 255; // (byte)(block is Empty && block.Wall is EmptyWall ? 255 : 0);
+            }
+
+            return;
+
+            // User is a light source
+            this.GetBlock((Vector2i)(this.Entities[0].CollisionBox.Position / IBlock.Size)).Light = 255;
+            this.GetBlock((Vector2i)(this.Entities[0].CollisionBox.Position / IBlock.Size)).Wall.Light = 255;
+
+            // Light fading
+            var neighborhood = new Vector2i[] { new Vector2i(-1, 0), new Vector2i(1, 0), new Vector2i(0, -1), new Vector2i(0, 1) };
+            for (byte currentLight = 255; currentLight >= 1; currentLight--)
+            {
+                foreach (var block in this.GetAllBlocks())
+                {
+                    if (block.Light == currentLight)
+                    {
+                        foreach (var delta in neighborhood)
+                        {
+                            var neighbour = this.GetBlock(block.Coords + delta);
+                            if (neighbour is not null)
+                            {
+                                if (neighbour.Light == 0)
+                                {
+                                    neighbour.Light = (byte)Math.Max(0, currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion : neighbour.LightDiffusion));
+                                    neighbour.Wall.Light = neighbour.Light;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void MoveCamera()

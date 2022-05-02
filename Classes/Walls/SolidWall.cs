@@ -20,7 +20,12 @@
         public bool IsCollidable { get; set; } = false;
 
         public IWall Copy()
-            => new SolidWall();
+            => new SolidWall()
+            {
+                CollisionBox = new RectangleShape(this.CollisionBox),
+                Coords = this.Coords,
+                Light = this.Light,
+            };
 
         public void Draw(RenderWindow window)
         {

@@ -34,76 +34,24 @@
 
         public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
 
-        public int Amount { get; set; } = 4;
-
         public IWall Wall { get; set; }
 
-        public void Update(Scene scene) // HACK: water amount
+        public int Amount { get; set; } = 4;
+
+        public bool WasUpdated { get; set; } = false;
+
+        public void Update(Scene scene)
         {
             // Fall down
-            var block = scene.GetBlock(this.Coords.X, this.Coords.Y + 1);
-            if (block is not null && block is not Water && !block.IsCollidable)
+            if (this.FallDown(scene))
             {
-                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1);
-                scene.SetBlock(new Empty(), this.Coords);
                 return;
             }
 
-            if (block is Water && (block as Water).Amount < 4)
+            // Spread Out
+            var deltaX = (scene.RandomGenerator.Next(0, 2) * -2) + 1;
+            if (this.SpreadOut(scene, deltaX))
             {
-                var water = block as Water;
-                water.Amount += this.Amount;
-                this.Amount = 0;
-                if (water.Amount > 4)
-                {
-                    this.Amount = 4 - water.Amount;
-                    water.Amount = 4;
-                }
-
-                if (this.Amount < 1)
-                {
-                    scene.SetBlock(new Empty(), this.Coords);
-                }
-
-                return;
-            }
-
-            // Spread out
-            int deltaX = (scene.RandomGenerator.Next(0, 2) * -2) + 1;
-            block = scene.GetBlock(this.Coords.X + deltaX, this.Coords.Y);
-            if (block is Empty)
-            {
-                var prevAmount = this.Amount;
-
-                this.Amount /= 2;
-
-                scene.SetBlock(
-                    new Water()
-                    {
-                        Amount = prevAmount - this.Amount,
-                        Light = this.Light,
-                    },
-                    this.Coords.X + deltaX,
-                    this.Coords.Y);
-
-                if (this.Amount < 1)
-                {
-                    scene.SetBlock(new Empty(), this.Coords);
-                }
-
-                return;
-            }
-
-            if (block is Water && (block as Water).Amount < 4 && (block as Water).Amount < this.Amount)
-            {
-                var water = block as Water;
-                water.Amount++;
-                this.Amount--;
-                if (this.Amount < 1)
-                {
-                    scene.SetBlock(new Empty(), this.Coords);
-                }
-
                 return;
             }
         }
@@ -126,6 +74,91 @@
         }
 
         public IBlock Copy()
-            => new Water() { Amount = this.Amount, Light = this.Light };
+            => new Water()
+            {
+                CollisionBox = new RectangleShape(this.CollisionBox),
+                Coords = this.Coords,
+                Light = this.Light,
+                Wall = this.Wall.Copy(),
+                Amount = this.Amount,
+                WasUpdated = this.WasUpdated,
+            };
+
+        private bool FallDown(Scene scene)
+        {
+            var block = scene.GetBlock(this.Coords.X, this.Coords.Y + 1);
+            if (block is not null && block is not Water && !block.IsCollidable)
+            {
+                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1);
+                scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                return true;
+            }
+
+            if (block is Water && (block as Water).Amount < 4)
+            {
+                var water = block as Water;
+                water.WasUpdated = true;
+                water.Amount += this.Amount;
+                this.Amount = 0;
+                if (water.Amount > 4)
+                {
+                    this.Amount = water.Amount - 4;
+                    water.Amount = 4;
+                }
+
+                if (this.Amount < 1)
+                {
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool SpreadOut(Scene scene, int deltaX)
+        {
+            var block = scene.GetBlock(this.Coords.X + deltaX, this.Coords.Y);
+            if (block is Empty)
+            {
+                var prevAmount = this.Amount;
+
+                this.Amount /= 2;
+
+                scene.SetBlock(
+                    new Water()
+                    {
+                        Amount = prevAmount - this.Amount,
+                        Light = this.Light,
+                        WasUpdated = true,
+                    },
+                    this.Coords.X + deltaX,
+                    this.Coords.Y);
+
+                if (this.Amount < 1)
+                {
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                }
+
+                return true;
+            }
+
+            if (block is Water && (block as Water).Amount < 4 && (block as Water).Amount < this.Amount)
+            {
+                var water = block as Water;
+                water.WasUpdated = true;
+                water.Amount++;
+                this.Amount--;
+                if (this.Amount < 1)
+                {
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
     }
 }

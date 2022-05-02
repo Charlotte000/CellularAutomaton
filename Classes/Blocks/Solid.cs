@@ -22,6 +22,8 @@
 
         public IWall Wall { get; set; }
 
+        public bool WasUpdated { get; set; } = false;
+
         public void Update(Scene scene)
         {
         }
@@ -39,6 +41,13 @@
         }
 
         public IBlock Copy()
-            => new Solid();
+            => new Solid()
+            {
+                CollisionBox = new RectangleShape(this.CollisionBox),
+                Coords = this.Coords,
+                Light = this.Light,
+                Wall = this.Wall.Copy(),
+                WasUpdated = this.WasUpdated,
+            };
     }
 }
