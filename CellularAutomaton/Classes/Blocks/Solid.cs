@@ -1,18 +1,20 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
+    using System;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
 
-    public class Empty : IBlock
+    public class Solid : IBlock, ICollidable
     {
+
+        private static Sprite sprite = new (Scene.Texture, new IntRect(0, 0, IBlock.Size, IBlock.Size));
+
+        public int LightDiffusion { get; set; } = 50;
+
         public Vector2i Coords { get; set; }
 
-        public byte Light { get; set; } = 255;
-
-        public byte LightDiffusion { get; set; } = 25;
-
-        public bool IsCollidable { get; set; } = false;
+        public int Light { get; set; }
 
         public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
 
@@ -25,10 +27,19 @@
         }
 
         public void Draw(RenderWindow window)
-            => this.Wall.Draw(window);
+        {
+            Solid.sprite.Position = this.CollisionBox.Position;
+            window.Draw(Solid.sprite);
+
+            var shadow = new RectangleShape(this.CollisionBox)
+            {
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+            window.Draw(shadow);
+        }
 
         public IBlock Copy()
-            => new Empty()
+            => new Solid()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,

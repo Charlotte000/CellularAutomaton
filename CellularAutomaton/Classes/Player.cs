@@ -23,8 +23,6 @@
 
         public bool IsOnWater { get; set; } = false;
 
-        public bool IsCollidable { get; set; } = true;
-
         public RectangleShape CollisionBox { get; set; }
 
         public void Draw(RenderWindow window)
@@ -46,7 +44,7 @@
         public void OnCollision(IEntity entity, Vector2f normal)
         {
             this.IsOnWater |= entity is Water;
-            this.IsOnGround |= normal.Y == -1 && entity.IsCollidable;
+            this.IsOnGround |= normal.Y == -1 && entity is ICollidable;
         }
 
         public void Control()

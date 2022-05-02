@@ -11,13 +11,11 @@
 
         public Vector2i Coords { get; set; }
 
-        public byte Light { get; set; }
+        public int Light { get; set; }
 
-        public byte LightDiffusion { get; set; } = 10;
+        public int LightDiffusion { get; set; } = 10;
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
-
-        public bool IsCollidable { get; set; } = false;
 
         public IWall Copy()
             => new SolidWall()
@@ -34,7 +32,7 @@
 
             var shadow = new RectangleShape(this.CollisionBox)
             {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, 255 - this.Light)),
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
             };
             window.Draw(shadow);
         }

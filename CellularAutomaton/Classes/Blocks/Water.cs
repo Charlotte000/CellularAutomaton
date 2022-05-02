@@ -24,13 +24,11 @@
             new (Scene.Texture, new IntRect(IBlock.Size, 0, IBlock.Size, IBlock.Size)),
         };
 
-        public byte LightDiffusion { get; set; } = 10;
-
-        public bool IsCollidable { get; set; } = false;
+        public int LightDiffusion { get; set; } = 10;
 
         public Vector2i Coords { get; set; }
 
-        public byte Light { get; set; }
+        public int Light { get; set; }
 
         public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
 
@@ -67,7 +65,7 @@
 
                 var shadow = new Sprite(Water.sprites[this.Amount - 1])
                 {
-                    Color = new Color(0, 0, 0, (byte)Math.Max(0, 255 - this.Light)),
+                    Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
                 };
                 window.Draw(shadow);
             }
@@ -79,7 +77,6 @@
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
                 Light = this.Light,
-                Wall = this.Wall.Copy(),
                 Amount = this.Amount,
                 WasUpdated = this.WasUpdated,
             };
@@ -87,7 +84,7 @@
         private bool FallDown(Scene scene)
         {
             var block = scene.GetBlock(this.Coords.X, this.Coords.Y + 1);
-            if (block is not null && block is not Water && !block.IsCollidable)
+            if (block is not null && block is not Water && block is not ICollidable)
             {
                 scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1);
                 scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);

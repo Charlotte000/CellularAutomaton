@@ -8,9 +8,9 @@
 
         public Vector2i Coords { get; set; }
 
-        public byte Light { get; set; }
+        public int Light { get; set; }
 
-        public byte LightDiffusion { get; set; }
+        public int LightDiffusion { get; set; }
 
         public IWall Wall { get; set; }
 

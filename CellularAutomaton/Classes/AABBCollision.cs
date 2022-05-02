@@ -34,12 +34,12 @@
                 out float contactTime))
             {
                 var neighbour = scene.GetBlock((Vector2i)((staticEntity.CollisionBox.Position / IBlock.Size) + normal));
-                if (neighbour is not null && neighbour.IsCollidable)
+                if (neighbour is not null && neighbour is ICollidable)
                 {
                     return false;
                 }
 
-                if (staticEntity.IsCollidable)
+                if (staticEntity is ICollidable)
                 {
                     dynamicEntity.Vel += AABBCollision.Mult(
                         normal,

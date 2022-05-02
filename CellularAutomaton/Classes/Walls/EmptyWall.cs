@@ -8,13 +8,11 @@
     {
         public Vector2i Coords { get; set; }
 
-        public byte Light { get; set; } = 255;
+        public int Light { get; set; } = 255;
 
-        public byte LightDiffusion { get; set; } = 0;
+        public int LightDiffusion { get; set; } = 0;
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
-
-        public bool IsCollidable { get; set; } = false;
 
         public IWall Copy()
             => new EmptyWall()
