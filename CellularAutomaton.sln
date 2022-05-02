@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CellularAutomaton", "CellularAutomaton\CellularAutomaton.csproj", "{6CAF21E6-7DC4-4BF4-96BD-057AD3C70527}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CellularAutomaton", "CellularAutomaton.csproj", "{417A1E43-9AC8-49FF-9D50-67AC7C84A6AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6CAF21E6-7DC4-4BF4-96BD-057AD3C70527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CAF21E6-7DC4-4BF4-96BD-057AD3C70527}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CAF21E6-7DC4-4BF4-96BD-057AD3C70527}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CAF21E6-7DC4-4BF4-96BD-057AD3C70527}.Release|Any CPU.Build.0 = Release|Any CPU
+		{417A1E43-9AC8-49FF-9D50-67AC7C84A6AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{417A1E43-9AC8-49FF-9D50-67AC7C84A6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{417A1E43-9AC8-49FF-9D50-67AC7C84A6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{417A1E43-9AC8-49FF-9D50-67AC7C84A6AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3A722D9F-FD47-4322-BC24-484FBA17342E}
+		SolutionGuid = {DB69BAEF-79DA-4087-9E27-32C29017B041}
 	EndGlobalSection
 EndGlobal
