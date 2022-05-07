@@ -6,7 +6,7 @@
     {
         public static void Main()
         {
-            var scene = new Scene(800, 600);
+            var scene = new Scene(700, 700);
 
             scene.Run();
         }

@@ -48,9 +48,13 @@
 
         public Random RandomGenerator { get; set; } = new Random();
 
-        public Clock Clock { get; set; } = new Clock();
+        public Clock FPSClock { get; set; } = new Clock();
 
-        public Clock LastUpdatedClock { get; set; } = new Clock();
+        public Clock LastPhysicUpdatedClock { get; set; } = new Clock();
+
+        public Clock LastLightUpdatedClock { get; set; } = new Clock();
+
+        public Clock Clock { get; set; } = new Clock();
 
         private static readonly Vector2i[] Neighborhood = new Vector2i[]
         {
@@ -64,26 +68,33 @@
         {
             while (this.Window.IsOpen)
             {
-                this.Window.SetTitle($"FPS: {MathF.Round(1 / this.Clock.ElapsedTime.AsSeconds())}");
-                this.Clock.Restart();
+                this.Window.SetTitle($"FPS: {MathF.Round(1 / this.FPSClock.ElapsedTime.AsSeconds())}");
+                this.FPSClock.Restart();
 
                 this.Window.DispatchEvents();
 
                 this.KeyListen();
 
                 this.MoveChunks();
-                if (this.LastUpdatedClock.ElapsedTime.AsMilliseconds() > 100)
+                if (this.LastPhysicUpdatedClock.ElapsedTime.AsMilliseconds() > 100)
                 {
-                    this.LastUpdatedClock.Restart();
+                    this.LastPhysicUpdatedClock.Restart();
                     foreach (var chunk in this.Map)
                     {
                         chunk.Update(this);
                     }
                 }
 
+                if (this.LastLightUpdatedClock.ElapsedTime.AsSeconds() > 1)
+                {
+                    this.LastLightUpdatedClock.Restart();
+                    this.UpdateLights();
+                }
+
                 this.MoveCamera();
 
-                this.Window.Clear(new Color(100, 150, 255));
+                var daylight = this.GetDay();
+                this.Window.Clear(new Color((byte)(100 * daylight), (byte)(150 * daylight), (byte)(255 * daylight)));
 
                 this.UpdateVisibility();
 
@@ -200,6 +211,17 @@
             return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
         }
 
+        private float GetDay()
+        {
+            var daylight = (this.Clock.ElapsedTime.AsSeconds() % 100) / 100 * 2;
+            if (daylight > 1)
+            {
+                daylight = 2 - daylight;
+            }
+
+            return daylight;
+        }
+
         private void KeyListen()
         {
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -250,7 +272,9 @@
             var blocks = this.GetAllBlocks();
 
             // Light source
-            var maxLight = 255;
+            var daylight = (int)(this.GetDay() * 255);
+
+            var maxLight = daylight;
             foreach (var block in blocks)
             {
                 maxLight = Math.Max(maxLight, block.Light);
@@ -260,7 +284,7 @@
                     continue;
                 }
 
-                block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? 255 : 0;
+                block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? daylight : 0;
                 block.Wall.Light = block.Light;
             }
 
