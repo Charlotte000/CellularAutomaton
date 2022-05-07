@@ -11,9 +11,7 @@
     {
         public static readonly Texture Texture = new (@"..\..\..\Source\textures.png");
 
-        private static readonly Mutex Mutex = new ();
-
-        private static readonly int DayDuration = 100;
+        private static readonly int DayDuration = 3600;
 
         private static readonly Vector2i[] Neighborhood = new Vector2i[]
         {
@@ -25,7 +23,7 @@
 
         private readonly Clock fpsClock = new ();
 
-        private float daylight = 0;
+        private readonly Mutex mutex = new ();
 
         public Scene(uint windowWidth, uint windowHeight)
         {
@@ -52,16 +50,18 @@
             {
                 while (this.Window.IsOpen)
                 {
-                    Scene.Mutex.WaitOne();
+                    this.mutex.WaitOne();
 
-                    this.daylight = (this.Clock.ElapsedTime.AsSeconds() % Scene.DayDuration) / Scene.DayDuration * 2;
-                    if (this.daylight > 1)
+                    this.Daylight = ((this.Clock.ElapsedTime.AsSeconds() +
+                    (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
+                    if (this.Daylight > 1)
                     {
-                        this.daylight = 2 - this.daylight;
+                        this.Daylight = 2 - this.Daylight;
                     }
 
                     this.UpdateLights();
-                    Scene.Mutex.ReleaseMutex();
+
+                    this.mutex.ReleaseMutex();
                     Thread.Sleep(1000);
                 }
             }).Start();
@@ -70,19 +70,20 @@
             {
                 while (this.Window.IsOpen)
                 {
-                    Scene.Mutex.WaitOne();
+                    this.mutex.WaitOne();
 
                     foreach (var chunk in this.Map)
                     {
                         chunk.Update(this);
                     }
 
-                    Scene.Mutex.ReleaseMutex();
+                    this.mutex.ReleaseMutex();
                     Thread.Sleep(100);
-
                 }
             }).Start();
         }
+
+        public float Daylight { get; set; } = 0;
 
         public Chunk[,] Map { get; set; } = new Chunk[3, 3];
 
@@ -112,13 +113,13 @@
 
                 this.MoveCamera();
 
-                Scene.Mutex.WaitOne();
+                this.mutex.WaitOne();
 
                 this.MoveChunks();
                 this.Window.Clear(new Color(
-                    (byte)(100 * this.daylight),
-                    (byte)(150 * this.daylight),
-                    (byte)(255 * this.daylight)));
+                    (byte)(100 * this.Daylight),
+                    (byte)(150 * this.Daylight),
+                    (byte)(255 * this.Daylight)));
                 this.UpdateVisibility();
                 foreach (var chunk in this.Map)
                 {
@@ -131,7 +132,7 @@
                     entity.Draw(this.Window);
                 }
 
-                Scene.Mutex.ReleaseMutex();
+                this.mutex.ReleaseMutex();
 
                 this.Window.Display();
             }
@@ -285,7 +286,7 @@
             var blocks = this.GetAllBlocks();
 
             // Light source
-            var light = (int)(this.daylight * 255);
+            var light = (int)(this.Daylight * 255);
             var maxLight = light;
             foreach (var block in blocks)
             {
