@@ -88,8 +88,8 @@
             var block = scene.GetBlock(this.Coords.X, this.Coords.Y + 1);
             if (block is not null && block is not Water && block is not ICollidable)
             {
-                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1);
-                scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
+                scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
                 return true;
             }
 
@@ -107,7 +107,7 @@
 
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
                 }
 
                 return true;
@@ -133,25 +133,26 @@
                         WasUpdated = true,
                     },
                     this.Coords.X + deltaX,
-                    this.Coords.Y);
+                    this.Coords.Y,
+                    false);
 
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
                 }
 
                 return true;
             }
 
-            if (block is Water && (block as Water).Amount < 4 && (block as Water).Amount < this.Amount)
+            if (block is Water && ((Water)block).Amount < 4 && ((Water)block).Amount < this.Amount)
             {
-                var water = block as Water;
+                var water = (Water)block;
                 water.WasUpdated = true;
                 water.Amount++;
                 this.Amount--;
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords);
+                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
                 }
 
                 return true;

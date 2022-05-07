@@ -125,18 +125,25 @@
         public IBlock? GetBlock(int x, int y)
             => this.GetBlock(new Vector2i(x, y));
 
-        public void SetBlock(IBlock block, Vector2i coords)
+        public void SetBlock(IBlock block, Vector2i coords, bool isUpdateLights = true)
         {
             var chunk = this.GetChunk(coords);
             if (chunk is not null)
             {
                 chunk.SetBlock(block, coords);
-                this.UpdateLights();
+                if (isUpdateLights)
+                {
+                    this.UpdateLights();
+                }
+                else
+                {
+                    block.Light = block.Wall.Light;
+                }
             }
         }
 
-        public void SetBlock(IBlock block, int x, int y)
-            => this.SetBlock(block, new Vector2i(x, y));
+        public void SetBlock(IBlock block, int x, int y, bool isUpdateLights = true)
+            => this.SetBlock(block, new Vector2i(x, y), isUpdateLights);
 
         public void TrySetBlock(IBlock block, Vector2i coords)
         {
