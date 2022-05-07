@@ -18,6 +18,8 @@
 
         public bool WasUpdated { get; set; } = false;
 
+        public bool IsVisible { get; set; } = false;
+
         public void Update(Scene scene)
         {
         }

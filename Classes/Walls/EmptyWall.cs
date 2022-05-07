@@ -14,6 +14,8 @@
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
 
+        public bool IsVisible { get; set; } = false;
+
         public IWall Copy()
             => new EmptyWall()
             {

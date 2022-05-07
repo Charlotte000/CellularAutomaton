@@ -41,7 +41,13 @@
 
                 for (int y = height; y < chunk.Coord.Y + h; y++)
                 {
-                    chunk.SetBlock(new Solid() { Wall = new SolidWall() }, x + chunk.Coord.X, y);
+                    if (y == height)
+                    {
+                        chunk.SetBlock(new Grass() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
+                        continue;
+                    }
+
+                    chunk.SetBlock(new Dirt() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
                 }
             }
         }
@@ -62,7 +68,7 @@
                 {
                     if (caveMap[x, y] > .5 && chunk.Coord.Y + y > TerrainGenerator.SeaLevel + TerrainGenerator.MountainHeight)
                     {
-                        chunk.SetBlock(new Empty() { Wall = new SolidWall() }, x + chunk.Coord.X, y + chunk.Coord.Y);
+                        chunk.SetBlock(new Empty() { Wall = new DirtWall() }, x + chunk.Coord.X, y + chunk.Coord.Y);
                     }
                 }
             }

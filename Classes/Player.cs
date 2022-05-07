@@ -25,6 +25,8 @@
 
         public RectangleShape CollisionBox { get; set; }
 
+        public bool IsVisible { get; set; } = false;
+
         public void Draw(RenderWindow window)
         {
             window.Draw(this.CollisionBox);

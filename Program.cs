@@ -2,9 +2,9 @@
 {
     using CellularAutomaton.Classes;
 
-    class Program
+    public static class Program
     {
-        static void Main()
+        public static void Main()
         {
             var scene = new Scene(800, 600);
 

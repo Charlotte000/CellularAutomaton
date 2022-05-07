@@ -20,6 +20,8 @@
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
 
+        public bool IsVisible { get; set; } = false;
+
         public IBlock Copy()
             => new Torch()
             {
@@ -37,9 +39,9 @@
             Torch.sprite.Position = this.CollisionBox.Position;
             window.Draw(Torch.sprite);
 
-            var shadow = new Sprite(Torch.sprite)
+            var shadow = new RectangleShape(this.CollisionBox)
             {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
             };
             window.Draw(shadow);
         }

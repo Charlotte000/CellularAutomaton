@@ -5,7 +5,7 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class SolidWall : IWall
+    public class DirtWall : IWall
     {
         private static Sprite sprite = new (Scene.Texture, new IntRect(0, IBlock.Size, IBlock.Size, IBlock.Size));
 
@@ -17,8 +17,10 @@
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
 
+        public bool IsVisible { get; set; } = false;
+
         public IWall Copy()
-            => new SolidWall()
+            => new DirtWall()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
@@ -27,8 +29,8 @@
 
         public void Draw(RenderWindow window)
         {
-            SolidWall.sprite.Position = this.CollisionBox.Position;
-            window.Draw(SolidWall.sprite);
+            DirtWall.sprite.Position = this.CollisionBox.Position;
+            window.Draw(DirtWall.sprite);
 
             var shadow = new RectangleShape(this.CollisionBox)
             {

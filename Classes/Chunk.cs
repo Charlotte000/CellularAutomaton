@@ -32,11 +32,9 @@
             };
             window.Draw(border);
 
-            var view = window.GetView();
-            var viewRect = new FloatRect(view.Center - (view.Size / 2), view.Size);
             foreach (var block in this.Map)
             {
-                if (viewRect.Intersects(block.CollisionBox.GetGlobalBounds()))
+                if (block.IsVisible)
                 {
                     block.Draw(window);
                 }
