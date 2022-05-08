@@ -10,7 +10,7 @@
 
         public int Light { get; set; } = 255;
 
-        public int LightDiffusion { get; set; } = 5;
+        public int LightDiffusion { get; set; } = 10;
 
         public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
 

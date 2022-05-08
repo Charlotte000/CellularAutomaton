@@ -314,7 +314,7 @@
                             if (neighbour is not null && neighbour.Light < currentLight)
                             {
                                 neighbour.Light = Math.Max(
-                                    0,
+                                    neighbour.Light,
                                     currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion : neighbour.LightDiffusion));
                                 neighbour.Wall.Light = neighbour.Light;
                             }

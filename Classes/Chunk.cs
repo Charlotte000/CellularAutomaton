@@ -8,14 +8,14 @@
 
     public class Chunk
     {
-        public static Vector2i Size = new (20, 20);
-
         public Chunk(int x, int y)
         {
             this.Coord = new Vector2i(x, y);
 
             this.InitMap();
         }
+
+        public static Vector2i Size { get; } = new (20, 20);
 
         public Vector2i Coord { get; set; }
 
@@ -79,7 +79,7 @@
             return blocks.ToArray();
         }
 
-        public IBlock GetBlock(Vector2i coords)
+        public IBlock? GetBlock(Vector2i coords)
         {
             if (this.IsValidCoords(coords))
             {
@@ -89,7 +89,7 @@
             return null;
         }
 
-        public IBlock GetBlock(int x, int y)
+        public IBlock? GetBlock(int x, int y)
             => this.GetBlock(new Vector2i(x, y));
 
         public void SetBlock(IBlock block, Vector2i coords)
