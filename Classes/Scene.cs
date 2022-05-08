@@ -53,7 +53,7 @@
                     this.mutex.WaitOne();
 
                     this.Daylight = ((this.Clock.ElapsedTime.AsSeconds() +
-                    (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
+                    (Scene.DayDuration / 2) * 0) % Scene.DayDuration) / Scene.DayDuration * 2;
                     if (this.Daylight > 1)
                     {
                         this.Daylight = 2 - this.Daylight;
@@ -311,7 +311,7 @@
                         foreach (var delta in Scene.Neighborhood)
                         {
                             var neighbour = this.GetBlock(block.Coords + delta);
-                            if (neighbour is not null && neighbour.Light == 0)
+                            if (neighbour is not null && neighbour.Light < currentLight)
                             {
                                 neighbour.Light = Math.Max(
                                     0,
