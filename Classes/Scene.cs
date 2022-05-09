@@ -25,6 +25,8 @@
 
         private readonly Mutex mutex = new ();
 
+        private Dictionary<Vector2i, List<IBlock>> blockHistory = new ();
+
         public Scene(uint windowWidth, uint windowHeight)
         {
             TerrainGenerator.Seed = 125;
@@ -37,8 +39,6 @@
                     TerrainGenerator.Generate(this.Map[x, y]);
                 }
             }
-
-            this.UpdateLights();
 
             this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
             this.Window.SetFramerateLimit(60);
@@ -53,7 +53,7 @@
                     this.mutex.WaitOne();
 
                     this.Daylight = ((this.Clock.ElapsedTime.AsSeconds() +
-                    (Scene.DayDuration / 2) * 0) % Scene.DayDuration) / Scene.DayDuration * 2;
+                    (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
                     if (this.Daylight > 1)
                     {
                         this.Daylight = 2 - this.Daylight;
@@ -109,18 +109,21 @@
 
                 this.Window.DispatchEvents();
 
-                this.KeyListen();
-
                 this.MoveCamera();
 
                 this.mutex.WaitOne();
 
                 this.MoveChunks();
+
+                this.KeyListen();
+
+                this.UpdateVisibility();
+
                 this.Window.Clear(new Color(
                     (byte)(100 * this.Daylight),
                     (byte)(150 * this.Daylight),
                     (byte)(255 * this.Daylight)));
-                this.UpdateVisibility();
+
                 foreach (var chunk in this.Map)
                 {
                     chunk.Draw(this.Window);
@@ -146,87 +149,6 @@
                 coords.Y >= topLeftCoord.Y && coords.Y < bottomRightCoord.Y;
         }
 
-        public IBlock? GetBlock(Vector2i coords)
-        {
-            var chunk = this.GetChunk(coords);
-
-            if (chunk is not null)
-            {
-                return chunk.GetBlock(coords);
-            }
-
-            return null;
-        }
-
-        public IBlock? GetBlock(int x, int y)
-            => this.GetBlock(new Vector2i(x, y));
-
-        public void SetBlock(IBlock block, Vector2i coords, bool isUpdateLights = true)
-        {
-            var chunk = this.GetChunk(coords);
-            if (chunk is not null)
-            {
-                chunk.SetBlock(block, coords);
-                if (isUpdateLights)
-                {
-                    this.UpdateLights();
-                }
-                else
-                {
-                    block.Light = block.Wall.Light;
-                }
-            }
-        }
-
-        public void SetBlock(IBlock block, int x, int y, bool isUpdateLights = true)
-            => this.SetBlock(block, new Vector2i(x, y), isUpdateLights);
-
-        public void TrySetBlock(IBlock block, Vector2i coords)
-        {
-            block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
-
-            if (block is ICollidable)
-            {
-                foreach (var entity in this.Entities)
-                {
-                    if (entity.CollisionBox.GetGlobalBounds().Intersects(block.CollisionBox.GetGlobalBounds()))
-                    {
-                        return;
-                    }
-                }
-            }
-
-            this.SetBlock(block, coords);
-        }
-
-        public void TrySetBlock(IBlock block, int x, int y)
-            => this.TrySetBlock(block, new Vector2i(x, y));
-
-        public IBlock[] GetAllBlocks()
-        {
-            var blocks = new List<IBlock>();
-            foreach (var chunk in this.Map)
-            {
-                blocks.AddRange(chunk.GetAllBlocks());
-            }
-
-            return blocks.ToArray();
-        }
-
-        public Chunk? GetChunk(Vector2i coord)
-        {
-            if (this.IsValidCoords(coord))
-            {
-                var localCoord = coord - this.Map[0, 0].Coord;
-                return this.Map[localCoord.X / Chunk.Size.X, localCoord.Y / Chunk.Size.Y];
-            }
-
-            return null;
-        }
-
-        public Chunk? GetChunk(int x, int y)
-            => this.GetChunk(new Vector2i(x, y));
-
         public Vector2i GetMouseCoords()
         {
             var scale = new Vector2f(this.Camera.Size.X / this.Window.Size.X, this.Camera.Size.Y / this.Window.Size.Y);
@@ -245,27 +167,46 @@
 
             if (Mouse.IsButtonPressed(Mouse.Button.Right))
             {
-                var coords = this.GetMouseCoords();
-                var block = this.GetBlock(coords);
-                if (block is not null && block is not Empty)
-                {
-                    this.SetBlock(new Empty(), this.GetMouseCoords());
-                }
+                this.TrySetBlock(new Empty(), this.GetMouseCoords());
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Middle))
             {
-                var coords = this.GetMouseCoords();
-                var block = this.GetBlock(coords);
-                if (block is Empty || block is Water)
-                {
-                    this.SetBlock(new Water() { Amount = 4 }, coords);
-                }
+                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords());
             }
 
             if (Keyboard.IsKeyPressed(Keyboard.Key.T))
             {
                 this.TrySetBlock(new Torch(), this.GetMouseCoords());
+            }
+        }
+
+        private void SaveBlock(Chunk chunk, IBlock block)
+        {
+            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
+            if (blockList is null)
+            {
+                blockList = new List<IBlock>() { block.Copy() };
+                this.blockHistory.Add(chunk.Coord, blockList);
+                return;
+            }
+
+            blockList.Add(block.Copy());
+            this.blockHistory.Remove(chunk.Coord);
+            this.blockHistory.Add(chunk.Coord, blockList);
+        }
+
+        private void LoadBlocks(Chunk chunk)
+        {
+            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
+            if (blockList is null)
+            {
+                return;
+            }
+
+            foreach (var block in blockList)
+            {
+                chunk.SetBlock(block.Copy(), block.Coords);
             }
         }
 
@@ -275,6 +216,11 @@
             var viewRect = new FloatRect(this.Camera.Center - (this.Camera.Size / 2) - blockSize, this.Camera.Size + (blockSize * 2));
             foreach (var block in this.GetAllBlocks())
             {
+                if (block is Empty && block.Wall is EmptyWall)
+                {
+                    continue;
+                }
+
                 var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
                 block.IsVisible = isVisible;
                 block.Wall.IsVisible = isVisible;
@@ -351,6 +297,109 @@
             this.Window.SetView(this.Camera);
         }
 
+        #region Get/Set blocks/chunks
+        public IBlock? GetBlock(Vector2i coords)
+        {
+            var chunk = this.GetChunk(coords);
+
+            if (chunk is null)
+            {
+                return null;
+
+            }
+
+            return chunk.GetBlock(coords);
+        }
+
+        public IBlock? GetBlock(int x, int y)
+            => this.GetBlock(new Vector2i(x, y));
+
+        public void SetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = false)
+        {
+            var chunk = this.GetChunk(coords);
+            if (chunk is null)
+            {
+                return;
+            }
+
+            chunk.SetBlock(block, coords);
+
+            if (updateLights)
+            {
+                this.UpdateLights();
+            }
+            else
+            {
+                block.Light = block.Wall.Light;
+            }
+
+            if (saveToHistory)
+            {
+                this.SaveBlock(chunk, block);
+            }
+        }
+
+        public void SetBlock(IBlock block, int x, int y, bool updateLights = true, bool saveToHistory = false)
+            => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
+
+        public void TrySetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
+        {
+            if (block is not Empty)
+            {
+                var oldBlock = this.GetBlock(coords);
+                if (oldBlock is null || oldBlock is not Empty)
+                {
+                    return;
+                }
+            }
+
+            block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
+
+            if (block is ICollidable)
+            {
+                foreach (var entity in this.Entities)
+                {
+                    if (entity.CollisionBox.GetGlobalBounds().Intersects(block.CollisionBox.GetGlobalBounds()))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            this.SetBlock(block, coords, updateLights, saveToHistory);
+        }
+
+        public void TrySetBlock(IBlock block, int x, int y, bool updateLights = true, bool saveToHistory = true)
+            => this.TrySetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
+
+        public IBlock[] GetAllBlocks()
+        {
+            var blocks = new List<IBlock>();
+            foreach (var chunk in this.Map)
+            {
+                blocks.AddRange(chunk.GetAllBlocks());
+            }
+
+            return blocks.ToArray();
+        }
+
+        public Chunk? GetChunk(Vector2i coord)
+        {
+            if (!this.IsValidCoords(coord))
+            {
+                return null;
+            }
+
+            var localCoord = coord - this.Map[0, 0].Coord;
+            return this.Map[localCoord.X / Chunk.Size.X, localCoord.Y / Chunk.Size.Y];
+        }
+
+        public Chunk? GetChunk(int x, int y)
+            => this.GetChunk(new Vector2i(x, y));
+
+        #endregion
+
+        #region Chunk movement
         private void MoveChunks()
         {
             var cameraCoord = this.Entities[0].CollisionBox.Position / IBlock.Size;
@@ -398,6 +447,7 @@
                         var oldY = this.Map[0, y].Coord.Y;
                         this.Map[0, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(this.Map[0, y]);
+                        this.LoadBlocks(this.Map[0, y]);
                     }
                 }
             }
@@ -422,6 +472,7 @@
                         var oldY = this.Map[x + 1, y].Coord.Y;
                         this.Map[x + 1, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(this.Map[x + 1, y]);
+                        this.LoadBlocks(this.Map[x + 1, y]);
                     }
                 }
             }
@@ -446,6 +497,7 @@
                         var newY = this.Map[x, 0].Coord.Y - Chunk.Size.Y;
                         this.Map[x, 0] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(this.Map[x, 0]);
+                        this.LoadBlocks(this.Map[x, 0]);
                     }
                 }
             }
@@ -470,9 +522,11 @@
                         var newY = this.Map[x, y + 1].Coord.Y + Chunk.Size.Y;
                         this.Map[x, y + 1] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(this.Map[x, y + 1]);
+                        this.LoadBlocks(this.Map[x, y + 1]);
                     }
                 }
             }
         }
+        #endregion
     }
 }

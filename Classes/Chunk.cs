@@ -23,14 +23,14 @@
 
         public void Draw(RenderWindow window)
         {
-            //var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
-            //{
-            //    FillColor = Color.Transparent,
-            //    OutlineColor = Color.Red,
-            //    OutlineThickness = 2,
-            //    Position = (Vector2f)this.Coord * IBlock.Size,
-            //};
-            //window.Draw(border);
+            var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
+            {
+                FillColor = Color.Transparent,
+                OutlineColor = Color.Red,
+                OutlineThickness = 2,
+                Position = (Vector2f)this.Coord * IBlock.Size,
+            };
+            window.Draw(border);
 
             foreach (var block in this.Map)
             {
@@ -81,12 +81,12 @@
 
         public IBlock? GetBlock(Vector2i coords)
         {
-            if (this.IsValidCoords(coords))
+            if (!this.IsValidCoords(coords))
             {
-                return this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y];
+                return null;
             }
 
-            return null;
+            return this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y];
         }
 
         public IBlock? GetBlock(int x, int y)
@@ -110,7 +110,7 @@
                 oldBlock.Dispose();
             }
 
-            this.SetBlockStrong(block, coords.X, coords.Y);
+            this.SetBlockForce(block, coords.X, coords.Y);
         }
 
         public void SetBlock(IBlock block, int x, int y)
@@ -124,7 +124,7 @@
             }
         }
 
-        private void SetBlockStrong(IBlock block, Vector2i coords)
+        private void SetBlockForce(IBlock block, Vector2i coords)
         {
             block.Coords = coords;
             block.CollisionBox.Position = (Vector2f)coords * IBlock.Size;
@@ -132,8 +132,8 @@
             this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y] = block;
         }
 
-        private void SetBlockStrong(IBlock block, int x, int y)
-            => this.SetBlockStrong(block, new Vector2i(x, y));
+        private void SetBlockForce(IBlock block, int x, int y)
+            => this.SetBlockForce(block, new Vector2i(x, y));
 
         private void InitMap()
         {
@@ -141,7 +141,7 @@
             {
                 for (int y = 0; y < Chunk.Size.Y; y++)
                 {
-                    this.SetBlockStrong(new Empty() { Wall = new EmptyWall() }, this.Coord.X + x, this.Coord.Y + y);
+                    this.SetBlockForce(new Empty() { Wall = new EmptyWall() }, this.Coord.X + x, this.Coord.Y + y);
                 }
             }
         }
