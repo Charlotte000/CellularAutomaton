@@ -64,7 +64,7 @@
             if (block is not null && block is not Water && block is not ICollidable)
             {
                 scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
-                scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
+                scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
                 return true;
             }
 
@@ -81,7 +81,7 @@
 
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
+                    scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
                 }
 
                 return true;
@@ -112,7 +112,7 @@
 
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
+                    scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
                 }
 
                 return true;
@@ -125,7 +125,7 @@
                 this.Amount--;
                 if (this.Amount < 1)
                 {
-                    scene.SetBlock(new Empty() { WasUpdated = true }, this.Coords, false);
+                    scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
                 }
 
                 return true;

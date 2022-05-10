@@ -187,11 +187,6 @@
             {
                 this.UpdateLights();
             }
-            else
-            {
-                // TODO: update lights local
-                // block.Light = block.Wall.Light;
-            }
 
             if (saveToHistory)
             {

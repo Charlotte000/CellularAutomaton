@@ -43,9 +43,9 @@
                 window.Draw(this.Sprite);
             }
 
-            var shadow = new Sprite(this.Sprite)
+            var shadow = new RectangleShape(this.CollisionBox)
             {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
             };
             window.Draw(shadow);
         }
