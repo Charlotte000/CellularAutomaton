@@ -23,6 +23,7 @@
 
         public void Draw(RenderWindow window)
         {
+            /*
             var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
             {
                 FillColor = Color.Transparent,
@@ -31,6 +32,7 @@
                 Position = (Vector2f)this.Coord * IBlock.Size,
             };
             window.Draw(border);
+            */
 
             foreach (var block in this.Map)
             {

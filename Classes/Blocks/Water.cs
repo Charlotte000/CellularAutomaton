@@ -7,7 +7,7 @@
 
     public class Water : IBlock
     {
-        private static Sprite[] sprites = new Sprite[]
+        private static readonly Sprite[] Sprites = new Sprite[]
         {
             new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size * 3 / 4, IBlock.Size, IBlock.Size / 4))
             {
@@ -62,10 +62,10 @@
             {
                 this.Wall.Draw(window);
 
-                Water.sprites[this.Amount - 1].Position = this.CollisionBox.Position;
-                window.Draw(Water.sprites[this.Amount - 1]);
+                Water.Sprites[this.Amount - 1].Position = this.CollisionBox.Position;
+                window.Draw(Water.Sprites[this.Amount - 1]);
 
-                var shadow = new Sprite(Water.sprites[this.Amount - 1])
+                var shadow = new Sprite(Water.Sprites[this.Amount - 1])
                 {
                     Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
                 };
@@ -93,9 +93,8 @@
                 return true;
             }
 
-            if (block is Water && (block as Water).Amount < 4)
+            if (block is Water water && water.Amount < 4)
             {
-                var water = block as Water;
                 water.WasUpdated = true;
                 water.Amount += this.Amount;
                 this.Amount = 0;
@@ -144,9 +143,8 @@
                 return true;
             }
 
-            if (block is Water && ((Water)block).Amount < 4 && ((Water)block).Amount < this.Amount)
+            if (block is Water water && water.Amount < 4 && water.Amount < this.Amount)
             {
-                var water = (Water)block;
                 water.WasUpdated = true;
                 water.Amount++;
                 this.Amount--;

@@ -7,7 +7,7 @@
 
     public class DirtWall : IWall
     {
-        private static Sprite sprite = new (Scene.Texture, new IntRect(0, IBlock.Size, IBlock.Size, IBlock.Size));
+        private static readonly Sprite Sprite = new (Scene.Texture, new IntRect(0, IBlock.Size, IBlock.Size, IBlock.Size));
 
         public Vector2i Coords { get; set; }
 
@@ -29,8 +29,8 @@
 
         public void Draw(RenderWindow window)
         {
-            DirtWall.sprite.Position = this.CollisionBox.Position;
-            window.Draw(DirtWall.sprite);
+            DirtWall.Sprite.Position = this.CollisionBox.Position;
+            window.Draw(DirtWall.Sprite);
 
             var shadow = new RectangleShape(this.CollisionBox)
             {

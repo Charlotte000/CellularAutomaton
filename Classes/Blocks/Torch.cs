@@ -6,11 +6,13 @@
 
     public class Torch : IBlock, ILightSource
     {
-        private static Sprite sprite = new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size, IBlock.Size, IBlock.Size));
+        private static readonly Sprite Sprite = new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size, IBlock.Size, IBlock.Size));
 
         public Vector2i Coords { get; set; }
 
-        public int Light { get; set; } = 300;
+        public int Brightness { get; set; } = 300;
+
+        public int Light { get; set; }
 
         public int LightDiffusion { get; set; } = 0;
 
@@ -36,8 +38,8 @@
         {
             this.Wall.Draw(window);
 
-            Torch.sprite.Position = this.CollisionBox.Position;
-            window.Draw(Torch.sprite);
+            Torch.Sprite.Position = this.CollisionBox.Position;
+            window.Draw(Torch.Sprite);
 
             var shadow = new RectangleShape(this.CollisionBox)
             {

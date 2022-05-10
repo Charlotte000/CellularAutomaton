@@ -6,7 +6,7 @@
 
     public class Dirt : IBlock, ICollidable
     {
-        private static Sprite sprite = new (Scene.Texture, new IntRect(0, 0, IBlock.Size, IBlock.Size));
+        private static readonly Sprite Sprite = new (Scene.Texture, new IntRect(0, 0, IBlock.Size, IBlock.Size));
 
         public virtual int LightDiffusion { get; set; } = 50;
 
@@ -30,8 +30,8 @@
         {
             if (this.Light > 0)
             {
-                Dirt.sprite.Position = this.CollisionBox.Position;
-                window.Draw(Dirt.sprite);
+                Dirt.Sprite.Position = this.CollisionBox.Position;
+                window.Draw(Dirt.Sprite);
             }
 
             var shadow = new RectangleShape(this.CollisionBox)

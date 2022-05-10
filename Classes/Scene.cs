@@ -158,145 +158,6 @@
             return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
         }
 
-        private void KeyListen()
-        {
-            if (Mouse.IsButtonPressed(Mouse.Button.Left))
-            {
-                this.TrySetBlock(new Dirt(), this.GetMouseCoords());
-            }
-
-            if (Mouse.IsButtonPressed(Mouse.Button.Right))
-            {
-                this.TrySetBlock(new Empty(), this.GetMouseCoords());
-            }
-
-            if (Mouse.IsButtonPressed(Mouse.Button.Middle))
-            {
-                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords());
-            }
-
-            if (Keyboard.IsKeyPressed(Keyboard.Key.T))
-            {
-                this.TrySetBlock(new Torch(), this.GetMouseCoords());
-            }
-        }
-
-        private void SaveBlock(Chunk chunk, IBlock block)
-        {
-            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
-            if (blockList is null)
-            {
-                blockList = new List<IBlock>() { block.Copy() };
-                this.blockHistory.Add(chunk.Coord, blockList);
-                return;
-            }
-
-            blockList.Add(block.Copy());
-            this.blockHistory.Remove(chunk.Coord);
-            this.blockHistory.Add(chunk.Coord, blockList);
-        }
-
-        private void LoadBlocks(Chunk chunk)
-        {
-            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
-            if (blockList is null)
-            {
-                return;
-            }
-
-            foreach (var block in blockList)
-            {
-                chunk.SetBlock(block.Copy(), block.Coords);
-            }
-        }
-
-        private void UpdateVisibility()
-        {
-            var blockSize = new Vector2f(IBlock.Size, IBlock.Size);
-            var viewRect = new FloatRect(this.Camera.Center - (this.Camera.Size / 2) - blockSize, this.Camera.Size + (blockSize * 2));
-            foreach (var block in this.GetAllBlocks())
-            {
-                if (block is Empty && block.Wall is EmptyWall)
-                {
-                    continue;
-                }
-
-                var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
-                block.IsVisible = isVisible;
-                block.Wall.IsVisible = isVisible;
-            }
-        }
-
-        private void UpdateLights()
-        {
-            var blocks = this.GetAllBlocks();
-
-            // Light source
-            var light = (int)(this.Daylight * 255);
-            var maxLight = light;
-            foreach (var block in blocks)
-            {
-                maxLight = Math.Max(maxLight, block.Light);
-                if (block is ILightSource)
-                {
-                    block.Wall.Light = block.Light;
-                    continue;
-                }
-
-                block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? light : 0;
-                block.Wall.Light = block.Light;
-            }
-
-            // Light fading
-            for (int currentLight = maxLight; currentLight >= 1; currentLight--)
-            {
-                foreach (var block in blocks)
-                {
-                    if (block.Light == currentLight)
-                    {
-                        foreach (var delta in Scene.Neighborhood)
-                        {
-                            var neighbour = this.GetBlock(block.Coords + delta);
-                            if (neighbour is not null && neighbour.Light < currentLight)
-                            {
-                                neighbour.Light = Math.Max(
-                                    neighbour.Light,
-                                    currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion : neighbour.LightDiffusion));
-                                neighbour.Wall.Light = neighbour.Light;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void MoveCamera()
-        {
-            const int offsetX = 20;
-            const int offsetY = 20;
-            var follow = this.Entities[0].CollisionBox.Position + (this.Entities[0].CollisionBox.Size / 2);
-
-            if (follow.X - this.Camera.Center.X > offsetX)
-            {
-                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X - offsetX, 0));
-            }
-            else if (this.Camera.Center.X - follow.X > offsetX)
-            {
-                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X + offsetX, 0));
-            }
-
-            if (follow.Y - this.Camera.Center.Y > offsetY)
-            {
-                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y - offsetY));
-            }
-            else if (this.Camera.Center.Y - follow.Y > offsetY)
-            {
-                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y + offsetY));
-            }
-
-            this.Window.SetView(this.Camera);
-        }
-
         #region Get/Set blocks/chunks
         public IBlock? GetBlock(Vector2i coords)
         {
@@ -305,7 +166,6 @@
             if (chunk is null)
             {
                 return null;
-
             }
 
             return chunk.GetBlock(coords);
@@ -323,7 +183,6 @@
             }
 
             chunk.SetBlock(block, coords);
-
             if (updateLights)
             {
                 this.UpdateLights();
@@ -344,13 +203,15 @@
 
         public void TrySetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
         {
-            if (block is not Empty)
+            var oldBlock = this.GetBlock(coords);
+            if (block is not Empty && (oldBlock is null || oldBlock is not Empty))
             {
-                var oldBlock = this.GetBlock(coords);
-                if (oldBlock is null || oldBlock is not Empty)
-                {
-                    return;
-                }
+                return;
+            }
+
+            if (block is Empty && oldBlock is Empty)
+            {
+                return;
             }
 
             block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
@@ -528,5 +389,146 @@
             }
         }
         #endregion
+
+        private void KeyListen()
+        {
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))
+            {
+                this.TrySetBlock(new Dirt(), this.GetMouseCoords());
+            }
+
+            if (Mouse.IsButtonPressed(Mouse.Button.Right))
+            {
+                this.TrySetBlock(new Empty(), this.GetMouseCoords());
+            }
+
+            if (Mouse.IsButtonPressed(Mouse.Button.Middle))
+            {
+                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords());
+            }
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.T))
+            {
+                this.TrySetBlock(new Torch(), this.GetMouseCoords());
+            }
+        }
+
+        private void SaveBlock(Chunk chunk, IBlock block)
+        {
+            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
+            if (blockList is null)
+            {
+                blockList = new List<IBlock>() { block.Copy() };
+                this.blockHistory.Add(chunk.Coord, blockList);
+                return;
+            }
+
+            blockList.Add(block.Copy());
+            this.blockHistory.Remove(chunk.Coord);
+            this.blockHistory.Add(chunk.Coord, blockList);
+        }
+
+        private void LoadBlocks(Chunk chunk)
+        {
+            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
+            if (blockList is null)
+            {
+                return;
+            }
+
+            foreach (var block in blockList)
+            {
+                chunk.SetBlock(block.Copy(), block.Coords);
+            }
+        }
+
+        private void UpdateVisibility()
+        {
+            var blockSize = new Vector2f(IBlock.Size, IBlock.Size);
+            var viewRect = new FloatRect(this.Camera.Center - (this.Camera.Size / 2) - blockSize, this.Camera.Size + (blockSize * 2));
+            foreach (var block in this.GetAllBlocks())
+            {
+                if (block is Empty && block.Wall is EmptyWall)
+                {
+                    continue;
+                }
+
+                var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
+                block.IsVisible = isVisible;
+                block.Wall.IsVisible = isVisible;
+            }
+        }
+
+        private void UpdateLights()
+        {
+            var blocks = this.GetAllBlocks();
+
+            // Light source
+            var light = (int)(this.Daylight * 255);
+            var maxLight = light;
+            foreach (var block in blocks)
+            {
+                if (block is ILightSource lightSource)
+                {
+                    block.Light = lightSource.Brightness;
+                    block.Wall.Light = block.Light;
+                    maxLight = Math.Max(maxLight, block.Light);
+                    continue;
+                }
+
+                block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? light : 0;
+                block.Wall.Light = block.Light;
+                maxLight = Math.Max(maxLight, block.Light);
+            }
+
+            // Light fading
+            for (int currentLight = maxLight; currentLight >= 1; currentLight--)
+            {
+                foreach (var block in blocks)
+                {
+                    if (block.Light == currentLight)
+                    {
+                        foreach (var delta in Scene.Neighborhood)
+                        {
+                            var neighbour = this.GetBlock(block.Coords + delta);
+                            if (neighbour is not null && neighbour.Light < currentLight)
+                            {
+                                neighbour.Light = Math.Max(
+                                    neighbour.Light,
+                                    currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion : neighbour.LightDiffusion));
+                                neighbour.Wall.Light = neighbour.Light;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void MoveCamera()
+        {
+            const int offsetX = 20;
+            const int offsetY = 20;
+            var follow = this.Entities[0].CollisionBox.Position + (this.Entities[0].CollisionBox.Size / 2);
+
+            if (follow.X - this.Camera.Center.X > offsetX)
+            {
+                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X - offsetX, 0));
+            }
+            else if (this.Camera.Center.X - follow.X > offsetX)
+            {
+                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X + offsetX, 0));
+            }
+
+            if (follow.Y - this.Camera.Center.Y > offsetY)
+            {
+                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y - offsetY));
+            }
+            else if (this.Camera.Center.Y - follow.Y > offsetY)
+            {
+                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y + offsetY));
+            }
+
+            this.Window.SetView(this.Camera);
+        }
     }
 }

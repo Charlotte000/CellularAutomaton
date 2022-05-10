@@ -5,14 +5,14 @@
 
     internal class Grass : Dirt
     {
-        private static Sprite sprite = new (Scene.Texture, new IntRect(IBlock.Size * 2, 0, IBlock.Size, IBlock.Size));
+        private static readonly Sprite Sprite = new (Scene.Texture, new IntRect(IBlock.Size * 2, 0, IBlock.Size, IBlock.Size));
 
         public override void Draw(RenderWindow window)
         {
             if (this.Light > 0)
             {
-                Grass.sprite.Position = this.CollisionBox.Position;
-                window.Draw(Grass.sprite);
+                Grass.Sprite.Position = this.CollisionBox.Position;
+                window.Draw(Grass.Sprite);
             }
 
             var shadow = new RectangleShape(this.CollisionBox)
