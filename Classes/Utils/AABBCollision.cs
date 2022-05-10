@@ -1,4 +1,4 @@
-﻿namespace CellularAutomaton.Classes
+﻿namespace CellularAutomaton.Classes.Utils
 {
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;

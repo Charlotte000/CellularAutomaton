@@ -23,16 +23,7 @@
 
         public void Draw(RenderWindow window)
         {
-            /*
-            var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
-            {
-                FillColor = Color.Transparent,
-                OutlineColor = Color.Red,
-                OutlineThickness = 2,
-                Position = (Vector2f)this.Coord * IBlock.Size,
-            };
-            window.Draw(border);
-            */
+            // this.DrawBorder(window);
 
             foreach (var block in this.Map)
             {
@@ -124,6 +115,18 @@
             {
                 block.Dispose();
             }
+        }
+
+        private void DrawBorder(RenderWindow window)
+        {
+            var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
+            {
+                FillColor = Color.Transparent,
+                OutlineColor = Color.Red,
+                OutlineThickness = 2,
+                Position = (Vector2f)this.Coord * IBlock.Size,
+            };
+            window.Draw(border);
         }
 
         private void SetBlockForce(IBlock block, Vector2i coords)

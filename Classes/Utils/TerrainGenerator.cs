@@ -1,4 +1,4 @@
-﻿namespace CellularAutomaton.Classes
+﻿namespace CellularAutomaton.Classes.Utils
 {
     using CellularAutomaton.Classes.Blocks;
     using CellularAutomaton.Classes.Walls;

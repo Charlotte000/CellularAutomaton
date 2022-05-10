@@ -1,6 +1,7 @@
-﻿namespace CellularAutomaton.Classes
+﻿namespace CellularAutomaton.Classes.Entities
 {
     using CellularAutomaton.Classes.Blocks;
+    using CellularAutomaton.Classes.Utils;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
