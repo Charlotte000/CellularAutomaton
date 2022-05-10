@@ -189,7 +189,8 @@
             }
             else
             {
-                block.Light = block.Wall.Light;
+                // TODO: update lights local
+                // block.Light = block.Wall.Light;
             }
 
             if (saveToHistory)
@@ -455,7 +456,6 @@
 
                 var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
                 block.IsVisible = isVisible;
-                block.Wall.IsVisible = isVisible;
             }
         }
 
@@ -471,13 +471,11 @@
                 if (block is ILightSource lightSource)
                 {
                     block.Light = lightSource.Brightness;
-                    block.Wall.Light = block.Light;
                     maxLight = Math.Max(maxLight, block.Light);
                     continue;
                 }
 
                 block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? light : 0;
-                block.Wall.Light = block.Light;
                 maxLight = Math.Max(maxLight, block.Light);
             }
 
@@ -495,8 +493,7 @@
                             {
                                 neighbour.Light = Math.Max(
                                     neighbour.Light,
-                                    currentLight - (neighbour is Empty ? neighbour.Wall.LightDiffusion : neighbour.LightDiffusion));
-                                neighbour.Wall.Light = neighbour.Light;
+                                    currentLight - neighbour.LightDiffusion);
                             }
                         }
                     }

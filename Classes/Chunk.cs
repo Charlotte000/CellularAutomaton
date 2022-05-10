@@ -130,7 +130,6 @@
         {
             block.Coords = coords;
             block.CollisionBox.Position = (Vector2f)coords * IBlock.Size;
-            block.Wall.CollisionBox.Position = block.CollisionBox.Position;
             this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y] = block;
         }
 

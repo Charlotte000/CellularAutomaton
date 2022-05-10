@@ -5,9 +5,9 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class Water : IBlock
+    public class Water : BaseBlock
     {
-        private static readonly Sprite[] Sprites = new Sprite[]
+        private static readonly Sprite[] SpriteSource = new Sprite[]
         {
             new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size * 3 / 4, IBlock.Size, IBlock.Size / 4))
             {
@@ -24,23 +24,15 @@
             new (Scene.Texture, new IntRect(IBlock.Size, 0, IBlock.Size, IBlock.Size)),
         };
 
-        public int LightDiffusion { get; set; } = 10;
+        public override Sprite Sprite { get => Water.SpriteSource[this.Amount - 1]; }
 
-        public Vector2i Coords { get; set; }
+        public override int LightDiffusion { get => 10; }
 
-        public int Light { get; set; }
-
-        public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
-
-        public IWall Wall { get; set; }
+        public override bool IsTransparent { get => true; }
 
         public int Amount { get; set; } = 4;
 
-        public bool WasUpdated { get; set; } = false;
-
-        public bool IsVisible { get; set; } = false;
-
-        public void Update(Scene scene)
+        public override void Update(Scene scene)
         {
             // Fall down
             if (this.FallDown(scene))
@@ -56,24 +48,7 @@
             }
         }
 
-        public void Draw(RenderWindow window)
-        {
-            if (this.Amount >= 1 && this.Amount < 5)
-            {
-                this.Wall.Draw(window);
-
-                Water.Sprites[this.Amount - 1].Position = this.CollisionBox.Position;
-                window.Draw(Water.Sprites[this.Amount - 1]);
-
-                var shadow = new Sprite(Water.Sprites[this.Amount - 1])
-                {
-                    Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-                };
-                window.Draw(shadow);
-            }
-        }
-
-        public IBlock Copy()
+        public override IBlock Copy()
             => new Water()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),

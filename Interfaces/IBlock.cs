@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Interfaces
 {
+    using SFML.Graphics;
     using SFML.System;
 
     public interface IBlock : IEntity
@@ -10,11 +11,15 @@
 
         public int Light { get; set; }
 
-        public int LightDiffusion { get; set; }
+        public int LightDiffusion { get; }
 
         public IWall Wall { get; set; }
 
         public bool WasUpdated { get; set; }
+
+        public Sprite Sprite { get; }
+
+        public bool IsTransparent { get; }
 
         public IBlock Copy();
 

@@ -1,20 +1,17 @@
 ﻿namespace CellularAutomaton.Interfaces
 {
-    using SFML.System;
+    using SFML.Graphics;
 
-    public interface IWall : IEntity
+    public interface IWall
     {
-        public Vector2i Coords { get; set; }
-
-        public int Light { get; set; }
-
-        public int LightDiffusion { get; set; }
+        public Sprite Sprite { get; }
 
         public IWall Copy();
 
+        public void Draw(RenderWindow window, IBlock parentBlock);
+
         public void Dispose()
         {
-            this.CollisionBox.Dispose();
         }
     }
 }

@@ -2,33 +2,15 @@
 {
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
-    using SFML.System;
 
-    public class EmptyWall : IWall
+    public class EmptyWall : BaseWall
     {
-        public Vector2i Coords { get; set; }
+        public override Sprite Sprite { get; }
 
-        public int Light { get; set; } = 255;
+        public override IWall Copy()
+            => new EmptyWall();
 
-        public int LightDiffusion { get; set; } = 10;
-
-        public RectangleShape CollisionBox { get; set; } = new (new Vector2f(IBlock.Size, IBlock.Size));
-
-        public bool IsVisible { get; set; } = false;
-
-        public IWall Copy()
-            => new EmptyWall()
-            {
-                CollisionBox = new RectangleShape(this.CollisionBox),
-                Coords = this.Coords,
-                Light = this.Light,
-            };
-
-        public void Draw(RenderWindow window)
-        {
-        }
-
-        public void Update(Scene scene)
+        public override void Draw(RenderWindow window, IBlock parentBlock)
         {
         }
     }
