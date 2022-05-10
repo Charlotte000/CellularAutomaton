@@ -25,12 +25,13 @@
 
         private readonly Mutex mutex = new ();
 
-        private Dictionary<Vector2i, List<IBlock>> blockHistory = new ();
+        private Dictionary<Vector2i, Dictionary<Vector2i, IBlock>> blockHistory = new ();
 
         public Scene(uint windowWidth, uint windowHeight)
         {
             TerrainGenerator.Seed = 125;
 
+            // Init chunk map
             for (int x = 0; x < this.Map.GetLength(0); x++)
             {
                 for (int y = 0; y < this.Map.GetLength(1); y++)
@@ -40,12 +41,14 @@
                 }
             }
 
+            // Init window
             this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
             this.Window.SetFramerateLimit(60);
             this.Window.Closed += (obj, e) => this.Window.Close();
 
             this.Camera = this.Window.GetView();
 
+            // Run block update & light threads.
             new Thread(() =>
             {
                 while (this.Window.IsOpen)
@@ -109,9 +112,9 @@
 
                 this.Window.DispatchEvents();
 
-                this.MoveCamera();
-
                 this.mutex.WaitOne();
+
+                this.MoveCamera();
 
                 this.MoveChunks();
 
@@ -190,7 +193,7 @@
 
             if (saveToHistory)
             {
-                this.SaveBlock(chunk, block);
+                this.SaveBlockToHistory(chunk, block);
             }
         }
 
@@ -293,6 +296,7 @@
                 {
                     if (x == this.Map.GetLength(0) - 1)
                     {
+                        this.SaveWaterToHistory(this.Map[x, y]);
                         this.Map[x, y].Dispose();
                     }
 
@@ -304,7 +308,7 @@
                         var oldY = this.Map[0, y].Coord.Y;
                         this.Map[0, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(this.Map[0, y]);
-                        this.LoadBlocks(this.Map[0, y]);
+                        this.LoadBlocksFromHistory(this.Map[0, y]);
                     }
                 }
             }
@@ -318,6 +322,7 @@
                 {
                     if (x == 0)
                     {
+                        this.SaveWaterToHistory(this.Map[0, y]);
                         this.Map[0, y].Dispose();
                     }
 
@@ -329,7 +334,7 @@
                         var oldY = this.Map[x + 1, y].Coord.Y;
                         this.Map[x + 1, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(this.Map[x + 1, y]);
-                        this.LoadBlocks(this.Map[x + 1, y]);
+                        this.LoadBlocksFromHistory(this.Map[x + 1, y]);
                     }
                 }
             }
@@ -343,6 +348,7 @@
                 {
                     if (y == this.Map.GetLength(1) - 1)
                     {
+                        this.SaveWaterToHistory(this.Map[x, y]);
                         this.Map[x, y].Dispose();
                     }
 
@@ -354,7 +360,7 @@
                         var newY = this.Map[x, 0].Coord.Y - Chunk.Size.Y;
                         this.Map[x, 0] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(this.Map[x, 0]);
-                        this.LoadBlocks(this.Map[x, 0]);
+                        this.LoadBlocksFromHistory(this.Map[x, 0]);
                     }
                 }
             }
@@ -368,6 +374,7 @@
                 {
                     if (y == 0)
                     {
+                        this.SaveWaterToHistory(this.Map[x, 0]);
                         this.Map[x, 0].Dispose();
                     }
 
@@ -379,7 +386,7 @@
                         var newY = this.Map[x, y + 1].Coord.Y + Chunk.Size.Y;
                         this.Map[x, y + 1] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(this.Map[x, y + 1]);
-                        this.LoadBlocks(this.Map[x, y + 1]);
+                        this.LoadBlocksFromHistory(this.Map[x, y + 1]);
                     }
                 }
             }
@@ -400,7 +407,7 @@
 
             if (Mouse.IsButtonPressed(Mouse.Button.Middle))
             {
-                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords());
+                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords(), saveToHistory: false);
             }
 
             if (Keyboard.IsKeyPressed(Keyboard.Key.T))
@@ -409,32 +416,58 @@
             }
         }
 
-        private void SaveBlock(Chunk chunk, IBlock block)
+        private void SaveBlockToHistory(Chunk chunk, IBlock block)
         {
-            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
-            if (blockList is null)
+            this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory);
+            if (chunkHistory is null)
             {
-                blockList = new List<IBlock>() { block.Copy() };
-                this.blockHistory.Add(chunk.Coord, blockList);
-                return;
+                chunkHistory = new ();
             }
 
-            blockList.Add(block.Copy());
+            chunkHistory.Remove(block.Coords);
+
+            chunkHistory.Add(block.Coords, block.Copy());
             this.blockHistory.Remove(chunk.Coord);
-            this.blockHistory.Add(chunk.Coord, blockList);
+            this.blockHistory.Add(chunk.Coord, chunkHistory);
         }
 
-        private void LoadBlocks(Chunk chunk)
+        private void SaveWaterToHistory(Chunk chunk)
         {
-            this.blockHistory.TryGetValue(chunk.Coord, out var blockList);
-            if (blockList is null)
+            if (this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory))
             {
-                return;
+                foreach (var block in chunkHistory)
+                {
+                    if (block.Value is Water)
+                    {
+                        chunkHistory.Remove(block.Key);
+                    }
+                }
+            }
+            else
+            {
+                chunkHistory = new ();
             }
 
-            foreach (var block in blockList)
+            foreach (var block in chunk.GetAllBlocks())
             {
-                chunk.SetBlock(block.Copy(), block.Coords);
+                if (block is Water)
+                {
+                    chunkHistory.Add(block.Coords, block.Copy());
+                }
+            }
+
+            this.blockHistory.Remove(chunk.Coord);
+            this.blockHistory.Add(chunk.Coord, chunkHistory);
+        }
+
+        private void LoadBlocksFromHistory(Chunk chunk)
+        {
+            if (this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory))
+            {
+                foreach (var block in chunkHistory)
+                {
+                    chunk.SetBlock(block.Value.Copy(), block.Key);
+                }
             }
         }
 

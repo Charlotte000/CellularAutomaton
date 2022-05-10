@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
-    using System;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;

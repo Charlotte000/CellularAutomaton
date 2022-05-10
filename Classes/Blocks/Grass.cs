@@ -3,7 +3,7 @@
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
 
-    internal class Grass : Dirt
+    public class Grass : Dirt
     {
         private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(IBlock.Size * 2, 0, IBlock.Size, IBlock.Size));
 
