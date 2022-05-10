@@ -67,7 +67,8 @@
                     this.mutex.ReleaseMutex();
                     Thread.Sleep(1000);
                 }
-            }).Start();
+            })
+            { IsBackground = true }.Start();
 
             new Thread(() =>
             {
@@ -83,12 +84,13 @@
                     this.mutex.ReleaseMutex();
                     Thread.Sleep(100);
                 }
-            }).Start();
+            })
+            { IsBackground = true }.Start();
         }
 
         public float Daylight { get; set; } = 0;
 
-        public Chunk[,] Map { get; set; } = new Chunk[3, 3];
+        public Chunk[,] Map { get; set; } = new Chunk[4, 4];
 
         public List<IMovingEntity> Entities { get; set; } = new List<IMovingEntity>()
         {
