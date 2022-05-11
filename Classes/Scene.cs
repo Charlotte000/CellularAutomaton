@@ -13,15 +13,15 @@
     {
         public static readonly Texture Texture = new (@"..\..\..\Source\textures.png");
 
-        private static readonly int DayDuration = 3600;
-
-        private static readonly Vector2i[] Neighborhood = new Vector2i[]
+        public static readonly Vector2i[] Neighborhood = new Vector2i[]
         {
             new Vector2i(-1, 0),
             new Vector2i(1, 0),
             new Vector2i(0, -1),
             new Vector2i(0, 1),
         };
+
+        private static readonly int DayDuration = 3600;
 
         private readonly Clock fpsClock = new ();
 
@@ -206,6 +206,16 @@
         public void TrySetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
         {
             var oldBlock = this.GetBlock(coords);
+
+            if (block is not Empty && block is not Water && oldBlock is Water oldBlockWater)
+            {
+                if (Water.Push(this, oldBlockWater))
+                {
+                    this.SetBlock(block, coords, updateLights, saveToHistory);
+                    return;
+                }
+            }
+
             if (block is not Empty && (oldBlock is null || oldBlock is not Empty))
             {
                 return;

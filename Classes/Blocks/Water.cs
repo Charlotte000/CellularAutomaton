@@ -31,6 +31,21 @@
 
         public int Amount { get; set; } = 4;
 
+        public static bool Push(Scene scene, Water water)
+        {
+            var block = scene.GetBlock(water.Coords + new Vector2i(0, -1));
+            if (block is Empty || block is Water)
+            {
+                if (Water.Push(scene, block, water.Amount))
+                {
+                    scene.SetBlock(new Empty(), water.Coords, false, true);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public override void Update(Scene scene)
         {
             // Fall down
@@ -56,6 +71,64 @@
                 Amount = this.Amount,
                 WasUpdated = this.WasUpdated,
             };
+
+        public override void Draw(RenderWindow window)
+        {
+            if (this.Wall is not Empty)
+            {
+                base.Draw(window);
+                return;
+            }
+
+            this.Wall.Draw(window, this);
+
+            this.Sprite.Position = this.CollisionBox.Position;
+            if (this.Light > 0)
+            {
+                window.Draw(this.Sprite);
+            }
+
+            var shadow = new Sprite(this.Sprite)
+            {
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+            window.Draw(shadow);
+        }
+
+        private static bool Push(Scene scene, IBlock block, int amount)
+        {
+            if (amount <= 0)
+            {
+                return true;
+            }
+
+            if (block is Empty)
+            {
+                scene.SetBlock(new Water() { WasUpdated = true, Light = block.Light, Amount = amount }, block.Coords, false);
+                return true;
+            }
+
+            if (block is Water waterBlock)
+            {
+                if (waterBlock.Amount + amount <= 4)
+                {
+                    waterBlock.Amount += amount;
+                    return true;
+                }
+
+                var neighbour = scene.GetBlock(block.Coords + new Vector2i(0, -1));
+                if (neighbour is Water || neighbour is Empty)
+                {
+                    if (Water.Push(scene, neighbour, amount - 4 + waterBlock.Amount))
+                    {
+                        waterBlock.Amount = 4;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
 
         private bool FallDown(Scene scene)
         {

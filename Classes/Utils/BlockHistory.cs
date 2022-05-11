@@ -25,10 +25,11 @@
                 chunkHistory = new ();
             }
 
-            foreach (var block in chunk.GetAllBlocks())
+            foreach (var block in chunk.Map)
             {
                 if (block is Water)
                 {
+                    chunkHistory.Remove(block.Coords);
                     chunkHistory.Add(block.Coords, block.Copy());
                 }
             }
