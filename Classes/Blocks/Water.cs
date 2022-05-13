@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
+    using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
@@ -74,7 +75,7 @@
 
         public override void Draw(RenderWindow window)
         {
-            if (this.Wall is not Empty)
+            if (this.Wall is not EmptyWall)
             {
                 base.Draw(window);
                 return;

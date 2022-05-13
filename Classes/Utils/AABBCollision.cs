@@ -34,7 +34,7 @@
                 out float contactTime))
             {
                 var neighbour = scene.GetBlock((Vector2i)((staticEntity.CollisionBox.Position / IBlock.Size) + normal));
-                if (neighbour is not null && neighbour is ICollidable)
+                if (neighbour is ICollidable)
                 {
                     return false;
                 }
@@ -143,28 +143,7 @@
             }
 
             // Contact normal of collision
-            if (tNear.X > tNear.Y)
-            {
-                if (invDir.X < 0)
-                {
-                    normal = new Vector2f(1, 0);
-                }
-                else
-                {
-                    normal = new Vector2f(-1, 0);
-                }
-            }
-            else if (tNear.X < tNear.Y)
-            {
-                if (invDir.Y < 0)
-                {
-                    normal = new Vector2f(0, 1);
-                }
-                else
-                {
-                    normal = new Vector2f(0, -1);
-                }
-            }
+            normal = tNear.X > tNear.Y ? new Vector2f(invDir.X < 0 ? 1 : -1, 0) : new Vector2f(0, invDir.Y < 0 ? 1 : -1);
 
             return true;
         }
