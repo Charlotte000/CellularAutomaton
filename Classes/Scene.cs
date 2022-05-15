@@ -207,16 +207,7 @@
         {
             var oldBlock = this.GetBlock(coords);
 
-            if (block is not Empty && block is not Water && oldBlock is Water oldBlockWater)
-            {
-                if (Water.Push(this, oldBlockWater))
-                {
-                    this.SetBlock(block, coords, updateLights, saveToHistory);
-                    return;
-                }
-            }
-
-            if (block is not Empty && (oldBlock is null || oldBlock is not Empty))
+            if (block is not Empty && (oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
             {
                 return;
             }
@@ -237,6 +228,16 @@
                         return;
                     }
                 }
+            }
+
+            if (block is not Empty && block is not Water && oldBlock is Water oldBlockWater)
+            {
+                if (Water.Push(this, oldBlockWater))
+                {
+                    this.SetBlock(block, coords, updateLights, saveToHistory);
+                }
+
+                return;
             }
 
             this.SetBlock(block, coords, updateLights, saveToHistory);
