@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
-    using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
@@ -72,29 +71,6 @@
                 Amount = this.Amount,
                 WasUpdated = this.WasUpdated,
             };
-
-        public override void Draw(RenderWindow window)
-        {
-            if (this.Wall is not EmptyWall)
-            {
-                base.Draw(window);
-                return;
-            }
-
-            this.Wall.Draw(window, this);
-
-            this.Sprite.Position = this.CollisionBox.Position;
-            if (this.Light > 0)
-            {
-                window.Draw(this.Sprite);
-            }
-
-            var shadow = new Sprite(this.Sprite)
-            {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-            };
-            window.Draw(shadow);
-        }
 
         private static bool Push(Scene scene, IBlock block, int amount)
         {

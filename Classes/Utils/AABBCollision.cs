@@ -70,7 +70,7 @@
             // Expand target rectangle by source dimensions
             var expandedTarget = new RectangleShape(staticEntity.CollisionBox.Size + movingEntity.CollisionBox.Size)
             {
-                Position = staticEntity.CollisionBox.Position - (movingEntity.CollisionBox.Size / 2),
+                Position = staticEntity.CollisionBox.Position - staticEntity.CollisionBox.Origin - (movingEntity.CollisionBox.Size / 2),
             };
 
             if (AABBCollision.RayVsRect(

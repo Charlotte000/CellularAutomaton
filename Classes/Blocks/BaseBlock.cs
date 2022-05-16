@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
+    using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
@@ -14,11 +15,11 @@
 
         public virtual bool IsTransparent { get => false; }
 
+        public virtual RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
+
         public Vector2i Coords { get; set; }
 
         public int Light { get; set; }
-
-        public RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(IBlock.Size, IBlock.Size));
 
         public IWall Wall { get; set; }
 
@@ -43,15 +44,21 @@
                 window.Draw(this.Sprite);
             }
 
-            var shadow = new RectangleShape(this.CollisionBox)
-            {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-            };
+            Drawable shadow = this.Wall is not EmptyWall && this.IsTransparent?
+                new RectangleShape(this.CollisionBox)
+                {
+                    FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                }
+                :
+                new Sprite(this.Sprite)
+                {
+                    Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                };
             window.Draw(shadow);
         }
 
         public virtual IBlock Copy()
-            => new Dirt()
+            => new BaseBlock()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
