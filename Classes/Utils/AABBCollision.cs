@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Utils
 {
+    using CellularAutomaton.Classes.Blocks;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
@@ -33,7 +34,7 @@
                 out normal,
                 out float contactTime))
             {
-                var neighbour = scene.GetBlock((Vector2i)((staticEntity.CollisionBox.Position / IBlock.Size) + normal));
+                var neighbour = scene.GetBlock((Vector2i)((staticEntity.CollisionBox.Position / Block.Size) + normal));
                 if (neighbour is ICollidable)
                 {
                     return false;

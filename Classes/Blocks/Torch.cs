@@ -3,9 +3,9 @@
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
 
-    public class Torch : BaseBlock, ILightSource
+    public class Torch : Block, ILightSource
     {
-        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size, IBlock.Size, IBlock.Size));
+        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size, Block.Size, Block.Size, Block.Size));
 
         public override Sprite Sprite { get => Torch.SpriteSource; }
 
@@ -15,7 +15,7 @@
 
         public int Brightness { get; set; } = 300;
 
-        public override IBlock Copy()
+        public override Block Copy()
             => new Torch()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),

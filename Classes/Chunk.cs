@@ -2,7 +2,6 @@
 {
     using CellularAutomaton.Classes.Blocks;
     using CellularAutomaton.Classes.Walls;
-    using CellularAutomaton.Interfaces;
     using SFML.Graphics;
     using SFML.System;
 
@@ -19,12 +18,11 @@
 
         public Vector2i Coord { get; set; }
 
-        public IBlock[,] Map { get; set; } = new IBlock[Chunk.Size.X, Chunk.Size.Y];
+        public Block[,] Map { get; set; } = new Block[Chunk.Size.X, Chunk.Size.Y];
 
         public void Draw(RenderWindow window)
         {
             // this.DrawBorder(window);
-
             foreach (var block in this.Map)
             {
                 if (block.IsVisible)
@@ -60,9 +58,9 @@
                 localCoord.Y < this.Map.GetLength(1);
         }
 
-        public IBlock[] GetAllBlocks()
+        public Block[] GetAllBlocks()
         {
-            var blocks = new List<IBlock>();
+            var blocks = new List<Block>();
 
             foreach (var block in this.Map)
             {
@@ -72,7 +70,7 @@
             return blocks.ToArray();
         }
 
-        public IBlock? GetBlock(Vector2i coords)
+        public Block? GetBlock(Vector2i coords)
         {
             if (!this.IsValidCoords(coords))
             {
@@ -82,10 +80,10 @@
             return this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y];
         }
 
-        public IBlock? GetBlock(int x, int y)
+        public Block? GetBlock(int x, int y)
             => this.GetBlock(new Vector2i(x, y));
 
-        public void SetBlock(IBlock block, Vector2i coords)
+        public void SetBlock(Block block, Vector2i coords)
         {
             if (!this.IsValidCoords(coords))
             {
@@ -106,7 +104,7 @@
             this.SetBlockForce(block, coords.X, coords.Y);
         }
 
-        public void SetBlock(IBlock block, int x, int y)
+        public void SetBlock(Block block, int x, int y)
             => this.SetBlock(block, new Vector2i(x, y));
 
         public void Dispose()
@@ -119,24 +117,24 @@
 
         private void DrawBorder(RenderWindow window)
         {
-            var border = new RectangleShape((Vector2f)Chunk.Size * IBlock.Size)
+            var border = new RectangleShape((Vector2f)Chunk.Size * Block.Size)
             {
                 FillColor = Color.Transparent,
                 OutlineColor = Color.Red,
                 OutlineThickness = 2,
-                Position = (Vector2f)this.Coord * IBlock.Size,
+                Position = (Vector2f)this.Coord * Block.Size,
             };
             window.Draw(border);
         }
 
-        private void SetBlockForce(IBlock block, Vector2i coords)
+        private void SetBlockForce(Block block, Vector2i coords)
         {
             block.Coords = coords;
-            block.CollisionBox.Position = (Vector2f)coords * IBlock.Size;
+            block.CollisionBox.Position = (Vector2f)coords * Block.Size;
             this.Map[coords.X - this.Coord.X, coords.Y - this.Coord.Y] = block;
         }
 
-        private void SetBlockForce(IBlock block, int x, int y)
+        private void SetBlockForce(Block block, int x, int y)
             => this.SetBlockForce(block, new Vector2i(x, y));
 
         private void InitMap()

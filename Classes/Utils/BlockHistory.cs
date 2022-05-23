@@ -1,12 +1,11 @@
 ﻿namespace CellularAutomaton.Classes.Utils
 {
     using CellularAutomaton.Classes.Blocks;
-    using CellularAutomaton.Interfaces;
     using SFML.System;
 
     public class BlockHistory
     {
-        private readonly Dictionary<Vector2i, Dictionary<Vector2i, IBlock>> blockHistory = new ();
+        private readonly Dictionary<Vector2i, Dictionary<Vector2i, Block>> blockHistory = new ();
 
         public void SaveWaterToHistory(Chunk chunk)
         {
@@ -49,7 +48,7 @@
             }
         }
 
-        public void SaveBlockToHistory(Chunk chunk, IBlock block)
+        public void SaveBlockToHistory(Chunk chunk, Block block)
         {
             this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory);
             if (chunkHistory is null)

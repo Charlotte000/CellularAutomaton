@@ -1,16 +1,16 @@
 ﻿namespace CellularAutomaton.Classes.Walls
 {
-    using CellularAutomaton.Interfaces;
+    using CellularAutomaton.Classes.Blocks;
     using SFML.Graphics;
 
-    public class EmptyWall : BaseWall
+    public class EmptyWall : Wall
     {
         public override Sprite Sprite { get; }
 
-        public override IWall Copy()
+        public override Wall Copy()
             => new EmptyWall();
 
-        public override void Draw(RenderWindow window, IBlock parentBlock)
+        public override void Draw(RenderWindow window, Block parentBlock)
         {
         }
     }

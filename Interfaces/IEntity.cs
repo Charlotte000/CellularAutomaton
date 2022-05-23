@@ -13,5 +13,6 @@
 
         public void Update(Scene scene);
 
+        public int Light { get; set; }
     }
 }

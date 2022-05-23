@@ -4,23 +4,23 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class Water : BaseBlock
+    public class Water : Block
     {
         private static readonly Sprite[] SpriteSource = new Sprite[]
         {
-            new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size * 3 / 4, IBlock.Size, IBlock.Size / 4))
+            new (Scene.Texture, new IntRect(Block.Size, Block.Size * 3 / 4, Block.Size, Block.Size / 4))
             {
-                Origin = new Vector2f(0, -IBlock.Size * 3 / 4),
+                Origin = new Vector2f(0, -Block.Size * 3 / 4),
             },
-            new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size / 2, IBlock.Size, IBlock.Size / 2))
+            new (Scene.Texture, new IntRect(Block.Size, Block.Size / 2, Block.Size, Block.Size / 2))
             {
-                Origin = new Vector2f(0, -IBlock.Size / 2),
+                Origin = new Vector2f(0, -Block.Size / 2),
             },
-            new (Scene.Texture, new IntRect(IBlock.Size, IBlock.Size / 4, IBlock.Size, IBlock.Size * 3 / 4))
+            new (Scene.Texture, new IntRect(Block.Size, Block.Size / 4, Block.Size, Block.Size * 3 / 4))
             {
-                Origin = new Vector2f(0, -IBlock.Size / 4),
+                Origin = new Vector2f(0, -Block.Size / 4),
             },
-            new (Scene.Texture, new IntRect(IBlock.Size, 0, IBlock.Size, IBlock.Size)),
+            new (Scene.Texture, new IntRect(Block.Size, 0, Block.Size, Block.Size)),
         };
 
         public override Sprite Sprite { get => Water.SpriteSource[this.Amount - 1]; }
@@ -62,7 +62,7 @@
             }
         }
 
-        public override IBlock Copy()
+        public override Block Copy()
             => new Water()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
@@ -72,7 +72,7 @@
                 WasUpdated = this.WasUpdated,
             };
 
-        private static bool Push(Scene scene, IBlock block, int amount)
+        private static bool Push(Scene scene, Block block, int amount)
         {
             if (amount <= 0)
             {

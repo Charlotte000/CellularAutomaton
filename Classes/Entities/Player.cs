@@ -11,7 +11,7 @@
     {
         public Player(float x, float y)
         {
-            this.CollisionBox = new RectangleShape(new Vector2f(IBlock.Size * .9f, IBlock.Size * 1.9f))
+            this.CollisionBox = new RectangleShape(new Vector2f(Block.Size * .9f, Block.Size * 1.9f))
             {
                 Position = new Vector2f(x, y),
                 FillColor = new Color(255, 0, 0),
@@ -28,9 +28,17 @@
 
         public bool IsVisible { get; set; } = false;
 
+        public int Light { get; set; }
+
         public void Draw(RenderWindow window)
         {
             window.Draw(this.CollisionBox);
+
+            var shadow = new RectangleShape(this.CollisionBox)
+            {
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+            window.Draw(shadow);
         }
 
         public void Update(Scene scene)
@@ -42,6 +50,9 @@
 
             this.Collision(scene);
             this.CollisionBox.Position += this.Vel;
+
+            var block = scene.GetBlock((Vector2i)(this.CollisionBox.Position / Block.Size));
+            this.Light = block is not null ? block.Light : this.Light;
         }
 
         public void OnCollision(IEntity entity, Vector2f normal)
@@ -50,7 +61,7 @@
             this.IsOnGround |= normal.Y == -1 && entity is ICollidable;
         }
 
-        public void Control()
+        private void Control()
         {
             if (Keyboard.IsKeyPressed(Keyboard.Key.D))
             {
@@ -79,7 +90,7 @@
             this.IsOnWater = false;
 
             var entities = new List<IEntity>();
-            var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / IBlock.Size;
+            var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
             for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
             {
                 for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)

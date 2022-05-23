@@ -3,9 +3,9 @@
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
 
-    public class Dirt : BaseBlock, ICollidable
+    public class Dirt : Block, ICollidable
     {
-        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, 0, IBlock.Size, IBlock.Size));
+        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, 0, Block.Size, Block.Size));
 
         public override Sprite Sprite { get => Dirt.SpriteSource; }
 
@@ -13,7 +13,7 @@
 
         public override bool IsTransparent { get => false; }
 
-        public override IBlock Copy()
+        public override Block Copy()
             => new Dirt()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),

@@ -57,6 +57,7 @@
 
                     this.Daylight = ((this.Clock.ElapsedTime.AsSeconds() +
                     (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
+
                     if (this.Daylight > 1)
                     {
                         this.Daylight = 2 - this.Daylight;
@@ -118,13 +119,18 @@
 
                 this.mutex.WaitOne();
 
-                this.MoveCamera();
-
                 this.MoveChunks();
 
                 this.KeyListen();
 
                 this.UpdateVisibility();
+
+                foreach (var entity in this.Entities)
+                {
+                    entity.Update(this);
+                }
+
+                this.MoveCamera();
 
                 this.Window.Clear(new Color(
                     (byte)(100 * this.Daylight),
@@ -138,7 +144,6 @@
 
                 foreach (var entity in this.Entities)
                 {
-                    entity.Update(this);
                     entity.Draw(this.Window);
                 }
 
@@ -161,26 +166,17 @@
             var scale = new Vector2f(this.Camera.Size.X / this.Window.Size.X, this.Camera.Size.Y / this.Window.Size.Y);
             var mousePos = (Vector2f)Mouse.GetPosition(this.Window);
             var mouseWindow = new Vector2f(mousePos.X * scale.X, mousePos.Y * scale.Y);
-            var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / IBlock.Size;
+            var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / Block.Size;
             return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
         }
 
-        public IBlock? GetBlock(Vector2i coords)
-        {
-            var chunk = this.GetChunk(coords);
+        public Block? GetBlock(Vector2i coords)
+            => this.GetChunk(coords)?.GetBlock(coords);
 
-            if (chunk is null)
-            {
-                return null;
-            }
-
-            return chunk.GetBlock(coords);
-        }
-
-        public IBlock? GetBlock(int x, int y)
+        public Block? GetBlock(int x, int y)
             => this.GetBlock(new Vector2i(x, y));
 
-        public void SetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = false)
+        public void SetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = false)
         {
             var chunk = this.GetChunk(coords);
             if (chunk is null)
@@ -200,10 +196,10 @@
             }
         }
 
-        public void SetBlock(IBlock block, int x, int y, bool updateLights = true, bool saveToHistory = false)
+        public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
             => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
-        public void TrySetBlock(IBlock block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
+        public void TrySetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
         {
             var oldBlock = this.GetBlock(coords);
 
@@ -217,7 +213,7 @@
                 return;
             }
 
-            block.CollisionBox.Position = new Vector2f(coords.X * IBlock.Size, coords.Y * IBlock.Size);
+            block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
 
             if (block is ICollidable)
             {
@@ -243,12 +239,12 @@
             this.SetBlock(block, coords, updateLights, saveToHistory);
         }
 
-        public void TrySetBlock(IBlock block, int x, int y, bool updateLights = true, bool saveToHistory = true)
+        public void TrySetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = true)
             => this.TrySetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
-        public IBlock[] GetAllBlocks()
+        public Block[] GetAllBlocks()
         {
-            var blocks = new List<IBlock>();
+            var blocks = new List<Block>();
             foreach (var chunk in this.Map)
             {
                 blocks.AddRange(chunk.GetAllBlocks());
@@ -273,7 +269,7 @@
 
         private void MoveChunks()
         {
-            var cameraCoord = this.Entities[0].CollisionBox.Position / IBlock.Size;
+            var cameraCoord = this.Entities[0].CollisionBox.Position / Block.Size;
             if (cameraCoord.X < this.Map[1, 0].Coord.X)
             {
                 ChunkMoveHelper.MoveChunksLeft(this);
@@ -324,7 +320,7 @@
 
         private void UpdateVisibility()
         {
-            var blockSize = new Vector2f(IBlock.Size, IBlock.Size);
+            var blockSize = new Vector2f(Block.Size, Block.Size);
             var viewRect = new FloatRect(this.Camera.Center - (this.Camera.Size / 2) - blockSize, this.Camera.Size + (blockSize * 2));
             foreach (var block in this.GetAllBlocks())
             {
@@ -354,7 +350,7 @@
                     continue;
                 }
 
-                block.Light = (block is Empty || block is Water) && block.Wall is EmptyWall ? light : 0;
+                block.Light = block.IsTransparent && block.Wall is EmptyWall ? light : 0;
                 maxLight = Math.Max(maxLight, block.Light);
             }
 

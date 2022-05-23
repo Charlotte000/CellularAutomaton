@@ -1,15 +1,15 @@
 ﻿namespace CellularAutomaton.Classes.Walls
 {
-    using CellularAutomaton.Interfaces;
+    using CellularAutomaton.Classes.Blocks;
     using SFML.Graphics;
 
-    public class DirtWall : BaseWall
+    public class DirtWall : Wall
     {
-        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, IBlock.Size, IBlock.Size, IBlock.Size));
+        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, Block.Size, Block.Size, Block.Size));
 
         public override Sprite Sprite { get => DirtWall.SpriteSource; }
 
-        public override IWall Copy()
+        public override Wall Copy()
             => new DirtWall();
     }
 }

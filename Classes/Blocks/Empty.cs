@@ -1,9 +1,8 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
-    using CellularAutomaton.Interfaces;
     using SFML.Graphics;
 
-    public class Empty : BaseBlock
+    public class Empty : Block
     {
         public override int LightDiffusion { get => 15; }
 
@@ -23,7 +22,7 @@
             }
         }
 
-        public override IBlock Copy()
+        public override Block Copy()
             => new Empty()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
