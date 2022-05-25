@@ -2,6 +2,7 @@
 {
     using CellularAutomaton.Classes;
     using SFML.Graphics;
+    using SFML.System;
 
     public interface IEntity
     {
@@ -14,5 +15,7 @@
         public void Update(Scene scene);
 
         public int Light { get; set; }
+
+        public void OnCollision(IEntity entity, Vector2f? contactNormal);
     }
 }

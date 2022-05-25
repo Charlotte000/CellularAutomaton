@@ -59,6 +59,10 @@
             window.Draw(shadow);
         }
 
+        public virtual void OnCollision(IEntity entity, Vector2f? normal)
+        {
+        }
+
         public virtual Block Copy()
             => new ()
             {

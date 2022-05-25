@@ -14,10 +14,12 @@
                 if (AABBCollision.ApplyCollision(scene, dynamicEntity, entity, out Vector2f normal))
                 {
                     dynamicEntity.OnCollision(entity, normal);
+                    entity.OnCollision(dynamicEntity, normal);
                 }
                 else if (dynamicEntity.CollisionBox.GetGlobalBounds().Intersects(entity.CollisionBox.GetGlobalBounds()))
                 {
-                    dynamicEntity.OnCollision(entity, normal);
+                    dynamicEntity.OnCollision(entity, null);
+                    entity.OnCollision(dynamicEntity, normal);
                 }
             }
         }

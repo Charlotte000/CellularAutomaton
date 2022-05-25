@@ -12,6 +12,6 @@
 
         public bool IsOnWater { get; set; }
 
-        public void OnCollision(IEntity entity, Vector2f normal);
+        public bool IsOnLadder { get; set; }
     }
 }

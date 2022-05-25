@@ -11,7 +11,7 @@
 
     public class Scene
     {
-        public static readonly Texture Texture = new (@"..\..\..\Source\textures.png");
+        public static readonly Texture Texture = new (@"..\..\..\Data\textures.png");
 
         public static readonly Vector2i[] Neighborhood = new Vector2i[]
         {
@@ -208,6 +208,11 @@
                 return;
             }
 
+            if (block is Empty && oldBlock is Water)
+            {
+                return;
+            }
+
             if (block is Empty && oldBlock is Empty)
             {
                 return;
@@ -315,6 +320,11 @@
             if (Keyboard.IsKeyPressed(Keyboard.Key.T))
             {
                 this.TrySetBlock(new Torch(), this.GetMouseCoords());
+            }
+
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Y))
+            {
+                this.TrySetBlock(new Ladder(), this.GetMouseCoords());
             }
         }
 

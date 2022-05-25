@@ -62,6 +62,14 @@
             }
         }
 
+        public override void OnCollision(IEntity entity, Vector2f? normal)
+        {
+            if (entity is IMovingEntity movingEntity)
+            {
+                movingEntity.IsOnWater = true;
+            }
+        }
+
         public override Block Copy()
             => new Water()
             {
@@ -142,7 +150,7 @@
         private bool SpreadOut(Scene scene, int deltaX)
         {
             var block = scene.GetBlock(this.Coords.X + deltaX, this.Coords.Y);
-            if (block is Empty)
+            if (block is not null && block is not Water && block is not ICollidable)
             {
                 var prevAmount = this.Amount;
 
