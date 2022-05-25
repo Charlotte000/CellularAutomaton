@@ -10,9 +10,23 @@
 
         public override Sprite Sprite { get => Ladder.SpriteSource; }
 
+        public override int LightDiffusion { get => 15; }
+
         public override bool IsTransparent { get => true; }
 
-        public override int LightDiffusion { get => 15; }
+        public override void OnCreate(Scene scene)
+        {
+            for (int i = 1; i < 10; i++)
+            {
+                var block = scene.GetBlock(this.Coords.X, this.Coords.Y + i);
+                if (block is not Empty)
+                {
+                    return;
+                }
+
+                scene.SetBlock(new Ladder(), this.Coords.X, this.Coords.Y + i, false, true);
+            }
+        }
 
         public override void OnCollision(IEntity entity, Vector2f? normal)
         {

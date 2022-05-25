@@ -27,7 +27,7 @@
             {
                 if (block.IsVisible)
                 {
-                    block.Draw(window);
+                    block.OnDraw(window);
                 }
             }
         }
@@ -44,7 +44,7 @@
                 if (!block.WasUpdated)
                 {
                     block.WasUpdated = true;
-                    block.Update(scene);
+                    block.OnUpdate(scene);
                 }
             }
         }
@@ -98,7 +98,8 @@
                     block.Wall = oldBlock.Wall.Copy();
                 }
 
-                oldBlock.Dispose();
+                block.Light = oldBlock.Light;
+                oldBlock.OnDelete();
             }
 
             this.SetBlockForce(block, coords.X, coords.Y);
@@ -111,7 +112,7 @@
         {
             foreach (var block in this.Map)
             {
-                block.Dispose();
+                block.OnDelete();
             }
         }
 

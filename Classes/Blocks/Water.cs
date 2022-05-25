@@ -46,7 +46,7 @@
             return false;
         }
 
-        public override void Update(Scene scene)
+        public override void OnUpdate(Scene scene)
         {
             // Fall down
             if (this.FallDown(scene))

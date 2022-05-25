@@ -29,11 +29,15 @@
 
         public bool IsVisible { get; set; } = false;
 
-        public virtual void Update(Scene scene)
+        public virtual void OnCreate(Scene scene)
         {
         }
 
-        public virtual void Draw(RenderWindow window)
+        public virtual void OnUpdate(Scene scene)
+        {
+        }
+
+        public virtual void OnDraw(RenderWindow window)
         {
             if (this.IsTransparent)
             {
@@ -63,6 +67,12 @@
         {
         }
 
+        public virtual void OnDelete()
+        {
+            this.Wall.Dispose();
+            this.CollisionBox.Dispose();
+        }
+
         public virtual Block Copy()
             => new ()
             {
@@ -72,11 +82,5 @@
                 Wall = this.Wall.Copy(),
                 WasUpdated = this.WasUpdated,
             };
-
-        public virtual void Dispose()
-        {
-            this.Wall.Dispose();
-            this.CollisionBox.Dispose();
-        }
     }
 }

@@ -10,12 +10,16 @@
 
         public bool IsVisible { get; set; }
 
-        public void Draw(RenderWindow window);
+        public void OnCreate(Scene scene);
 
-        public void Update(Scene scene);
+        public void OnDraw(RenderWindow window);
 
-        public int Light { get; set; }
+        public void OnUpdate(Scene scene);
 
         public void OnCollision(IEntity entity, Vector2f? contactNormal);
+
+        public void OnDelete();
+
+        public int Light { get; set; }
     }
 }

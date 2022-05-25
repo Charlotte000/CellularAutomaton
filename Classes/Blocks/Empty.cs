@@ -8,7 +8,7 @@
 
         public override bool IsTransparent { get => true; }
 
-        public override void Draw(RenderWindow window)
+        public override void OnDraw(RenderWindow window)
         {
             this.Wall.Draw(window, this);
 

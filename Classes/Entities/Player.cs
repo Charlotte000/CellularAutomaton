@@ -32,7 +32,11 @@
 
         public int Light { get; set; }
 
-        public void Draw(RenderWindow window)
+        public void OnCreate(Scene scene)
+        {
+        }
+
+        public void OnDraw(RenderWindow window)
         {
             window.Draw(this.CollisionBox);
 
@@ -43,7 +47,7 @@
             window.Draw(shadow);
         }
 
-        public void Update(Scene scene)
+        public void OnUpdate(Scene scene)
         {
             this.Vel += IMovingEntity.Gravity * (this.IsOnWater ? .2f : 1f) * (this.IsOnLadder ? 0 : 1);
             this.Control();
@@ -60,6 +64,11 @@
         public void OnCollision(IEntity entity, Vector2f? contactNormal)
         {
             this.IsOnGround |= contactNormal?.Y == -1 && entity is ICollidable;
+        }
+
+        public void OnDelete()
+        {
+            this.CollisionBox.Dispose();
         }
 
         private void Control()

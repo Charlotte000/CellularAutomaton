@@ -127,7 +127,7 @@
 
                 foreach (var entity in this.Entities)
                 {
-                    entity.Update(this);
+                    entity.OnUpdate(this);
                 }
 
                 this.MoveCamera();
@@ -144,7 +144,7 @@
 
                 foreach (var entity in this.Entities)
                 {
-                    entity.Draw(this.Window);
+                    entity.OnDraw(this.Window);
                 }
 
                 this.mutex.ReleaseMutex();
@@ -199,23 +199,23 @@
         public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
             => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
-        public void TrySetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
+        public Block? TrySetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
         {
             var oldBlock = this.GetBlock(coords);
 
             if (block is not Empty && (oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
             {
-                return;
+                return null;
             }
 
             if (block is Empty && oldBlock is Water)
             {
-                return;
+                return null;
             }
 
             if (block is Empty && oldBlock is Empty)
             {
-                return;
+                return null;
             }
 
             block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
@@ -226,7 +226,7 @@
                 {
                     if (entity.CollisionBox.GetGlobalBounds().Intersects(block.CollisionBox.GetGlobalBounds()))
                     {
-                        return;
+                        return null;
                     }
                 }
             }
@@ -238,13 +238,14 @@
                     this.SetBlock(block, coords, updateLights, saveToHistory);
                 }
 
-                return;
+                return block;
             }
 
             this.SetBlock(block, coords, updateLights, saveToHistory);
+            return block;
         }
 
-        public void TrySetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = true)
+        public Block? TrySetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = true)
             => this.TrySetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
         public Block[] GetAllBlocks()
@@ -304,27 +305,27 @@
         {
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                this.TrySetBlock(new Dirt(), this.GetMouseCoords());
+                this.TrySetBlock(new Dirt(), this.GetMouseCoords())?.OnCreate(this);
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Right))
             {
-                this.TrySetBlock(new Empty(), this.GetMouseCoords());
+                this.TrySetBlock(new Empty(), this.GetMouseCoords())?.OnCreate(this);
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Middle))
             {
-                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords(), saveToHistory: false);
+                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords(), saveToHistory: false)?.OnCreate(this);
             }
 
             if (Keyboard.IsKeyPressed(Keyboard.Key.T))
             {
-                this.TrySetBlock(new Torch(), this.GetMouseCoords());
+                this.TrySetBlock(new Torch(), this.GetMouseCoords())?.OnCreate(this);
             }
 
             if (Keyboard.IsKeyPressed(Keyboard.Key.Y))
             {
-                this.TrySetBlock(new Ladder(), this.GetMouseCoords());
+                this.TrySetBlock(new Ladder(), this.GetMouseCoords())?.OnCreate(this);
             }
         }
 

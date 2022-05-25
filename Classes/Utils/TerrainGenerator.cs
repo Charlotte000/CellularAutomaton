@@ -26,7 +26,7 @@
             var h = chunk.Map.GetLength(1);
 
             var heightGenerator = new NoiseGenerator(TerrainGenerator.Seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
-            var stoneGenerator = new NoiseGenerator(TerrainGenerator.Seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
+            var stoneGenerator = new NoiseGenerator(TerrainGenerator.Seed + 123, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
 
             var heightMap = new double[w, 1];
             heightGenerator.Fill(heightMap, new long[] { chunk.Coord.X / w, 0 });
@@ -70,7 +70,7 @@
             var w = chunk.Map.GetLength(0);
             var h = chunk.Map.GetLength(1);
 
-            var generator = new NoiseGenerator(TerrainGenerator.Seed, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
+            var generator = new NoiseGenerator(TerrainGenerator.Seed + 1234, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
 
             var caveMap = new double[w, h];
             generator.Fill(caveMap, new long[] { chunk.Coord.X / w, chunk.Coord.Y / h });
