@@ -24,7 +24,7 @@
 
         public bool IsOnWater { get; set; } = false;
 
-        public bool IsOnLadder { get; set; } = false;
+        public bool IsClimbing { get; set; } = false;
 
         public RectangleShape CollisionBox { get; set; }
 
@@ -49,10 +49,10 @@
 
         public void OnUpdate(Scene scene)
         {
-            this.Vel += IMovingEntity.Gravity * (this.IsOnWater ? .2f : 1f) * (this.IsOnLadder ? 0 : 1);
+            this.Vel += IMovingEntity.Gravity * (this.IsOnWater ? .2f : 1f) * (this.IsClimbing ? 0 : 1);
             this.Control();
 
-            this.Vel *= this.IsOnWater || this.IsOnLadder ? .8f : .87f;
+            this.Vel *= this.IsOnWater || this.IsClimbing ? .8f : .87f;
 
             this.Collision(scene);
             this.CollisionBox.Position += this.Vel;
@@ -64,6 +64,7 @@
         public void OnCollision(IEntity entity, Vector2f? contactNormal)
         {
             this.IsOnGround |= contactNormal?.Y == -1 && entity is ICollidable;
+            this.IsClimbing |= entity is IClimbable;
         }
 
         public void OnDelete()
@@ -83,17 +84,17 @@
                 this.Vel += new Vector2f(-.7f, 0);
             }
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && this.IsOnGround && !this.IsOnWater && !this.IsOnLadder)
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && this.IsOnGround && !this.IsOnWater && !this.IsClimbing)
             {
                 this.Vel += new Vector2f(0, -15f);
             }
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && (this.IsOnLadder || this.IsOnWater))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && (this.IsClimbing || this.IsOnWater))
             {
                 this.Vel += new Vector2f(0, -.7f);
             }
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.S) && (this.IsOnLadder || this.IsOnWater))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.S) && (this.IsClimbing || this.IsOnWater))
             {
                 this.Vel += new Vector2f(0, .7f);
             }
@@ -103,7 +104,7 @@
         {
             this.IsOnGround = false;
             this.IsOnWater = false;
-            this.IsOnLadder = false;
+            this.IsClimbing = false;
 
             var entities = new List<IEntity>();
             var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;

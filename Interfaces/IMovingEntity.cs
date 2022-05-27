@@ -12,6 +12,6 @@
 
         public bool IsOnWater { get; set; }
 
-        public bool IsOnLadder { get; set; }
+        public bool IsClimbing { get; set; }
     }
 }

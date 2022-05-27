@@ -21,7 +21,7 @@
                         var newX = scene.Map[0, y].Coord.X - Chunk.Size.X;
                         var oldY = scene.Map[0, y].Coord.Y;
                         scene.Map[0, y] = new Chunk(newX, oldY);
-                        TerrainGenerator.Generate(scene.Map[0, y]);
+                        scene.TerrainGenerator.Generate(scene.Map[0, y]);
                         scene.BlockHistory.LoadChunk(scene.Map[0, y]);
                     }
                 }
@@ -47,7 +47,7 @@
                         var newX = scene.Map[x + 1, y].Coord.X + Chunk.Size.X;
                         var oldY = scene.Map[x + 1, y].Coord.Y;
                         scene.Map[x + 1, y] = new Chunk(newX, oldY);
-                        TerrainGenerator.Generate(scene.Map[x + 1, y]);
+                        scene.TerrainGenerator.Generate(scene.Map[x + 1, y]);
                         scene.BlockHistory.LoadChunk(scene.Map[x + 1, y]);
                     }
                 }
@@ -73,7 +73,7 @@
                         var oldX = scene.Map[x, 0].Coord.X;
                         var newY = scene.Map[x, 0].Coord.Y - Chunk.Size.Y;
                         scene.Map[x, 0] = new Chunk(oldX, newY);
-                        TerrainGenerator.Generate(scene.Map[x, 0]);
+                        scene.TerrainGenerator.Generate(scene.Map[x, 0]);
                         scene.BlockHistory.LoadChunk(scene.Map[x, 0]);
                     }
                 }
@@ -99,7 +99,7 @@
                         var oldX = scene.Map[x, y + 1].Coord.X;
                         var newY = scene.Map[x, y + 1].Coord.Y + Chunk.Size.Y;
                         scene.Map[x, y + 1] = new Chunk(oldX, newY);
-                        TerrainGenerator.Generate(scene.Map[x, y + 1]);
+                        scene.TerrainGenerator.Generate(scene.Map[x, y + 1]);
                         scene.BlockHistory.LoadChunk(scene.Map[x, y + 1]);
                     }
                 }

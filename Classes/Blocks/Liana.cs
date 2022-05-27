@@ -4,23 +4,21 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class Ladder : Block, IClimbable
+    public class Liana : Block, IClimbable
     {
-        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 4, 0, Block.Size, Block.Size));
+        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 5, 0, Block.Size, Block.Size));
 
-        public override Sprite Sprite { get => Ladder.SpriteSource; }
+        public override Sprite Sprite { get => Liana.SpriteSource; }
 
         public override int LightDiffusion { get => 15; }
 
         public override bool IsTransparent { get => true; }
 
         public override void OnCreate(Scene scene)
-        {
-            this.Expand(scene, 10);
-        }
+            => this.Expand(scene, Scene.RandomGenerator.Next(3, 10));
 
         public override Block Copy()
-            => new Ladder()
+            => new Liana()
             {
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,

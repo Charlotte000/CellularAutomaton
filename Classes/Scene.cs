@@ -31,7 +31,7 @@
 
         public Scene(uint windowWidth, uint windowHeight)
         {
-            TerrainGenerator.Seed = 125;
+            this.TerrainGenerator.Scene = this;
 
             // Init chunk map
             for (int x = 0; x < this.Map.GetLength(0); x++)
@@ -39,7 +39,15 @@
                 for (int y = 0; y < this.Map.GetLength(1); y++)
                 {
                     this.Map[x, y] = new Chunk(x * Chunk.Size.X, y * Chunk.Size.Y);
-                    TerrainGenerator.Generate(this.Map[x, y]);
+                }
+            }
+
+            // Generate terrain
+            for (int x = 0; x < this.Map.GetLength(0); x++)
+            {
+                for (int y = 0; y < this.Map.GetLength(1); y++)
+                {
+                    this.TerrainGenerator.Generate(this.Map[x, y]);
                 }
             }
 
@@ -92,6 +100,8 @@
         }
 
         public BlockHistory BlockHistory { get; set; } = new ();
+
+        public TerrainGenerator TerrainGenerator { get; set; } = new () { Seed = 125 };
 
         public float Daylight { get; set; } = 0;
 
