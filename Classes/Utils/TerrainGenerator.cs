@@ -26,10 +26,14 @@
             var h = chunk.Map.GetLength(1);
 
             var heightGenerator = new NoiseGenerator(TerrainGenerator.Seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
-            var stoneGenerator = new NoiseGenerator(TerrainGenerator.Seed + 123, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
+            var vegetationGenerator = new NoiseGenerator(TerrainGenerator.Seed + 1, .5, 3, new[] { 5, 3 }, false, Interpolations.Linear);
+            var stoneGenerator = new NoiseGenerator(TerrainGenerator.Seed + 12, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
 
             var heightMap = new double[w, 1];
             heightGenerator.Fill(heightMap, new long[] { chunk.Coord.X / w, 0 });
+
+            var vegetationMap = new double[w, 1];
+            vegetationGenerator.Fill(vegetationMap, new long[] { chunk.Coord.X / w, 0 });
 
             var stoneMap = new double[w, 1];
             stoneGenerator.Fill(stoneMap, new long[] { chunk.Coord.X / w, 0 });
@@ -52,6 +56,22 @@
                     if (y == terrainHeight)
                     {
                         chunk.SetBlock(new Grass() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
+
+                        if (y - 1 < TerrainGenerator.Sea.Average)
+                        {
+                            if (vegetationMap[x, 0] > .5)
+                            {
+                                if (vegetationMap[x, 0] > .7)
+                                {
+                                    chunk.SetBlock(new Tree(), x + chunk.Coord.X, y - 1);
+                                }
+                                else
+                                {
+                                    chunk.SetBlock(new TallGrass(), x + chunk.Coord.X, y - 1);
+                                }
+                            }
+                        }
+
                         continue;
                     }
 
@@ -70,7 +90,7 @@
             var w = chunk.Map.GetLength(0);
             var h = chunk.Map.GetLength(1);
 
-            var generator = new NoiseGenerator(TerrainGenerator.Seed + 1234, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
+            var generator = new NoiseGenerator(TerrainGenerator.Seed + 123, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
 
             var caveMap = new double[w, h];
             generator.Fill(caveMap, new long[] { chunk.Coord.X / w, chunk.Coord.Y / h });

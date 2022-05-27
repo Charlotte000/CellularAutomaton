@@ -55,7 +55,7 @@
             }
 
             // Spread Out
-            var deltaX = (scene.RandomGenerator.Next(0, 2) * -2) + 1;
+            var deltaX = (Scene.RandomGenerator.Next(0, 2) * -2) + 1;
             if (this.SpreadOut(scene, deltaX))
             {
                 return;

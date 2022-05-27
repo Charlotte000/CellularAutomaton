@@ -10,7 +10,7 @@
                 {
                     if (x == scene.Map.GetLength(0) - 1)
                     {
-                        scene.BlockHistory.SaveWaterToHistory(scene.Map[x, y]);
+                        scene.BlockHistory.SaveChunk(scene.Map[x, y]);
                         scene.Map[x, y].Dispose();
                     }
 
@@ -22,7 +22,7 @@
                         var oldY = scene.Map[0, y].Coord.Y;
                         scene.Map[0, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(scene.Map[0, y]);
-                        scene.BlockHistory.LoadBlocksFromHistory(scene.Map[0, y]);
+                        scene.BlockHistory.LoadChunk(scene.Map[0, y]);
                     }
                 }
             }
@@ -36,7 +36,7 @@
                 {
                     if (x == 0)
                     {
-                        scene.BlockHistory.SaveWaterToHistory(scene.Map[0, y]);
+                        scene.BlockHistory.SaveChunk(scene.Map[0, y]);
                         scene.Map[0, y].Dispose();
                     }
 
@@ -48,7 +48,7 @@
                         var oldY = scene.Map[x + 1, y].Coord.Y;
                         scene.Map[x + 1, y] = new Chunk(newX, oldY);
                         TerrainGenerator.Generate(scene.Map[x + 1, y]);
-                        scene.BlockHistory.LoadBlocksFromHistory(scene.Map[x + 1, y]);
+                        scene.BlockHistory.LoadChunk(scene.Map[x + 1, y]);
                     }
                 }
             }
@@ -62,7 +62,7 @@
                 {
                     if (y == scene.Map.GetLength(1) - 1)
                     {
-                        scene.BlockHistory.SaveWaterToHistory(scene.Map[x, y]);
+                        scene.BlockHistory.SaveChunk(scene.Map[x, y]);
                         scene.Map[x, y].Dispose();
                     }
 
@@ -74,7 +74,7 @@
                         var newY = scene.Map[x, 0].Coord.Y - Chunk.Size.Y;
                         scene.Map[x, 0] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(scene.Map[x, 0]);
-                        scene.BlockHistory.LoadBlocksFromHistory(scene.Map[x, 0]);
+                        scene.BlockHistory.LoadChunk(scene.Map[x, 0]);
                     }
                 }
             }
@@ -88,7 +88,7 @@
                 {
                     if (y == 0)
                     {
-                        scene.BlockHistory.SaveWaterToHistory(scene.Map[x, 0]);
+                        scene.BlockHistory.SaveChunk(scene.Map[x, 0]);
                         scene.Map[x, 0].Dispose();
                     }
 
@@ -100,7 +100,7 @@
                         var newY = scene.Map[x, y + 1].Coord.Y + Chunk.Size.Y;
                         scene.Map[x, y + 1] = new Chunk(oldX, newY);
                         TerrainGenerator.Generate(scene.Map[x, y + 1]);
-                        scene.BlockHistory.LoadBlocksFromHistory(scene.Map[x, y + 1]);
+                        scene.BlockHistory.LoadChunk(scene.Map[x, y + 1]);
                     }
                 }
             }

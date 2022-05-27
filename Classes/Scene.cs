@@ -21,6 +21,8 @@
             new Vector2i(0, 1),
         };
 
+        public static readonly Random RandomGenerator = new ();
+
         private static readonly int DayDuration = 3600;
 
         private readonly Clock fpsClock = new ();
@@ -103,8 +105,6 @@
         public RenderWindow Window { get; set; }
 
         public View Camera { get; set; }
-
-        public Random RandomGenerator { get; set; } = new Random();
 
         public Clock Clock { get; set; } = new Clock();
 
@@ -192,7 +192,7 @@
 
             if (saveToHistory)
             {
-                this.BlockHistory.SaveBlockToHistory(chunk, block);
+                this.BlockHistory.SaveBlock(chunk, block);
             }
         }
 
