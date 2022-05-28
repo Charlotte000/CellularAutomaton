@@ -2,7 +2,6 @@
 {
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
-    using SFML.System;
 
     public class Ladder : Block, IClimbable
     {
@@ -25,7 +24,7 @@
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
                 Light = this.Light,
-                Wall = this.Wall.Copy(),
+                Wall = this.Wall?.Copy(),
                 WasUpdated = this.WasUpdated,
             };
 
@@ -33,13 +32,12 @@
         {
             for (int i = 1; i < length; i++)
             {
-                var block = scene.GetBlock(this.Coords.X, this.Coords.Y + i);
-                if (block is not Empty)
+                if (scene.GetBlock(this.Coords.X, this.Coords.Y + i) is not Empty)
                 {
                     return;
                 }
 
-                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + i, false, true);
+                scene.SetBlock(new Ladder(), this.Coords.X, this.Coords.Y + i, false, true);
             }
         }
     }

@@ -2,7 +2,6 @@
 {
     using CellularAutomaton.Classes.Blocks;
     using CellularAutomaton.Classes.Walls;
-    using CellularAutomaton.Interfaces;
     using RandomAccessPerlinNoise;
 
     public class TerrainGenerator

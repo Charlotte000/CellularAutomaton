@@ -22,7 +22,7 @@
 
         public void Draw(RenderWindow window)
         {
-            // this.DrawBorder(window);
+            this.DrawBorder(window);
             foreach (var block in this.Map)
             {
                 if (block.IsVisible)
@@ -95,7 +95,7 @@
             {
                 if (block.Wall is null)
                 {
-                    block.Wall = oldBlock.Wall.Copy();
+                    block.Wall = oldBlock.Wall?.Copy();
                 }
 
                 block.Light = oldBlock.Light;

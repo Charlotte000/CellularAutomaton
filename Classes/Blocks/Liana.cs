@@ -23,11 +23,11 @@
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
                 Light = this.Light,
-                Wall = this.Wall.Copy(),
+                Wall = this.Wall?.Copy(),
                 WasUpdated = this.WasUpdated,
             };
 
-        public void Expand(Scene scene, int length)
+        public void Expand(Scene scene, int length) // HACK: new chunk empty wall
         {
             for (int i = 1; i < length; i++)
             {
@@ -37,7 +37,7 @@
                     return;
                 }
 
-                scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + i, false, true);
+                scene.SetBlock(new Liana(), this.Coords.X, this.Coords.Y + i, false, true);
             }
         }
     }

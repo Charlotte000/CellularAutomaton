@@ -23,7 +23,7 @@
 
         public int Light { get; set; }
 
-        public Wall Wall { get; set; }
+        public Wall? Wall { get; set; }
 
         public bool WasUpdated { get; set; } = false;
 
@@ -41,7 +41,7 @@
         {
             if (this.IsTransparent)
             {
-                this.Wall.Draw(window, this);
+                this.Wall!.Draw(window, this);
             }
 
             this.Sprite.Position = this.CollisionBox.Position;
@@ -69,7 +69,7 @@
 
         public virtual void OnDelete()
         {
-            this.Wall.Dispose();
+            this.Wall?.Dispose();
             this.CollisionBox.Dispose();
         }
 
@@ -79,7 +79,7 @@
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
                 Light = this.Light,
-                Wall = this.Wall.Copy(),
+                Wall = this.Wall?.Copy(),
                 WasUpdated = this.WasUpdated,
             };
     }

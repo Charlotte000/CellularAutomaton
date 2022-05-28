@@ -2,6 +2,7 @@
 {
     using CellularAutomaton.Classes.Blocks;
     using CellularAutomaton.Classes.Entities;
+    using CellularAutomaton.Classes.Menu;
     using CellularAutomaton.Classes.Utils;
     using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
@@ -28,6 +29,8 @@
         private readonly Clock fpsClock = new ();
 
         private readonly Mutex mutex = new ();
+
+        private readonly InventoryMenu inventoryMenu;
 
         public Scene(uint windowWidth, uint windowHeight)
         {
@@ -56,7 +59,9 @@
             this.Window.SetFramerateLimit(60);
             this.Window.Closed += (obj, e) => this.Window.Close();
 
-            this.Camera = this.Window.GetView();
+            this.Camera = new View(this.Window.GetView());
+
+            this.inventoryMenu = new (new Vector2f(windowWidth, 50), new Vector2f(0, windowHeight - 50));
 
             // Run block update & light threads.
             new Thread(() =>
@@ -97,6 +102,12 @@
                 }
             })
             { IsBackground = true }.Start();
+
+            // Add event listener
+            this.Window.MouseWheelScrolled += new EventHandler<MouseWheelScrollEventArgs>((sender, e) =>
+            {
+                this.inventoryMenu.OnChange(e.Delta);
+            });
         }
 
         public BlockHistory BlockHistory { get; set; } = new ();
@@ -133,6 +144,8 @@
 
                 this.KeyListen();
 
+                this.MoveCamera();
+
                 this.UpdateVisibility();
 
                 foreach (var entity in this.Entities)
@@ -140,22 +153,7 @@
                     entity.OnUpdate(this);
                 }
 
-                this.MoveCamera();
-
-                this.Window.Clear(new Color(
-                    (byte)(100 * this.Daylight),
-                    (byte)(150 * this.Daylight),
-                    (byte)(255 * this.Daylight)));
-
-                foreach (var chunk in this.Map)
-                {
-                    chunk.Draw(this.Window);
-                }
-
-                foreach (var entity in this.Entities)
-                {
-                    entity.OnDraw(this.Window);
-                }
+                this.Draw();
 
                 this.mutex.ReleaseMutex();
 
@@ -209,27 +207,55 @@
         public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
             => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
-        public Block? TrySetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = true)
+        public Block? TrySetBlock(
+            Scene scene,
+            Block block,
+            Vector2i coords,
+            bool updateLights = true,
+            bool saveToHistory = true)
         {
             var oldBlock = this.GetBlock(coords);
+            block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
 
+            // Attempt to build up an existing block
             if (block is not Empty && (oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
             {
                 return null;
             }
 
+            // Attempt to remove water
             if (block is Empty && oldBlock is Water)
             {
                 return null;
             }
 
+            // Attempt to delete an empty block
             if (block is Empty && oldBlock is Empty)
             {
                 return null;
             }
 
-            block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
+            // Attempt to build a levitating block
+            if (block is not Empty)
+            {
+                var hasNeighbour = false;
+                foreach (var delta in Scene.Neighborhood)
+                {
+                    var neighbour = scene.GetBlock(coords + delta);
+                    if (neighbour is ICollidable || neighbour?.Wall is not EmptyWall)
+                    {
+                        hasNeighbour = true;
+                        break;
+                    }
+                }
 
+                if (!hasNeighbour)
+                {
+                    return null;
+                }
+            }
+
+            // Attempt to build up an entity
             if (block is ICollidable)
             {
                 foreach (var entity in this.Entities)
@@ -241,6 +267,7 @@
                 }
             }
 
+            // Water ejection
             if (block is not Empty && block is not Water && oldBlock is Water oldBlockWater)
             {
                 if (Water.Push(this, oldBlockWater))
@@ -251,12 +278,19 @@
                 return block;
             }
 
+            // Creating block
             this.SetBlock(block, coords, updateLights, saveToHistory);
             return block;
         }
 
-        public Block? TrySetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = true)
-            => this.TrySetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
+        public Block? TrySetBlock(
+            Scene scene,
+            Block block,
+            int x,
+            int y,
+            bool updateLights = true,
+            bool saveToHistory = true)
+            => this.TrySetBlock(scene, block, new Vector2i(x, y), updateLights, saveToHistory);
 
         public Block[] GetAllBlocks()
         {
@@ -282,6 +316,31 @@
 
         public Chunk? GetChunk(int x, int y)
             => this.GetChunk(new Vector2i(x, y));
+
+        private void Draw()
+        {
+            // Sky
+            this.Window.Clear(new Color(
+                (byte)(100 * this.Daylight),
+                (byte)(150 * this.Daylight),
+                (byte)(255 * this.Daylight)));
+
+            // Blocks
+            foreach (var chunk in this.Map)
+            {
+                chunk.Draw(this.Window);
+            }
+
+            // Entitues
+            foreach (var entity in this.Entities)
+            {
+                entity.OnDraw(this.Window);
+            }
+
+            // UI
+            this.Window.SetView(this.Window.DefaultView);
+            this.inventoryMenu.OnDraw(this.Window);
+        }
 
         private void MoveChunks()
         {
@@ -315,34 +374,21 @@
         {
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                this.TrySetBlock(new Dirt(), this.GetMouseCoords())?.OnCreate(this);
+                this.TrySetBlock(this, this.inventoryMenu.GetValue(), this.GetMouseCoords())?.OnCreate(this);
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Right))
             {
-                this.TrySetBlock(new Empty(), this.GetMouseCoords())?.OnCreate(this);
-            }
-
-            if (Mouse.IsButtonPressed(Mouse.Button.Middle))
-            {
-                this.TrySetBlock(new Water() { Amount = 4 }, this.GetMouseCoords(), saveToHistory: false)?.OnCreate(this);
-            }
-
-            if (Keyboard.IsKeyPressed(Keyboard.Key.T))
-            {
-                this.TrySetBlock(new Torch(), this.GetMouseCoords())?.OnCreate(this);
-            }
-
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Y))
-            {
-                this.TrySetBlock(new Ladder(), this.GetMouseCoords())?.OnCreate(this);
+                this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate(this);
             }
         }
 
         private void UpdateVisibility()
         {
             var blockSize = new Vector2f(Block.Size, Block.Size);
-            var viewRect = new FloatRect(this.Camera.Center - (this.Camera.Size / 2) - blockSize, this.Camera.Size + (blockSize * 2));
+            var viewRect = new FloatRect(
+                this.Camera.Center - (this.Camera.Size / 2) - blockSize,
+                this.Camera.Size + (blockSize * 2));
             foreach (var block in this.GetAllBlocks())
             {
                 if (block is Empty && block.Wall is EmptyWall)

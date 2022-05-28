@@ -10,9 +10,9 @@
 
         public override void OnDraw(RenderWindow window)
         {
-            this.Wall.Draw(window, this);
+            this.Wall!.Draw(window, this);
 
-            if (this.Wall.Sprite is not null)
+            if (this.Wall!.Sprite is not null)
             {
                 var shadow = new Sprite(this.Wall.Sprite)
                 {
@@ -28,7 +28,7 @@
                 CollisionBox = new RectangleShape(this.CollisionBox),
                 Coords = this.Coords,
                 Light = this.Light,
-                Wall = this.Wall.Copy(),
+                Wall = this.Wall?.Copy(),
                 WasUpdated = this.WasUpdated,
             };
     }
