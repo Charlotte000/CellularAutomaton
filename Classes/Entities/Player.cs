@@ -84,7 +84,7 @@
                 this.Vel += new Vector2f(-.7f, 0);
             }
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && this.IsOnGround && !this.IsOnWater && !this.IsClimbing)
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W) && this.IsOnGround)
             {
                 this.Vel += new Vector2f(0, -15f);
             }

@@ -61,7 +61,7 @@
 
             this.Camera = new View(this.Window.GetView());
 
-            this.inventoryMenu = new (new Vector2f(windowWidth, 50), new Vector2f(0, windowHeight - 50));
+            this.inventoryMenu = new (this.Window, new Vector2f(0, windowHeight - 50), new Vector2f(windowWidth, 50));
 
             // Run block update & light threads.
             new Thread(() =>
@@ -102,12 +102,6 @@
                 }
             })
             { IsBackground = true }.Start();
-
-            // Add event listener
-            this.Window.MouseWheelScrolled += new EventHandler<MouseWheelScrollEventArgs>((sender, e) =>
-            {
-                this.inventoryMenu.OnChange(e.Delta);
-            });
         }
 
         public BlockHistory BlockHistory { get; set; } = new ();
@@ -339,7 +333,7 @@
 
             // UI
             this.Window.SetView(this.Window.DefaultView);
-            this.inventoryMenu.OnDraw(this.Window);
+            this.inventoryMenu.OnDraw();
         }
 
         private void MoveChunks()

@@ -3,52 +3,67 @@
     using CellularAutomaton.Classes.Blocks;
     using SFML.Graphics;
     using SFML.System;
+    using SFML.Window;
 
-    public class InventoryMenu
+    public class InventoryMenu : Interface
     {
-        public static readonly int Margin = 7;
-
-        private readonly RectangleShape shape;
-
         private readonly List<InventoryItem> items = new ();
 
         private int selected;
 
-        public InventoryMenu(Vector2f size, Vector2f position)
+        public InventoryMenu(RenderWindow window, Vector2f position, Vector2f size)
+            : base(window, position, size)
         {
-            this.shape = new RectangleShape(size)
-            {
-                Position = position,
-                FillColor = new Color(50, 50, 50),
-                OutlineColor = new Color(100, 100, 100),
-                OutlineThickness = 3,
-            };
-
-            this.items.Add(new (size, position, 0, new Dirt()));
-            this.items.Add(new (size, position, 1, new Grass()));
-            this.items.Add(new (size, position, 2, new Ladder()));
-            this.items.Add(new (size, position, 3, new Liana()));
-            this.items.Add(new (size, position, 4, new Stone()));
-            this.items.Add(new (size, position, 5, new TallGrass()));
-            this.items.Add(new (size, position, 6, new Torch()));
-            this.items.Add(new (size, position, 7, new Water()));
+            this.items.Add(new (window, size, position, 0, new Dirt()));
+            this.items.Add(new (window, size, position, 1, new Grass()));
+            this.items.Add(new (window, size, position, 2, new Ladder()));
+            this.items.Add(new (window, size, position, 3, new Liana()));
+            this.items.Add(new (window, size, position, 4, new Stone()));
+            this.items.Add(new (window, size, position, 5, new TallGrass()));
+            this.items.Add(new (window, size, position, 6, new Torch()));
+            this.items.Add(new (window, size, position, 7, new Water()));
 
             this.selected = 0;
         }
 
-        public void OnDraw(RenderWindow window)
+        public override void AddEvents()
         {
-            window.Draw(this.shape);
+            this.Window.MouseWheelScrolled += this.OnMouseScrolled;
+            this.Window.KeyPressed += this.OnKeyPressed;
+        }
+
+        public override void DeleteEvents()
+        {
+            this.Window.MouseWheelScrolled -= this.OnMouseScrolled;
+            this.Window.KeyPressed -= this.OnKeyPressed;
+        }
+
+        public override void OnDraw()
+        {
+            base.OnDraw();
 
             for (int i = 0; i < this.items.Count; i++)
             {
-                this.items[i].OnDraw(window, i == this.selected);
+                this.items[i].OnDraw(i == this.selected);
             }
         }
 
-        public void OnChange(float delta)
+        public override void OnDelete()
         {
-            if (delta > 0)
+            base.OnDelete();
+
+            foreach (var item in this.items)
+            {
+                item.Dispose();
+            }
+        }
+
+        public Block GetValue()
+            => this.items[this.selected].Block.Copy();
+
+        private void OnMouseScrolled(object? sender, MouseWheelScrollEventArgs e)
+        {
+            if (e.Delta > 0)
             {
                 this.selected--;
                 if (this.selected < 0)
@@ -57,41 +72,43 @@
                 }
             }
 
-            if (delta < 0)
+            if (e.Delta < 0)
             {
                 this.selected++;
                 this.selected %= this.items.Count;
             }
         }
 
-        public Block GetValue()
-            => this.items[this.selected].Block.Copy();
-
-        private class InventoryItem
+        private void OnKeyPressed(object? sender, KeyEventArgs e)
         {
-            private readonly RectangleShape shape;
+            for (int i = 27; i < 36; i++)
+            {
+                if (((int)e.Code) == i)
+                {
+                    this.selected = Math.Min(i - 27, this.items.Count - 1);
+                    break;
+                }
+            }
+        }
 
+        private class InventoryItem : Interface
+        {
             private readonly Sprite sprite;
 
-            public InventoryItem(Vector2f originSize, Vector2f originPosition, int index, Block block)
+            public InventoryItem(RenderWindow window, Vector2f originSize, Vector2f originPosition, int index, Block block)
+                : base(
+                      window,
+                      new Vector2f(
+                          originPosition.X + Interface.Margin + (originSize.Y * index),
+                          originPosition.Y + Interface.Margin),
+                      new Vector2f(originSize.Y - (InventoryMenu.Margin * 2), originSize.Y - (InventoryMenu.Margin * 2)))
             {
-                this.shape = new (
-                    new Vector2f(originSize.Y - (InventoryMenu.Margin * 2), originSize.Y - (InventoryMenu.Margin * 2)))
-                {
-                    Position = new Vector2f(
-                        originPosition.X + InventoryMenu.Margin + (originSize.Y * index),
-                        originPosition.Y + InventoryMenu.Margin),
-                    FillColor = new Color(100, 100, 100),
-                    OutlineColor = new Color(0, 0, 0),
-                    OutlineThickness = 2,
-                };
-
                 this.sprite = new Sprite(block.Sprite)
                 {
                     Scale = new Vector2f(
-                        (this.shape.Size.X - (InventoryMenu.Margin * 2)) / block.Sprite.TextureRect.Width,
-                        (this.shape.Size.Y - (InventoryMenu.Margin * 2)) / block.Sprite.TextureRect.Height),
-                    Position = this.shape.Position + new Vector2f(InventoryMenu.Margin, InventoryMenu.Margin),
+                        (this.Shape.Size.X - (InventoryMenu.Margin * 2)) / block.Sprite.TextureRect.Width,
+                        (this.Shape.Size.Y - (InventoryMenu.Margin * 2)) / block.Sprite.TextureRect.Height),
+                    Position = this.Shape.Position + new Vector2f(InventoryMenu.Margin, InventoryMenu.Margin),
                 };
 
                 this.Block = block.Copy();
@@ -99,12 +116,21 @@
 
             public Block Block { get; set; }
 
-            public void OnDraw(RenderWindow window, bool isSelected)
+            public void OnDraw(bool isSelected)
             {
-                this.shape.FillColor = isSelected ? new Color(150, 150, 150) : new Color(100, 100, 100);
+                this.Shape.FillColor = isSelected ? new Color(150, 150, 150) : new Color(100, 100, 100);
 
-                window.Draw(this.shape);
-                window.Draw(this.sprite);
+                this.OnDraw();
+
+                this.Window.Draw(this.Shape);
+                this.Window.Draw(this.sprite);
+            }
+
+            public void Dispose()
+            {
+                this.sprite.Dispose();
+                this.Shape.Dispose();
+                this.Block.OnDelete();
             }
         }
     }
