@@ -322,18 +322,18 @@
             // Blocks
             foreach (var chunk in this.Map)
             {
-                chunk.Draw(this.Window);
+                this.Window.Draw(chunk);
             }
 
             // Entitues
             foreach (var entity in this.Entities)
             {
-                entity.OnDraw(this.Window);
+                this.Window.Draw(entity);
             }
 
             // UI
             this.Window.SetView(this.Window.DefaultView);
-            this.inventoryMenu.OnDraw();
+            this.Window.Draw(this.inventoryMenu);
         }
 
         private void MoveChunks()

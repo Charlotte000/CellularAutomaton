@@ -36,15 +36,15 @@
         {
         }
 
-        public void OnDraw(RenderWindow window)
+        public void Draw(RenderTarget target, RenderStates states)
         {
-            window.Draw(this.CollisionBox);
+            target.Draw(this.CollisionBox, states);
 
             var shadow = new RectangleShape(this.CollisionBox)
             {
                 FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
             };
-            window.Draw(shadow);
+            target.Draw(shadow, states);
         }
 
         public void OnUpdate(Scene scene)

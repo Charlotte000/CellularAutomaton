@@ -4,7 +4,7 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public interface IEntity
+    public interface IEntity : Drawable
     {
         public RectangleShape CollisionBox { get; set; }
 
@@ -13,8 +13,6 @@
         public int Light { get; set; }
 
         public void OnCreate(Scene scene);
-
-        public void OnDraw(RenderWindow window);
 
         public void OnUpdate(Scene scene);
 

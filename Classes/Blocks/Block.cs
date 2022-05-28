@@ -37,30 +37,30 @@
         {
         }
 
-        public virtual void OnDraw(RenderWindow window)
+        public virtual void Draw(RenderTarget target, RenderStates states)
         {
             if (this.IsTransparent)
             {
-                this.Wall!.Draw(window, this);
+                target.Draw(this.Wall!, states);
             }
 
-            this.Sprite.Position = this.CollisionBox.Position;
             if (this.Light > 0)
             {
-                window.Draw(this.Sprite);
+                target.Draw(this.Sprite, states);
             }
 
             Drawable shadow = this.Wall is not EmptyWall && this.IsTransparent ?
                 new RectangleShape(this.CollisionBox)
                 {
                     FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                    Position = new Vector2f(0, 0),
                 }
                 :
                 new Sprite(this.Sprite)
                 {
                     Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
                 };
-            window.Draw(shadow);
+            target.Draw(shadow, states);
         }
 
         public virtual void OnCollision(IEntity entity, Vector2f? normal)

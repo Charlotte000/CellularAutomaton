@@ -3,7 +3,7 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class Interface
+    public class Interface : Drawable
     {
         public static readonly int Margin = 7;
 
@@ -34,9 +34,9 @@
         {
         }
 
-        public virtual void OnDraw()
+        public virtual void Draw(RenderTarget target, RenderStates states)
         {
-            this.Window.Draw(this.Shape);
+            target.Draw(this.Shape, states);
         }
 
         public virtual void OnDelete()

@@ -8,9 +8,9 @@
 
         public override bool IsTransparent { get => true; }
 
-        public override void OnDraw(RenderWindow window)
+        public override void Draw(RenderTarget target, RenderStates states)
         {
-            this.Wall!.Draw(window, this);
+            target.Draw(this.Wall!, states);
 
             if (this.Wall!.Sprite is not null)
             {
@@ -18,7 +18,7 @@
                 {
                     Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
                 };
-                window.Draw(shadow);
+                target.Draw(shadow, states);
             }
         }
 

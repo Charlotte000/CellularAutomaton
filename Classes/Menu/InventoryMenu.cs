@@ -38,13 +38,14 @@
             this.Window.KeyPressed -= this.OnKeyPressed;
         }
 
-        public override void OnDraw()
+        public override void Draw(RenderTarget target, RenderStates states)
         {
-            base.OnDraw();
+            base.Draw(target, states);
 
             for (int i = 0; i < this.items.Count; i++)
             {
-                this.items[i].OnDraw(i == this.selected);
+                this.items[i].Shape.FillColor = i == this.selected ? new Color(150, 150, 150) : new Color(100, 100, 100);
+                target.Draw(this.items[i], states);
             }
         }
 
@@ -54,7 +55,7 @@
 
             foreach (var item in this.items)
             {
-                item.Dispose();
+                item.OnDelete();
             }
         }
 
@@ -116,20 +117,19 @@
 
             public Block Block { get; set; }
 
-            public void OnDraw(bool isSelected)
+            public override void Draw(RenderTarget target, RenderStates states)
             {
-                this.Shape.FillColor = isSelected ? new Color(150, 150, 150) : new Color(100, 100, 100);
+                base.Draw(target, states);
 
-                this.OnDraw();
-
-                this.Window.Draw(this.Shape);
-                this.Window.Draw(this.sprite);
+                target.Draw(this.Shape, states);
+                target.Draw(this.sprite, states);
             }
 
-            public void Dispose()
+            public override void OnDelete()
             {
+                base.OnDelete();
+
                 this.sprite.Dispose();
-                this.Shape.Dispose();
                 this.Block.OnDelete();
             }
         }

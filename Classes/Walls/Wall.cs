@@ -3,7 +3,7 @@
     using CellularAutomaton.Classes.Blocks;
     using SFML.Graphics;
 
-    public class Wall
+    public class Wall : Drawable
     {
         private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 2, Block.Size, Block.Size, Block.Size));
 
@@ -12,10 +12,9 @@
         public virtual Wall Copy()
             => new ();
 
-        public virtual void Draw(RenderWindow window, Block parentBlock)
+        public virtual void Draw(RenderTarget target, RenderStates states)
         {
-            this.Sprite.Position = parentBlock.CollisionBox.Position;
-            window.Draw(this.Sprite);
+            target.Draw(this.Sprite, states);
         }
 
         public virtual void Dispose()

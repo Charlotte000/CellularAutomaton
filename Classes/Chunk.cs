@@ -5,7 +5,7 @@
     using SFML.Graphics;
     using SFML.System;
 
-    public class Chunk
+    public class Chunk : Drawable
     {
         public Chunk(int x, int y)
         {
@@ -20,14 +20,16 @@
 
         public Block[,] Map { get; set; } = new Block[Chunk.Size.X, Chunk.Size.Y];
 
-        public void Draw(RenderWindow window)
+        public void Draw(RenderTarget target, RenderStates states)
         {
             // this.DrawBorder(window);
             foreach (var block in this.Map)
             {
                 if (block.IsVisible)
                 {
-                    block.OnDraw(window);
+                    var blockRenderState = new RenderStates(states);
+                    blockRenderState.Transform.Translate(block.CollisionBox.Position);
+                    target.Draw(block, blockRenderState);
                 }
             }
         }
