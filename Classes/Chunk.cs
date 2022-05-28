@@ -22,7 +22,7 @@
 
         public void Draw(RenderWindow window)
         {
-            this.DrawBorder(window);
+            // this.DrawBorder(window);
             foreach (var block in this.Map)
             {
                 if (block.IsVisible)

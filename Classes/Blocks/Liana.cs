@@ -1,8 +1,8 @@
 ﻿namespace CellularAutomaton.Classes.Blocks
 {
+    using CellularAutomaton.Classes.Walls;
     using CellularAutomaton.Interfaces;
     using SFML.Graphics;
-    using SFML.System;
 
     public class Liana : Block, IClimbable
     {
@@ -27,12 +27,12 @@
                 WasUpdated = this.WasUpdated,
             };
 
-        public void Expand(Scene scene, int length) // HACK: new chunk empty wall
+        public void Expand(Scene scene, int length) // HACK: one length liana
         {
             for (int i = 1; i < length; i++)
             {
                 var block = scene.GetBlock(this.Coords.X, this.Coords.Y + i);
-                if (block is not Empty)
+                if (block is null || block is not Empty || block.Wall is EmptyWall)
                 {
                     return;
                 }
