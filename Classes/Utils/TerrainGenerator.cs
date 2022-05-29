@@ -6,15 +6,15 @@
 
     public class TerrainGenerator
     {
-        public Scene Scene { get; set; }
+        private readonly Level sea = new () { Average = 20, Dispersion = 0 };
 
-        private readonly Level Sea = new () { Average = 20, Dispersion = 0 };
+        private readonly Level dirt = new () { Average = 20, Dispersion = 15 };
 
-        private readonly Level Dirt = new () { Average = 20, Dispersion = 15 };
-
-        private readonly Level Stone = new () { Average = 40, Dispersion = 25 };
+        private readonly Level stone = new () { Average = 40, Dispersion = 25 };
 
         public long Seed { get; set; }
+
+        public Scene Scene { get; set; }
 
         public void Generate(Chunk chunk)
         {
@@ -43,12 +43,12 @@
             for (int x = 0; x < w; x++)
             {
                 var terrainNoise = (heightMap[x, 0] * 2) - 1;
-                var terrainHeight = this.Dirt.Calculate(terrainNoise);
+                var terrainHeight = this.dirt.Calculate(terrainNoise);
 
                 var stoneNoise = (stoneMap[x, 0] * 2) - 1;
-                var stoneHeight = this.Stone.Calculate(stoneNoise);
+                var stoneHeight = this.stone.Calculate(stoneNoise);
 
-                for (int y = this.Sea.Average; y < terrainHeight; y++)
+                for (int y = this.sea.Average; y < terrainHeight; y++)
                 {
                     chunk.SetBlock(new Water() { Amount = 4, Wall = new EmptyWall() }, x + chunk.Coord.X, y);
                 }
@@ -59,7 +59,7 @@
                     {
                         chunk.SetBlock(new Grass() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
 
-                        if (y - 1 < this.Sea.Average)
+                        if (y - 1 < this.sea.Average)
                         {
                             if (vegetationMap[x, 0] > .5)
                             {
@@ -101,7 +101,7 @@
             {
                 for (int y = 0; y < h; y++)
                 {
-                    if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.Dirt.Average + this.Dirt.Dispersion)
+                    if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.dirt.Average + this.dirt.Dispersion)
                     {
                         chunk.SetBlock(new Empty(), x + chunk.Coord.X, y + chunk.Coord.Y);
                     }
@@ -118,7 +118,7 @@
                 bool isHole = true;
                 for (int y = 0; y < h; y++)
                 {
-                    if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.Dirt.Average + this.Dirt.Dispersion)
+                    if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.dirt.Average + this.dirt.Dispersion)
                     {
                         if (!isHole && vegetationMap[x, y] > .6)
                         {

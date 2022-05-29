@@ -13,7 +13,6 @@
 
         public override bool IsTransparent { get => false; }
 
-
         public override Block Copy()
             => new Stone()
             {

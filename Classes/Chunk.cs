@@ -22,7 +22,7 @@
 
         public void Draw(RenderTarget target, RenderStates states)
         {
-            // this.DrawBorder(window);
+            // this.DrawBorder(target, states);
             foreach (var block in this.Map)
             {
                 if (block.IsVisible)
@@ -118,7 +118,7 @@
             }
         }
 
-        private void DrawBorder(RenderWindow window)
+        private void DrawBorder(RenderTarget target, RenderStates states)
         {
             var border = new RectangleShape((Vector2f)Chunk.Size * Block.Size)
             {
@@ -127,7 +127,7 @@
                 OutlineThickness = 2,
                 Position = (Vector2f)this.Coord * Block.Size,
             };
-            window.Draw(border);
+            target.Draw(border, states);
         }
 
         private void SetBlockForce(Block block, Vector2i coords)

@@ -16,12 +16,13 @@
         {
             this.items.Add(new (window, size, position, 0, new Dirt()));
             this.items.Add(new (window, size, position, 1, new Grass()));
-            this.items.Add(new (window, size, position, 2, new Ladder()));
-            this.items.Add(new (window, size, position, 3, new Liana()));
-            this.items.Add(new (window, size, position, 4, new Stone()));
-            this.items.Add(new (window, size, position, 5, new TallGrass()));
-            this.items.Add(new (window, size, position, 6, new Torch()));
+            this.items.Add(new (window, size, position, 2, new Torch()));
+            this.items.Add(new (window, size, position, 3, new Ladder()));
+            this.items.Add(new (window, size, position, 4, new Liana()));
+            this.items.Add(new (window, size, position, 5, new Stone()));
+            this.items.Add(new (window, size, position, 6, new TallGrass()));
             this.items.Add(new (window, size, position, 7, new Water()));
+            this.items.Add(new (window, size, position, 8, new Block()));
 
             this.selected = 0;
         }

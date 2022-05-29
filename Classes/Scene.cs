@@ -236,7 +236,7 @@
                 foreach (var delta in Scene.Neighborhood)
                 {
                     var neighbour = scene.GetBlock(coords + delta);
-                    if (neighbour is ICollidable || neighbour?.Wall is not EmptyWall)
+                    if (neighbour is not Empty || neighbour?.Wall is not EmptyWall)
                     {
                         hasNeighbour = true;
                         break;
