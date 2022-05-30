@@ -7,7 +7,7 @@
     using SFML.System;
     using SFML.Window;
 
-    public class Player : IMovingEntity
+    public class Player : IMovingEntity, ILivingEntity, ICollidable
     {
         public Player(float x, float y)
         {
@@ -59,6 +59,8 @@
 
             var block = scene.GetBlock((Vector2i)(this.CollisionBox.Position / Block.Size));
             this.Light = block is not null ? block.Light : this.Light;
+
+            scene.AddVel(this.Vel / 20, (Vector2i)(this.CollisionBox.Position / Block.Size));
         }
 
         public void OnCollision(IEntity entity, Vector2f? contactNormal)

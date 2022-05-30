@@ -64,9 +64,9 @@
 
         public override void OnCollision(IEntity entity, Vector2f? normal)
         {
-            if (entity is IMovingEntity movingEntity)
+            if (entity is ILivingEntity livingEntity)
             {
-                movingEntity.IsOnWater = true;
+                livingEntity.IsOnWater = true;
             }
         }
 

@@ -112,7 +112,7 @@
 
         public Chunk[,] Map { get; set; } = new Chunk[4, 4];
 
-        public List<IMovingEntity> Entities { get; set; } = new List<IMovingEntity>()
+        public List<IEntity> Entities { get; set; } = new ()
         {
             new Player(0, 0),
         };
@@ -142,9 +142,9 @@
 
                 this.UpdateVisibility();
 
-                foreach (var entity in this.Entities)
+                for (int i = 0; i < this.Entities.Count; i++)
                 {
-                    entity.OnUpdate(this);
+                    this.Entities[i].OnUpdate(this);
                 }
 
                 this.Draw();
@@ -200,6 +200,23 @@
 
         public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
             => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
+
+        public Vector2f? GetVel(Vector2i coords)
+            => this.GetChunk(coords)?.GetVel(coords);
+
+        public Vector2f? GetVel(int x, int y)
+            => this.GetVel(new Vector2i(x, y));
+
+        public void AddVel(Vector2f vel, Vector2i coords)
+            => this.GetChunk(coords)?.AddVel(vel, coords);
+
+        public void AddVel(Vector2f vel, int x, int y)
+            => this.AddVel(vel, new Vector2i(x, y));
+
+        public void RemoveEntity(IEntity entity)
+        {
+            this.Entities.Remove(entity);
+        }
 
         public Block? TrySetBlock(
             Scene scene,

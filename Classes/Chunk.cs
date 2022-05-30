@@ -20,6 +20,8 @@
 
         public Block[,] Map { get; set; } = new Block[Chunk.Size.X, Chunk.Size.Y];
 
+        public Vector2f[,] VelMap { get; set; } = new Vector2f[Chunk.Size.X, Chunk.Size.Y];
+
         public void Draw(RenderTarget target, RenderStates states)
         {
             // this.DrawBorder(target, states);
@@ -32,6 +34,8 @@
                     target.Draw(block, blockRenderState);
                 }
             }
+
+            // this.DrawVelMap(target, states);
         }
 
         public void Update(Scene scene)
@@ -49,6 +53,8 @@
                     block.OnUpdate(scene);
                 }
             }
+
+            this.UpdateVelMap(scene);
         }
 
         public bool IsValidCoords(Vector2i coords)
@@ -110,11 +116,50 @@
         public void SetBlock(Block block, int x, int y)
             => this.SetBlock(block, new Vector2i(x, y));
 
+        public Vector2f? GetVel(Vector2i coords)
+        {
+            if (!this.IsValidCoords(coords))
+            {
+                return null;
+            }
+
+            return this.VelMap[coords.X - this.Coord.X, coords.Y - this.Coord.Y];
+        }
+
+        public Vector2f? GetVel(int x, int y)
+            => this.GetVel(new Vector2i(x, y));
+
+        public void AddVel(Vector2f vel, Vector2i coords)
+        {
+            if (!this.IsValidCoords(coords))
+            {
+                return;
+            }
+
+            this.VelMap[coords.X - this.Coord.X, coords.Y - this.Coord.Y] += vel;
+        }
+
+        public void AddVel(Vector2f vel, int x, int y)
+            => this.AddVel(vel, new Vector2i(x, y));
+
         public void Dispose()
         {
             foreach (var block in this.Map)
             {
                 block.OnDelete();
+            }
+        }
+
+        private void DrawVelMap(RenderTarget target, RenderStates states)
+        {
+            for (int x = 0; x < this.VelMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < this.VelMap.GetLength(1); y++)
+                {
+                    var a = new Vertex((Vector2f)this.Coord * Block.Size + new Vector2f(x * Block.Size, y * Block.Size));
+                    var b = new Vertex(a.Position + (this.VelMap[x, y] * 40));
+                    target.Draw(new Vertex[] { a, b }, PrimitiveType.Lines);
+                }
             }
         }
 
@@ -149,6 +194,39 @@
                     this.SetBlockForce(new Empty() { Wall = new EmptyWall() }, this.Coord.X + x, this.Coord.Y + y);
                 }
             }
+        }
+
+        private void UpdateVelMap(Scene scene)
+        {
+            var tempVelMap = new Vector2f[this.VelMap.GetLength(0), this.VelMap.GetLength(1)];
+
+            for (int x = 0; x < this.VelMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < this.VelMap.GetLength(1); y++)
+                {
+                    tempVelMap[x, y] = this.AverageVel(scene, this.Coord + new Vector2i(x, y));
+                }
+            }
+
+            this.VelMap = tempVelMap;
+        }
+
+        private Vector2f AverageVel(Scene scene, Vector2i coord)
+        {
+            var vel = new Vector2f(0, 0);
+            var count = 0;
+
+            foreach (var delta in Scene.Neighborhood)
+            {
+                var neighbour = scene.GetVel(coord + delta);
+                if (neighbour.HasValue)
+                {
+                    vel += neighbour.Value;
+                    count++;
+                }
+            }
+
+            return vel / count;
         }
     }
 }
