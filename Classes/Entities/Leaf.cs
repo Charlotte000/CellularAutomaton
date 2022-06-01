@@ -29,6 +29,12 @@
         public void Draw(RenderTarget target, RenderStates states)
         {
             target.Draw(this.CollisionBox, states);
+
+            var shadow = new RectangleShape(this.CollisionBox)
+            {
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+            target.Draw(shadow, states);
         }
 
         public void OnCollision(IEntity entity, Vector2f? contactNormal)
@@ -60,6 +66,14 @@
             this.Collision(scene);
             this.CollisionBox.Position += this.Vel;
 
+            var block = scene.GetBlock((Vector2i)(this.CollisionBox.Position / Block.Size));
+            this.Light = block is not null ? block.Light : this.Light;
+
+            if (block is null)
+            {
+                this.Vel *= 0;
+            }
+
             if (this.Vel.X == 0 && this.Vel.Y == 0)
             {
                 scene.RemoveEntity(this);
@@ -71,6 +85,7 @@
         {
             var entities = new List<IEntity>();
             var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
+
             for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
             {
                 for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)

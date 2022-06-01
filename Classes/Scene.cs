@@ -462,20 +462,20 @@
 
             if (follow.X - this.Camera.Center.X > offsetX)
             {
-                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X - offsetX, 0));
+                this.Camera.Move(new Vector2f(MathF.Round(follow.X - this.Camera.Center.X - offsetX), 0));
             }
             else if (this.Camera.Center.X - follow.X > offsetX)
             {
-                this.Camera.Move(new Vector2f(follow.X - this.Camera.Center.X + offsetX, 0));
+                this.Camera.Move(new Vector2f(MathF.Round(follow.X - this.Camera.Center.X + offsetX), 0));
             }
 
             if (follow.Y - this.Camera.Center.Y > offsetY)
             {
-                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y - offsetY));
+                this.Camera.Move(new Vector2f(0, MathF.Round(follow.Y - this.Camera.Center.Y - offsetY)));
             }
             else if (this.Camera.Center.Y - follow.Y > offsetY)
             {
-                this.Camera.Move(new Vector2f(0, follow.Y - this.Camera.Center.Y + offsetY));
+                this.Camera.Move(new Vector2f(0, MathF.Round(follow.Y - this.Camera.Center.Y + offsetY)));
             }
 
             this.Window.SetView(this.Camera);
