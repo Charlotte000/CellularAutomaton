@@ -1,16 +1,15 @@
-﻿namespace CellularAutomaton.Classes.Walls
+﻿namespace CellularAutomaton.Classes.Walls;
+
+using SFML.Graphics;
+
+public class EmptyWall : Wall
 {
-    using SFML.Graphics;
+    public override Sprite Sprite { get; }
 
-    public class EmptyWall : Wall
+    public override Wall Copy()
+        => new EmptyWall();
+
+    public override void Draw(RenderTarget target, RenderStates states)
     {
-        public override Sprite Sprite { get; }
-
-        public override Wall Copy()
-            => new EmptyWall();
-
-        public override void Draw(RenderTarget target, RenderStates states)
-        {
-        }
     }
 }

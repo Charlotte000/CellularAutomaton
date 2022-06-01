@@ -1,11 +1,10 @@
-﻿namespace CellularAutomaton.Interfaces
+﻿namespace CellularAutomaton.Interfaces;
+
+using SFML.System;
+
+public interface IMovingEntity : IEntity
 {
-    using SFML.System;
+    public static Vector2f Gravity { get; set; } = new Vector2f(0, 1f);
 
-    public interface IMovingEntity : IEntity
-    {
-        public static Vector2f Gravity { get; set; } = new Vector2f(0, 1f);
-
-        public Vector2f Vel { get; set; }
-    }
+    public Vector2f Vel { get; set; }
 }

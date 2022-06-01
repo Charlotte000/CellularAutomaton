@@ -1,9 +1,8 @@
-﻿namespace CellularAutomaton.Interfaces
-{
-    using CellularAutomaton.Classes;
+﻿namespace CellularAutomaton.Interfaces;
 
-    public interface IClimbable
-    {
-        public void Expand(Scene scene, int length);
-    }
+using CellularAutomaton.Classes;
+
+public interface IClimbable
+{
+    public void Expand(Scene scene, int length);
 }

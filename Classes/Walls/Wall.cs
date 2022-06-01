@@ -1,24 +1,23 @@
-﻿namespace CellularAutomaton.Classes.Walls
+﻿namespace CellularAutomaton.Classes.Walls;
+
+using CellularAutomaton.Classes.Blocks;
+using SFML.Graphics;
+
+public class Wall : Drawable
 {
-    using CellularAutomaton.Classes.Blocks;
-    using SFML.Graphics;
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 2, Block.Size, Block.Size, Block.Size));
 
-    public class Wall : Drawable
+    public virtual Sprite Sprite { get => Wall.SpriteSource; }
+
+    public virtual Wall Copy()
+        => new ();
+
+    public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 2, Block.Size, Block.Size, Block.Size));
+        target.Draw(this.Sprite, states);
+    }
 
-        public virtual Sprite Sprite { get => Wall.SpriteSource; }
-
-        public virtual Wall Copy()
-            => new ();
-
-        public virtual void Draw(RenderTarget target, RenderStates states)
-        {
-            target.Draw(this.Sprite, states);
-        }
-
-        public virtual void Dispose()
-        {
-        }
+    public virtual void Dispose()
+    {
     }
 }

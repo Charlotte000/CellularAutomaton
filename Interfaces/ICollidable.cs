@@ -1,6 +1,5 @@
-﻿namespace CellularAutomaton.Interfaces
+﻿namespace CellularAutomaton.Interfaces;
+
+public interface ICollidable
 {
-    public interface ICollidable
-    {
-    }
 }

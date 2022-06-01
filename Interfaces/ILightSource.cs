@@ -1,7 +1,6 @@
-﻿namespace CellularAutomaton.Interfaces
+﻿namespace CellularAutomaton.Interfaces;
+
+public interface ILightSource
 {
-    public interface ILightSource
-    {
-        public int Brightness { get; set; }
-    }
+    public int Brightness { get; set; }
 }
