@@ -3,6 +3,7 @@
 using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
+using SFML.System;
 
 public class Liana : Block, IClimbable
 {
@@ -31,7 +32,8 @@ public class Liana : Block, IClimbable
     {
         for (int i = 1; i < length; i++)
         {
-            var block = scene.GetBlock(this.Coords.X, this.Coords.Y + i);
+            var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
+            var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (block is null || block is not Empty || block.Wall is EmptyWall)
             {
                 return;

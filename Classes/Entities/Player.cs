@@ -57,10 +57,14 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
         this.Collision(scene);
         this.CollisionBox.Position += this.Vel;
 
-        var block = scene.GetBlock((Vector2i)(this.CollisionBox.Position / Block.Size));
+        var coord = (Vector2i)(this.CollisionBox.Position / Block.Size);
+        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
         this.Light = block is not null ? block.Light : this.Light;
 
-        scene.AddVel(this.Vel / 20, (Vector2i)(this.CollisionBox.Position / Block.Size));
+        if (scene.ChunkMesh.IsValidCoord(coord.X, coord.Y))
+        {
+            scene.ChunkMesh[coord] !.PressureMesh[coord] += this.Vel / 20;
+        }
     }
 
     public void OnCollision(IEntity entity, Vector2f? contactNormal)
@@ -114,7 +118,7 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
         {
             for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
             {
-                var block = scene.GetBlock(x, y);
+                var block = scene.ChunkMesh[x, y]?.BlockMesh[x, y];
                 if (block is not null && block is not Empty)
                 {
                     entities.Add(block);

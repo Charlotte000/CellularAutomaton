@@ -2,6 +2,7 @@
 
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
+using SFML.System;
 
 public class Ladder : Block, IClimbable
 {
@@ -32,7 +33,8 @@ public class Ladder : Block, IClimbable
     {
         for (int i = 1; i < length; i++)
         {
-            if (scene.GetBlock(this.Coords.X, this.Coords.Y + i) is not Empty)
+            var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
+            if (scene.ChunkMesh[coord]?.BlockMesh[coord] is not Empty)
             {
                 return;
             }

@@ -36,7 +36,8 @@ public static class AABBCollision
             out normal,
             out float contactTime))
         {
-            var neighbour = scene.GetBlock((Vector2i)((staticEntity.CollisionBox.Position / Block.Size) + normal));
+            var coord = (Vector2i)((staticEntity.CollisionBox.Position / Block.Size) + normal);
+            var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (neighbour is ICollidable)
             {
                 return false;

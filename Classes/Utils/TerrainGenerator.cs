@@ -24,8 +24,8 @@ public class TerrainGenerator
 
     private void Terrain(Chunk chunk)
     {
-        var w = chunk.Map.GetLength(0);
-        var h = chunk.Map.GetLength(1);
+        var w = chunk.BlockMesh.Width;
+        var h = chunk.BlockMesh.Height;
 
         var heightGenerator = new NoiseGenerator(this.Seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
         var vegetationGenerator = new NoiseGenerator(this.Seed + 1, .5, 3, new[] { 5, 3 }, false, Interpolations.Linear);
@@ -50,14 +50,14 @@ public class TerrainGenerator
 
             for (int y = this.sea.Average; y < terrainHeight; y++)
             {
-                chunk.SetBlock(new Water() { Amount = 4, Wall = new EmptyWall() }, x + chunk.Coord.X, y);
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Water() { Amount = 4, Wall = new EmptyWall() };
             }
 
             for (int y = terrainHeight; y < stoneHeight; y++)
             {
                 if (y == terrainHeight)
                 {
-                    chunk.SetBlock(new Grass() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
+                    chunk.BlockMesh[x + chunk.Coord.X, y] = new Grass() { Wall = new DirtWall() };
 
                     if (y - 1 < this.sea.Average)
                     {
@@ -65,11 +65,11 @@ public class TerrainGenerator
                         {
                             if (vegetationMap[x, 0] > .7)
                             {
-                                chunk.SetBlock(new Tree(), x + chunk.Coord.X, y - 1);
+                                chunk.BlockMesh[x + chunk.Coord.X, y - 1] = new Tree();
                             }
                             else
                             {
-                                chunk.SetBlock(new TallGrass(), x + chunk.Coord.X, y - 1);
+                                chunk.BlockMesh[x + chunk.Coord.X, y - 1] = new TallGrass();
                             }
                         }
                     }
@@ -77,20 +77,20 @@ public class TerrainGenerator
                     continue;
                 }
 
-                chunk.SetBlock(new Dirt() { Wall = new DirtWall() }, x + chunk.Coord.X, y);
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Dirt() { Wall = new DirtWall() };
             }
 
             for (int y = stoneHeight; y < chunk.Coord.Y + h; y++)
             {
-                chunk.SetBlock(new Stone() { Wall = new StoneWall() }, x + chunk.Coord.X, y);
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Stone() { Wall = new StoneWall() };
             }
         }
     }
 
     private void Caves(Chunk chunk)
     {
-        var w = chunk.Map.GetLength(0);
-        var h = chunk.Map.GetLength(1);
+        var w = chunk.BlockMesh.Width;
+        var h = chunk.BlockMesh.Height;
 
         // Making caves
         var caveGenerator = new NoiseGenerator(this.Seed + 123, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
@@ -103,7 +103,7 @@ public class TerrainGenerator
             {
                 if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.dirt.Average + this.dirt.Dispersion)
                 {
-                    chunk.SetBlock(new Empty(), x + chunk.Coord.X, y + chunk.Coord.Y);
+                    chunk.BlockMesh[x + chunk.Coord.X, y + chunk.Coord.Y] = new Empty();
                 }
             }
         }
@@ -123,7 +123,7 @@ public class TerrainGenerator
                     if (!isHole && vegetationMap[x, y] > .6)
                     {
                         var liana = new Liana();
-                        chunk.SetBlock(liana, x + chunk.Coord.X, y + chunk.Coord.Y);
+                        chunk.BlockMesh[x + chunk.Coord.X, y + chunk.Coord.Y] = liana;
                         liana.OnCreate(this.Scene);
                     }
 

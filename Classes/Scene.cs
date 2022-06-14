@@ -3,6 +3,7 @@
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Classes.Menu;
+using CellularAutomaton.Classes.Mesh;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
@@ -36,22 +37,10 @@ public class Scene
     {
         this.TerrainGenerator.Scene = this;
 
-        // Init chunk map
-        for (int x = 0; x < this.Map.GetLength(0); x++)
-        {
-            for (int y = 0; y < this.Map.GetLength(1); y++)
-            {
-                this.Map[x, y] = new Chunk(x * Chunk.Size.X, y * Chunk.Size.Y);
-            }
-        }
-
         // Generate terrain
-        for (int x = 0; x < this.Map.GetLength(0); x++)
+        foreach (var chunk in this.ChunkMesh)
         {
-            for (int y = 0; y < this.Map.GetLength(1); y++)
-            {
-                this.TerrainGenerator.Generate(this.Map[x, y]);
-            }
+            this.TerrainGenerator.Generate(chunk);
         }
 
         // Init window
@@ -91,7 +80,7 @@ public class Scene
             {
                 this.mutex.WaitOne();
 
-                foreach (var chunk in this.Map)
+                foreach (var chunk in this.ChunkMesh)
                 {
                     chunk.Update(this);
                 }
@@ -108,7 +97,7 @@ public class Scene
 
     public float Daylight { get; set; } = 0;
 
-    public Chunk[,] Map { get; set; } = new Chunk[4, 4];
+    public ChunkMesh ChunkMesh { get; set; } = new ();
 
     public List<IEntity> Entities { get; set; } = new ()
     {
@@ -132,7 +121,10 @@ public class Scene
 
             this.mutex.WaitOne();
 
-            this.MoveChunks();
+            if (this.ChunkMesh.Update(this))
+            {
+                this.UpdateLights();
+            }
 
             this.KeyListen();
 
@@ -153,14 +145,6 @@ public class Scene
         }
     }
 
-    public bool IsValidCoords(Vector2i coords)
-    {
-        var topLeftCoord = this.Map[0, 0].Coord;
-        var bottomRightCoord = this.Map[this.Map.GetLength(0) - 1, this.Map.GetLength(1) - 1].Coord + Chunk.Size;
-        return coords.X >= topLeftCoord.X && coords.X < bottomRightCoord.X &&
-            coords.Y >= topLeftCoord.Y && coords.Y < bottomRightCoord.Y;
-    }
-
     public Vector2i GetMouseCoords()
     {
         var scale = new Vector2f(this.Camera.Size.X / this.Window.Size.X, this.Camera.Size.Y / this.Window.Size.Y);
@@ -170,21 +154,15 @@ public class Scene
         return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
     }
 
-    public Block? GetBlock(Vector2i coords)
-        => this.GetChunk(coords)?.GetBlock(coords);
-
-    public Block? GetBlock(int x, int y)
-        => this.GetBlock(new Vector2i(x, y));
-
     public void SetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = false)
     {
-        var chunk = this.GetChunk(coords);
+        var chunk = this.ChunkMesh[coords];
         if (chunk is null)
         {
             return;
         }
 
-        chunk.SetBlock(block, coords);
+        chunk.BlockMesh[coords] = block;
         if (updateLights)
         {
             this.UpdateLights();
@@ -199,23 +177,6 @@ public class Scene
     public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
         => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
 
-    public Vector2f? GetVel(Vector2i coords)
-        => this.GetChunk(coords)?.GetVel(coords);
-
-    public Vector2f? GetVel(int x, int y)
-        => this.GetVel(new Vector2i(x, y));
-
-    public void AddVel(Vector2f vel, Vector2i coords)
-        => this.GetChunk(coords)?.AddVel(vel, coords);
-
-    public void AddVel(Vector2f vel, int x, int y)
-        => this.AddVel(vel, new Vector2i(x, y));
-
-    public void RemoveEntity(IEntity entity)
-    {
-        this.Entities.Remove(entity);
-    }
-
     public Block? TrySetBlock(
         Scene scene,
         Block block,
@@ -223,7 +184,7 @@ public class Scene
         bool updateLights = true,
         bool saveToHistory = true)
     {
-        var oldBlock = this.GetBlock(coords);
+        var oldBlock = this.ChunkMesh[coords]?.BlockMesh[coords];
         block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
 
         // Attempt to build up an existing block
@@ -250,7 +211,7 @@ public class Scene
             var hasNeighbour = false;
             foreach (var delta in Scene.Neighborhood)
             {
-                var neighbour = scene.GetBlock(coords + delta);
+                var neighbour = scene.ChunkMesh[coords + delta]?.BlockMesh[coords + delta];
                 if (neighbour is not Empty || neighbour?.Wall is not EmptyWall)
                 {
                     hasNeighbour = true;
@@ -301,31 +262,6 @@ public class Scene
         bool saveToHistory = true)
         => this.TrySetBlock(scene, block, new Vector2i(x, y), updateLights, saveToHistory);
 
-    public Block[] GetAllBlocks()
-    {
-        var blocks = new List<Block>();
-        foreach (var chunk in this.Map)
-        {
-            blocks.AddRange(chunk.GetAllBlocks());
-        }
-
-        return blocks.ToArray();
-    }
-
-    public Chunk? GetChunk(Vector2i coord)
-    {
-        if (!this.IsValidCoords(coord))
-        {
-            return null;
-        }
-
-        var localCoord = coord - this.Map[0, 0].Coord;
-        return this.Map[localCoord.X / Chunk.Size.X, localCoord.Y / Chunk.Size.Y];
-    }
-
-    public Chunk? GetChunk(int x, int y)
-        => this.GetChunk(new Vector2i(x, y));
-
     private void Draw()
     {
         // Sky
@@ -335,7 +271,7 @@ public class Scene
             (byte)(255 * this.Daylight)));
 
         // Blocks
-        foreach (var chunk in this.Map)
+        foreach (var chunk in this.ChunkMesh)
         {
             this.Window.Draw(chunk);
         }
@@ -349,34 +285,6 @@ public class Scene
         // UI
         this.Window.SetView(this.Window.DefaultView);
         this.Window.Draw(this.inventoryMenu);
-    }
-
-    private void MoveChunks()
-    {
-        var cameraCoord = this.Entities[0].CollisionBox.Position / Block.Size;
-        if (cameraCoord.X < this.Map[1, 0].Coord.X)
-        {
-            ChunkMoveHelper.MoveChunksLeft(this);
-            this.UpdateLights();
-        }
-
-        if (cameraCoord.X > this.Map[this.Map.GetLength(0) - 2, 0].Coord.X + Chunk.Size.X)
-        {
-            ChunkMoveHelper.MoveChunksRight(this);
-            this.UpdateLights();
-        }
-
-        if (cameraCoord.Y < this.Map[0, 1].Coord.Y)
-        {
-            ChunkMoveHelper.MoveChunksUp(this);
-            this.UpdateLights();
-        }
-
-        if (cameraCoord.Y > this.Map[0, this.Map.GetLength(1) - 2].Coord.Y + Chunk.Size.Y)
-        {
-            ChunkMoveHelper.MoveChunksDown(this);
-            this.UpdateLights();
-        }
     }
 
     private void KeyListen()
@@ -398,7 +306,8 @@ public class Scene
         var viewRect = new FloatRect(
             this.Camera.Center - (this.Camera.Size / 2) - blockSize,
             this.Camera.Size + (blockSize * 2));
-        foreach (var block in this.GetAllBlocks())
+
+        foreach (var block in this.ChunkMesh as IEnumerable<Block>)
         {
             if (block is Empty && block.Wall is EmptyWall)
             {
@@ -412,12 +321,10 @@ public class Scene
 
     private void UpdateLights()
     {
-        var blocks = this.GetAllBlocks();
-
         // Light source
         var light = (int)(this.Daylight * 255);
         var maxLight = light;
-        foreach (var block in blocks)
+        foreach (var block in this.ChunkMesh as IEnumerable<Block>)
         {
             if (block is ILightSource lightSource)
             {
@@ -433,13 +340,13 @@ public class Scene
         // Light fading
         for (int currentLight = maxLight; currentLight >= 1; currentLight--)
         {
-            foreach (var block in blocks)
+            foreach (var block in this.ChunkMesh as IEnumerable<Block>)
             {
                 if (block.Light == currentLight)
                 {
                     foreach (var delta in Scene.Neighborhood)
                     {
-                        var neighbour = this.GetBlock(block.Coords + delta);
+                        var neighbour = this.ChunkMesh[block.Coords + delta]?.BlockMesh[block.Coords + delta];
                         if (neighbour is not null && neighbour.Light < currentLight)
                         {
                             neighbour.Light = Math.Max(

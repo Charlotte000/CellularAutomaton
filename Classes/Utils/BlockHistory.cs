@@ -24,7 +24,7 @@ public class BlockHistory
             chunkHistory = new ();
         }
 
-        foreach (var block in chunk.Map)
+        foreach (var block in chunk.BlockMesh)
         {
             if (block is Water || block is Tree)
             {
@@ -43,7 +43,7 @@ public class BlockHistory
         {
             foreach (var block in chunkHistory)
             {
-                chunk.SetBlock(block.Value.Copy(), block.Key);
+                chunk.BlockMesh[block.Key] = block.Value.Copy();
             }
         }
     }

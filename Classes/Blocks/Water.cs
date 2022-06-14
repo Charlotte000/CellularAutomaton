@@ -33,7 +33,8 @@ public class Water : Block
 
     public static bool Push(Scene scene, Water water)
     {
-        var block = scene.GetBlock(water.Coords + new Vector2i(0, -1));
+        var coord = water.Coords + new Vector2i(0, -1);
+        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is Empty || block is Water)
         {
             if (Water.Push(scene, block, water.Amount))
@@ -101,7 +102,8 @@ public class Water : Block
                 return true;
             }
 
-            var neighbour = scene.GetBlock(block.Coords + new Vector2i(0, -1));
+            var coord = block.Coords + new Vector2i(0, -1);
+            var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (neighbour is Water || neighbour is Empty)
             {
                 if (Water.Push(scene, neighbour, amount - 4 + waterBlock.Amount))
@@ -117,7 +119,8 @@ public class Water : Block
 
     private bool FallDown(Scene scene)
     {
-        var block = scene.GetBlock(this.Coords.X, this.Coords.Y + 1);
+        var coord = new Vector2i(this.Coords.X, this.Coords.Y + 1);
+        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && block is not ICollidable)
         {
             scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
@@ -149,7 +152,8 @@ public class Water : Block
 
     private bool SpreadOut(Scene scene, int deltaX)
     {
-        var block = scene.GetBlock(this.Coords.X + deltaX, this.Coords.Y);
+        var coord = new Vector2i(this.Coords.X + deltaX, this.Coords.Y);
+        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && block is not ICollidable)
         {
             var prevAmount = this.Amount;
