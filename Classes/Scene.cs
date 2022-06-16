@@ -3,7 +3,7 @@
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Classes.Menu;
-using CellularAutomaton.Classes.Mesh;
+using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
@@ -80,10 +80,7 @@ public class Scene
             {
                 this.mutex.WaitOne();
 
-                foreach (var chunk in this.ChunkMesh)
-                {
-                    chunk.Update(this);
-                }
+                this.ChunkMesh.Update(this);
 
                 this.mutex.ReleaseMutex();
                 Thread.Sleep(100);
@@ -121,7 +118,7 @@ public class Scene
 
             this.mutex.WaitOne();
 
-            if (this.ChunkMesh.Update(this))
+            if (this.ChunkMesh.Move(this))
             {
                 this.UpdateLights();
             }
@@ -270,11 +267,8 @@ public class Scene
             (byte)(150 * this.Daylight),
             (byte)(255 * this.Daylight)));
 
-        // Blocks
-        foreach (var chunk in this.ChunkMesh)
-        {
-            this.Window.Draw(chunk);
-        }
+        // Chunks
+        this.Window.Draw(this.ChunkMesh);
 
         // Entitues
         foreach (var entity in this.Entities)

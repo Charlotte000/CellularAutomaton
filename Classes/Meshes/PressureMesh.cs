@@ -1,4 +1,4 @@
-﻿namespace CellularAutomaton.Classes.Mesh;
+﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
 using SFML.Graphics;
@@ -12,7 +12,7 @@ public class PressureMesh : Mesh<Vector2f>
         this[new Vector2i(0, 0)] = new Vector2f(0, 0);
     }
 
-    public void Update(Scene scene)
+    public override void Update(Scene scene)
     {
         var tempPressureMap = new Vector2f[this.Width, this.Height];
 
@@ -27,15 +27,17 @@ public class PressureMesh : Mesh<Vector2f>
         this.Grid = tempPressureMap;
     }
 
-    public void Draw(RenderTarget target, RenderStates states)
+    public override void DrawMesh(RenderTarget target)
     {
         for (int x = 0; x < this.Width; x++)
         {
             for (int y = 0; y < this.Height; y++)
             {
                 var a = new Vertex(
-                    (Vector2f)(this.Coord * Block.Size) + new Vector2f(x * Block.Size, y * Block.Size));
+                    (Vector2f)(this.Coord * Block.Size) +
+                    new Vector2f((x * Block.Size) + (Block.Size / 2), (y * Block.Size) + (Block.Size / 2)));
                 var b = new Vertex(a.Position + (this.Grid[x, y] * 40));
+
                 target.Draw(new Vertex[] { a, b }, PrimitiveType.Lines);
             }
         }

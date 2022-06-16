@@ -1,4 +1,4 @@
-﻿namespace CellularAutomaton.Classes.Mesh;
+﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Walls;
@@ -44,7 +44,20 @@ public class BlockMesh : Mesh<Block>
         }
     }
 
-    public void Draw(RenderTarget target, RenderStates states)
+    public override void Draw(RenderTarget target, RenderStates states)
+    {
+        foreach (var block in this.Grid)
+        {
+            if (block.IsVisible)
+            {
+                var blockRenderState = new RenderStates(states);
+                blockRenderState.Transform.Translate(block.CollisionBox.Position);
+                target.Draw(block, blockRenderState);
+            }
+        }
+    }
+
+    public override void DrawMesh(RenderTarget target)
     {
         var border = new RectangleShape((Vector2f)Chunk.Size * Block.Size)
         {
@@ -53,6 +66,31 @@ public class BlockMesh : Mesh<Block>
             OutlineThickness = 2,
             Position = (Vector2f)this.Coord * Block.Size,
         };
-        target.Draw(border, states);
+        target.Draw(border);
+    }
+
+    public override void Update(Scene scene)
+    {
+        foreach (var block in this.Grid)
+        {
+            block.WasUpdated = false;
+        }
+
+        foreach (var block in this.Grid)
+        {
+            if (!block.WasUpdated)
+            {
+                block.WasUpdated = true;
+                block.OnUpdate(scene);
+            }
+        }
+    }
+
+    public override void Dispose()
+    {
+        foreach (var block in this.Grid)
+        {
+            block.OnDelete();
+        }
     }
 }

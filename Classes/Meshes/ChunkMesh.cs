@@ -1,7 +1,8 @@
-﻿namespace CellularAutomaton.Classes.Mesh;
+﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Utils;
+using SFML.Graphics;
 using SFML.System;
 
 public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
@@ -18,6 +19,8 @@ public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
         }
     }
 
+    public override Vector2i Coord { get => this.Grid[0, 0].Coord; }
+
     public override Chunk? this[int x, int y]
     {
         get
@@ -32,8 +35,6 @@ public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
         }
     }
 
-    public override Vector2i Coord { get => this.Grid[0, 0].Coord; }
-
     public override bool IsValidCoord(int x, int y)
     {
         var topLeftCoord = this.Grid[0, 0].Coord;
@@ -41,7 +42,23 @@ public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
         return x >= topLeftCoord.X && x < bottomRightCoord.X && y >= topLeftCoord.Y && y < bottomRightCoord.Y;
     }
 
-    public bool Update(Scene scene)
+    public override void Draw(RenderTarget target, RenderStates states)
+    {
+        foreach (var chunk in this.Grid)
+        {
+            target.Draw(chunk, states);
+        }
+    }
+
+    public override void Update(Scene scene)
+    {
+        foreach (var chunk in this.Grid)
+        {
+            chunk.Update(scene);
+        }
+    }
+
+    public bool Move(Scene scene)
     {
         var cameraCoord = scene.Entities[0].CollisionBox.Position / Block.Size;
         if (cameraCoord.X < this.Grid[1, 0].Coord.X)

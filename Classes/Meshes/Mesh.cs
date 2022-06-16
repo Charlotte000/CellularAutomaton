@@ -1,9 +1,10 @@
-﻿namespace CellularAutomaton.Classes.Mesh;
+﻿namespace CellularAutomaton.Classes.Meshes;
 
+using SFML.Graphics;
 using SFML.System;
 using System.Collections;
 
-public abstract class Mesh<T> : IEnumerable<T>
+public abstract class Mesh<T> : IEnumerable<T>, Drawable
 {
     public Mesh(Vector2i size, Vector2i coord)
     {
@@ -61,6 +62,22 @@ public abstract class Mesh<T> : IEnumerable<T>
         return localX >= 0 && localX < this.Width && localY >= 0 && localY < this.Height;
     }
 
+    public virtual void Draw(RenderTarget target, RenderStates states)
+    {
+    }
+
+    public virtual void DrawMesh(RenderTarget target)
+    {
+    }
+
+    public virtual void Update(Scene scene)
+    {
+    }
+
+    public virtual void Dispose()
+    {
+    }
+
     public IEnumerator<T> GetEnumerator()
     {
         foreach (var chunk in this.Grid)
@@ -71,4 +88,5 @@ public abstract class Mesh<T> : IEnumerable<T>
 
     IEnumerator IEnumerable.GetEnumerator()
         => this.Grid.GetEnumerator();
+
 }
