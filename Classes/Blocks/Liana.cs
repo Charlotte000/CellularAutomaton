@@ -15,8 +15,8 @@ public class Liana : Block, IClimbable
 
     public override bool IsTransparent { get => true; }
 
-    public override void OnCreate(Scene scene)
-        => this.Expand(scene, Scene.RandomGenerator.Next(3, 10));
+    public override void OnCreate()
+        => this.Expand(Scene.RandomGenerator.Next(3, 10));
 
     public override Block Copy()
         => new Liana()
@@ -27,12 +27,12 @@ public class Liana : Block, IClimbable
             WasUpdated = this.WasUpdated,
         };
 
-    public void Expand(Scene scene, int length) // HACK: one length liana
+    public void Expand(int length) // HACK: one length liana
     {
         for (int i = 1; i < length; i++)
         {
             var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
-            var chunk = scene.ChunkMesh[coord];
+            var chunk = this.Chunk.Scene.ChunkMesh[coord];
             var block = chunk?.BlockMesh[coord];
             var wall = chunk?.WallMesh[coord];
             if (block is null || block is not Empty || wall is EmptyWall)
@@ -40,7 +40,7 @@ public class Liana : Block, IClimbable
                 return;
             }
 
-            scene.SetBlock(new Liana(), coord, false, true);
+            this.Chunk.Scene.SetBlock(new Liana(), coord, false, true);
         }
     }
 }

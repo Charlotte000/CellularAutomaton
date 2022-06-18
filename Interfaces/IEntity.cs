@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Interfaces;
 
-using CellularAutomaton.Classes;
 using SFML.Graphics;
 using SFML.System;
 
@@ -12,9 +11,9 @@ public interface IEntity : Drawable
 
     public int Light { get; set; }
 
-    public void OnCreate(Scene scene);
+    public void OnCreate();
 
-    public void OnUpdate(Scene scene);
+    public void OnUpdate();
 
     public void OnCollision(IEntity entity, Vector2f? contactNormal);
 

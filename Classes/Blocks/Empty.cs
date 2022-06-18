@@ -1,7 +1,7 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
-using SFML.System;
 
 public class Empty : Block
 {
@@ -11,12 +11,15 @@ public class Empty : Block
 
     public override void Draw(RenderTarget target, RenderStates states)
     {
-        var shadow = new RectangleShape(this.CollisionBox)
+        var wall = this.Chunk.WallMesh[this.Coords];
+        if (wall?.Sprite is not null)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-            Position = new Vector2f(0, 0),
-        };
-        target.Draw(shadow, states);
+            var shadow = new Sprite(wall.Sprite)
+            {
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+            target.Draw(shadow, states);
+        }
     }
 
     public override Block Copy()

@@ -29,11 +29,14 @@ public class Tree : Block
     public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(40, 200))
     { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) };
 
-    public override void OnUpdate(Scene scene)
+    public override void OnUpdate()
     {
         if (Scene.RandomGenerator.Next(0, 40) == 0)
         {
-            scene.Entities.Add(new Leaf(this.CollisionBox.Position - this.CollisionBox.Origin + new Vector2f(this.CollisionBox.Size.X / 2, 0)));
+            this.Chunk.Scene.AddEntity(
+                new Leaf(this.CollisionBox.Position - this.CollisionBox.Origin + new Vector2f(
+                    this.CollisionBox.Size.X / 2,
+                    0)));
         }
     }
 

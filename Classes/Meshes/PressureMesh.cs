@@ -9,10 +9,9 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
     public PressureMesh(Chunk chunk, Vector2i coord)
         : base(chunk, Chunk.Size, coord)
     {
-        this[new Vector2i(0, 0)] = new Vector2f(0, 0);
     }
 
-    public override void Update(Scene scene)
+    public override void Update()
     {
         var tempPressureMap = new Vector2f[this.Width, this.Height];
 
@@ -20,7 +19,7 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
         {
             for (int y = 0; y < this.Height; y++)
             {
-                tempPressureMap[x, y] = PressureMesh.AverageVel(scene, this.Coord + new Vector2i(x, y));
+                tempPressureMap[x, y] = this.AverageVel(this.Coord + new Vector2i(x, y));
             }
         }
 
@@ -43,14 +42,14 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
         }
     }
 
-    private static Vector2f AverageVel(Scene scene, Vector2i coord)
+    private Vector2f AverageVel(Vector2i coord)
     {
         var pressure = new Vector2f(0, 0);
         var count = 0;
 
         foreach (var delta in Scene.Neighborhood)
         {
-            var neighbour = scene.ChunkMesh[coord + delta]?.PressureMesh[coord + delta];
+            var neighbour = this.Parent.Scene.ChunkMesh[coord + delta]?.PressureMesh[coord + delta];
             if (neighbour.HasValue)
             {
                 pressure += neighbour.Value;

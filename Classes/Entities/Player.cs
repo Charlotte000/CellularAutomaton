@@ -32,7 +32,9 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
 
     public int Light { get; set; }
 
-    public void OnCreate(Scene scene)
+    public Scene Scene { get; set; }
+
+    public void OnCreate()
     {
     }
 
@@ -47,23 +49,23 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
         target.Draw(shadow, states);
     }
 
-    public void OnUpdate(Scene scene)
+    public void OnUpdate()
     {
         this.Vel += IMovingEntity.Gravity * (this.IsOnWater ? .2f : 1f) * (this.IsClimbing ? 0 : 1);
         this.Control();
 
         this.Vel *= this.IsOnWater || this.IsClimbing ? .8f : .87f;
 
-        this.Collision(scene);
+        this.Collision();
         this.CollisionBox.Position += this.Vel;
 
         var coord = (Vector2i)(this.CollisionBox.Position / Block.Size);
-        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
+        var block = this.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         this.Light = block is not null ? block.Light : this.Light;
 
-        if (scene.ChunkMesh.IsValidCoord(coord.X, coord.Y))
+        if (this.Scene.ChunkMesh.IsValidCoord(coord.X, coord.Y))
         {
-            scene.ChunkMesh[coord] !.PressureMesh[coord] += this.Vel / 20;
+            this.Scene.ChunkMesh[coord] !.PressureMesh[coord] += this.Vel / 20;
         }
     }
 
@@ -106,7 +108,7 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
         }
     }
 
-    private void Collision(Scene scene)
+    private void Collision()
     {
         this.IsOnGround = false;
         this.IsOnWater = false;
@@ -118,7 +120,7 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
         {
             for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
             {
-                var block = scene.ChunkMesh[x, y]?.BlockMesh[x, y];
+                var block = this.Scene.ChunkMesh[x, y]?.BlockMesh[x, y];
                 if (block is not null && block is not Empty)
                 {
                     entities.Add(block);
@@ -126,6 +128,6 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
             }
         }
 
-        AABBCollision.Collision(scene, this, entities);
+        AABBCollision.Collision(this.Scene, this, entities);
     }
 }

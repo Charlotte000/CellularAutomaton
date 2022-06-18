@@ -15,7 +15,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         {
             for (int y = 0; y < this.Height; y++)
             {
-                this.Grid[x, y] = new Chunk(x * Chunk.Size.X, y * Chunk.Size.Y);
+                this.Grid[x, y] = new Chunk(x * Chunk.Size.X, y * Chunk.Size.Y) { Scene = scene };
             }
         }
     }
@@ -28,7 +28,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         {
             if (this.IsValidCoord(x, y))
             {
-                var localCoord = new Vector2i(x, y) - this.Grid[0, 0].Coord;
+                var localCoord = new Vector2i(x, y) - this.Coord;
                 return this.Grid[localCoord.X / Chunk.Size.X, localCoord.Y / Chunk.Size.Y];
             }
 
@@ -51,11 +51,11 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         }
     }
 
-    public override void Update(Scene scene)
+    public override void Update()
     {
         foreach (var chunk in this.Grid)
         {
-            chunk.Update(scene);
+            chunk.Update();
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
-using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
 using SFML.System;
 
@@ -34,6 +33,7 @@ public class BlockMesh : Mesh<Block, Chunk>
 
                 value!.Coords = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coords * Block.Size;
+                value.Chunk = this.Parent;
                 this.Grid[x - this.Coord.X, y - this.Coord.Y] = value!;
             }
         }
@@ -64,7 +64,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         target.Draw(border);
     }
 
-    public override void Update(Scene scene)
+    public override void Update()
     {
         foreach (var block in this.Grid)
         {
@@ -76,7 +76,7 @@ public class BlockMesh : Mesh<Block, Chunk>
             if (!block.WasUpdated)
             {
                 block.WasUpdated = true;
-                block.OnUpdate(scene);
+                block.OnUpdate();
             }
         }
     }

@@ -4,18 +4,18 @@ using SFML.Graphics;
 using SFML.System;
 using System.Collections;
 
-public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
+public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
 {
-    public Mesh(P parent, Vector2i size, Vector2i coord)
+    public Mesh(TParent parent, Vector2i size, Vector2i coord)
     {
-        this.Grid = new T[size.X, size.Y];
+        this.Grid = new TValue[size.X, size.Y];
         this.Coord = coord;
         this.Parent = parent;
     }
 
-    public P Parent { get; set; }
+    public TParent Parent { get; set; }
 
-    public T[,] Grid { get; set; }
+    public TValue[,] Grid { get; set; }
 
     public virtual Vector2i Coord { get; set; }
 
@@ -23,7 +23,7 @@ public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
 
     public int Height { get => this.Grid.GetLength(1); }
 
-    public virtual T? this[int x, int y]
+    public virtual TValue? this[int x, int y]
     {
         get
         {
@@ -44,14 +44,14 @@ public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
         }
     }
 
-    public T? this[Index x, Index y]
+    public TValue? this[Index x, Index y]
     {
         get => this[x.GetOffset(this.Width), y.GetOffset(this.Height)];
 
         set => this[x.GetOffset(this.Width), y.GetOffset(this.Height)] = value;
     }
 
-    public T? this[Vector2i coord]
+    public TValue? this[Vector2i coord]
     {
         get => this[coord.X, coord.Y];
 
@@ -73,7 +73,7 @@ public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
     {
     }
 
-    public virtual void Update(Scene scene)
+    public virtual void Update()
     {
     }
 
@@ -81,7 +81,7 @@ public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
     {
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<TValue> GetEnumerator()
     {
         foreach (var chunk in this.Grid)
         {

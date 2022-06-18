@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -26,11 +27,13 @@ public class Block : IEntity
 
     public bool IsVisible { get; set; } = false;
 
-    public virtual void OnCreate(Scene scene)
+    public Chunk Chunk { get; set; }
+
+    public virtual void OnCreate()
     {
     }
 
-    public virtual void OnUpdate(Scene scene)
+    public virtual void OnUpdate()
     {
     }
 
@@ -41,11 +44,18 @@ public class Block : IEntity
             target.Draw(this.Sprite, states);
         }
 
-        var shadow = new RectangleShape(this.CollisionBox)
-        {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-            Position = new Vector2f(0, 0),
-        };
+        Drawable shadow = this.Chunk.WallMesh[this.Coords] is not EmptyWall && this.IsTransparent ?
+            new RectangleShape(this.CollisionBox)
+            {
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                Position = new Vector2f(0, 0),
+            }
+            :
+            new Sprite(this.Sprite)
+            {
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            };
+
         target.Draw(shadow, states);
     }
 

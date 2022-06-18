@@ -37,6 +37,8 @@ public class Scene
     {
         this.TerrainGenerator.Scene = this;
 
+        this.AddEntity(new Player(0, 0));
+
         // Generate terrain
         this.ChunkMesh = new (this);
         foreach (var chunk in this.ChunkMesh)
@@ -81,7 +83,7 @@ public class Scene
             {
                 this.mutex.WaitOne();
 
-                this.ChunkMesh.Update(this);
+                this.ChunkMesh.Update();
 
                 this.mutex.ReleaseMutex();
                 Thread.Sleep(100);
@@ -97,10 +99,7 @@ public class Scene
 
     public ChunkMesh ChunkMesh { get; set; }
 
-    public List<IEntity> Entities { get; set; } = new ()
-    {
-        new Player(0, 0),
-    };
+    public List<IMovingEntity> Entities { get; set; } = new ();
 
     public RenderWindow Window { get; set; }
 
@@ -132,7 +131,7 @@ public class Scene
 
             for (int i = 0; i < this.Entities.Count; i++)
             {
-                this.Entities[i].OnUpdate(this);
+                this.Entities[i].OnUpdate();
             }
 
             this.Draw();
@@ -262,6 +261,19 @@ public class Scene
         bool saveToHistory = true)
         => this.TrySetBlock(scene, block, new Vector2i(x, y), updateLights, saveToHistory);
 
+    public void AddEntity(IMovingEntity entity)
+    {
+        entity.Scene = this;
+        this.Entities.Add(entity);
+        entity.OnCreate();
+    }
+
+    public void RemoveEntity(IMovingEntity entity)
+    {
+        entity.OnDelete();
+        this.Entities.Remove(entity);
+    }
+
     private void Draw()
     {
         // Sky
@@ -288,12 +300,12 @@ public class Scene
     {
         if (Mouse.IsButtonPressed(Mouse.Button.Left))
         {
-            this.TrySetBlock(this, this.inventoryMenu.GetValue(), this.GetMouseCoords())?.OnCreate(this);
+            this.TrySetBlock(this, this.inventoryMenu.GetValue(), this.GetMouseCoords())?.OnCreate();
         }
 
         if (Mouse.IsButtonPressed(Mouse.Button.Right))
         {
-            this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate(this);
+            this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate();
         }
     }
 

@@ -47,17 +47,17 @@ public class Water : Block
         return false;
     }
 
-    public override void OnUpdate(Scene scene)
+    public override void OnUpdate()
     {
         // Fall down
-        if (this.FallDown(scene))
+        if (this.FallDown())
         {
             return;
         }
 
         // Spread Out
         var deltaX = (Scene.RandomGenerator.Next(0, 2) * -2) + 1;
-        if (this.SpreadOut(scene, deltaX))
+        if (this.SpreadOut(deltaX))
         {
             return;
         }
@@ -117,14 +117,14 @@ public class Water : Block
         return false;
     }
 
-    private bool FallDown(Scene scene)
+    private bool FallDown()
     {
         var coord = new Vector2i(this.Coords.X, this.Coords.Y + 1);
-        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
+        var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && block is not ICollidable)
         {
-            scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
-            scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+            this.Chunk.Scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
+            this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
             return true;
         }
 
@@ -141,7 +141,7 @@ public class Water : Block
 
             if (this.Amount < 1)
             {
-                scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
             }
 
             return true;
@@ -150,17 +150,17 @@ public class Water : Block
         return false;
     }
 
-    private bool SpreadOut(Scene scene, int deltaX)
+    private bool SpreadOut(int deltaX)
     {
         var coord = new Vector2i(this.Coords.X + deltaX, this.Coords.Y);
-        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
+        var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && block is not ICollidable)
         {
             var prevAmount = this.Amount;
 
             this.Amount /= 2;
 
-            scene.SetBlock(
+            this.Chunk.Scene.SetBlock(
                 new Water()
                 {
                     Amount = prevAmount - this.Amount,
@@ -173,7 +173,7 @@ public class Water : Block
 
             if (this.Amount < 1)
             {
-                scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
             }
 
             return true;
@@ -186,7 +186,7 @@ public class Water : Block
             this.Amount--;
             if (this.Amount < 1)
             {
-                scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
             }
 
             return true;

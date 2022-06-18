@@ -128,7 +128,7 @@ public class TerrainGenerator
                     {
                         var liana = new Liana();
                         chunk.BlockMesh[x + chunk.Coord.X, y + chunk.Coord.Y] = liana;
-                        liana.OnCreate(this.Scene);
+                        liana.OnCreate();
                     }
 
                     isHole = true;

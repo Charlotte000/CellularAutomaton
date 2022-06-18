@@ -25,6 +25,8 @@ public class Chunk : Drawable
 
     public WallMesh WallMesh { get; set; }
 
+    public Scene Scene { get; set; }
+
     public void Draw(RenderTarget target, RenderStates states)
     {
         // this.BlockMesh.DrawMesh(target);
@@ -34,10 +36,10 @@ public class Chunk : Drawable
         target.Draw(this.PressureMesh, states);
     }
 
-    public void Update(Scene scene)
+    public void Update()
     {
-        this.BlockMesh.Update(scene);
-        this.PressureMesh.Update(scene);
+        this.BlockMesh.Update();
+        this.PressureMesh.Update();
     }
 
     public void Dispose()

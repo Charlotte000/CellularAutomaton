@@ -26,6 +26,8 @@ public class Leaf : IMovingEntity
 
     public int Light { get; set; }
 
+    public Scene Scene { get; set; }
+
     public void Draw(RenderTarget target, RenderStates states)
     {
         target.Draw(this.CollisionBox, states);
@@ -45,7 +47,7 @@ public class Leaf : IMovingEntity
         }
     }
 
-    public void OnCreate(Scene scene)
+    public void OnCreate()
     {
     }
 
@@ -54,7 +56,7 @@ public class Leaf : IMovingEntity
         this.CollisionBox.Dispose();
     }
 
-    public void OnUpdate(Scene scene)
+    public void OnUpdate()
     {
         var coord = (Vector2i)(this.CollisionBox.Position / Block.Size);
 
@@ -63,12 +65,12 @@ public class Leaf : IMovingEntity
             (float)((Scene.RandomGenerator.NextDouble() * .5) - .25),
             (float)((Scene.RandomGenerator.NextDouble() * .5) - .25));
         this.Vel *= .7f;
-        this.Vel += scene.ChunkMesh[coord]?.PressureMesh[coord] ?? new Vector2f(0, 0);
+        this.Vel += this.Scene.ChunkMesh[coord]?.PressureMesh[coord] ?? new Vector2f(0, 0);
 
-        this.Collision(scene);
+        this.Collision();
         this.CollisionBox.Position += this.Vel;
 
-        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
+        var block = this.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         this.Light = block is not null ? block.Light : this.Light;
 
         if (block is null)
@@ -78,12 +80,12 @@ public class Leaf : IMovingEntity
 
         if (this.Vel.X == 0 && this.Vel.Y == 0)
         {
-            scene.Entities.Remove(this);
+            this.Scene.Entities.Remove(this);
             return;
         }
     }
 
-    private void Collision(Scene scene)
+    private void Collision()
     {
         var entities = new List<IEntity>();
         var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
@@ -92,7 +94,7 @@ public class Leaf : IMovingEntity
         {
             for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
             {
-                var block = scene.ChunkMesh[x, y]?.BlockMesh[x, y];
+                var block = this.Scene.ChunkMesh[x, y]?.BlockMesh[x, y];
                 if (block is not null && block is not Empty)
                 {
                     entities.Add(block);
@@ -100,6 +102,6 @@ public class Leaf : IMovingEntity
             }
         }
 
-        AABBCollision.Collision(scene, this, entities);
+        AABBCollision.Collision(this.Scene, this, entities);
     }
 }

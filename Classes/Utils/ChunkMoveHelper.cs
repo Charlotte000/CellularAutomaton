@@ -20,7 +20,7 @@ public static class ChunkMoveHelper
                 {
                     var newX = scene.ChunkMesh.Grid[0, y].Coord.X - Chunk.Size.X;
                     var oldY = scene.ChunkMesh.Grid[0, y].Coord.Y;
-                    scene.ChunkMesh.Grid[0, y] = new Chunk(newX, oldY);
+                    scene.ChunkMesh.Grid[0, y] = new Chunk(newX, oldY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[0, y]);
                     scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[0, y]);
                 }
@@ -46,7 +46,7 @@ public static class ChunkMoveHelper
                 {
                     var newX = scene.ChunkMesh.Grid[x + 1, y].Coord.X + Chunk.Size.X;
                     var oldY = scene.ChunkMesh.Grid[x + 1, y].Coord.Y;
-                    scene.ChunkMesh.Grid[x + 1, y] = new Chunk(newX, oldY);
+                    scene.ChunkMesh.Grid[x + 1, y] = new Chunk(newX, oldY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x + 1, y]);
                     scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x + 1, y]);
                 }
@@ -72,7 +72,7 @@ public static class ChunkMoveHelper
                 {
                     var oldX = scene.ChunkMesh.Grid[x, 0].Coord.X;
                     var newY = scene.ChunkMesh.Grid[x, 0].Coord.Y - Chunk.Size.Y;
-                    scene.ChunkMesh.Grid[x, 0] = new Chunk(oldX, newY);
+                    scene.ChunkMesh.Grid[x, 0] = new Chunk(oldX, newY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x, 0]);
                     scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x, 0]);
                 }
@@ -98,7 +98,7 @@ public static class ChunkMoveHelper
                 {
                     var oldX = scene.ChunkMesh.Grid[x, y + 1].Coord.X;
                     var newY = scene.ChunkMesh.Grid[x, y + 1].Coord.Y + Chunk.Size.Y;
-                    scene.ChunkMesh.Grid[x, y + 1] = new Chunk(oldX, newY);
+                    scene.ChunkMesh.Grid[x, y + 1] = new Chunk(oldX, newY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x, y + 1]);
                     scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x, y + 1]);
                 }

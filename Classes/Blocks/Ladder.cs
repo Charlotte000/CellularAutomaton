@@ -14,9 +14,9 @@ public class Ladder : Block, IClimbable
 
     public override bool IsTransparent { get => true; }
 
-    public override void OnCreate(Scene scene)
+    public override void OnCreate()
     {
-        this.Expand(scene, 10);
+        this.Expand(10);
     }
 
     public override Block Copy()
@@ -28,17 +28,17 @@ public class Ladder : Block, IClimbable
             WasUpdated = this.WasUpdated,
         };
 
-    public void Expand(Scene scene, int length)
+    public void Expand(int length)
     {
         for (int i = 1; i < length; i++)
         {
             var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
-            if (scene.ChunkMesh[coord]?.BlockMesh[coord] is not Empty)
+            if (this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord] is not Empty)
             {
                 return;
             }
 
-            scene.SetBlock(new Ladder(), this.Coords.X, this.Coords.Y + i, false, true);
+            this.Chunk.Scene.SetBlock(new Ladder(), this.Coords.X, this.Coords.Y + i, false, true);
         }
     }
 }
