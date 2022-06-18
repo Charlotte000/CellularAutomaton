@@ -4,13 +4,16 @@ using SFML.Graphics;
 using SFML.System;
 using System.Collections;
 
-public abstract class Mesh<T> : IEnumerable<T>, Drawable
+public abstract class Mesh<T, P> : IEnumerable<T>, Drawable
 {
-    public Mesh(Vector2i size, Vector2i coord)
+    public Mesh(P parent, Vector2i size, Vector2i coord)
     {
         this.Grid = new T[size.X, size.Y];
         this.Coord = coord;
+        this.Parent = parent;
     }
+
+    public P Parent { get; set; }
 
     public T[,] Grid { get; set; }
 

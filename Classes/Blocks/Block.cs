@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -23,8 +22,6 @@ public class Block : IEntity
 
     public int Light { get; set; }
 
-    public Wall? Wall { get; set; }
-
     public bool WasUpdated { get; set; } = false;
 
     public bool IsVisible { get; set; } = false;
@@ -39,27 +36,16 @@ public class Block : IEntity
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        if (this.IsTransparent)
-        {
-            target.Draw(this.Wall!, states);
-        }
-
         if (this.Light > 0)
         {
             target.Draw(this.Sprite, states);
         }
 
-        Drawable shadow = this.Wall is not EmptyWall && this.IsTransparent ?
-            new RectangleShape(this.CollisionBox)
-            {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-                Position = new Vector2f(0, 0),
-            }
-            :
-            new Sprite(this.Sprite)
-            {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
-            };
+        var shadow = new RectangleShape(this.CollisionBox)
+        {
+            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            Position = new Vector2f(0, 0),
+        };
         target.Draw(shadow, states);
     }
 
@@ -69,7 +55,6 @@ public class Block : IEntity
 
     public virtual void OnDelete()
     {
-        this.Wall?.Dispose();
         this.CollisionBox.Dispose();
     }
 
@@ -79,7 +64,6 @@ public class Block : IEntity
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coords = this.Coords,
             Light = this.Light,
-            Wall = this.Wall?.Copy(),
             WasUpdated = this.WasUpdated,
         };
 }

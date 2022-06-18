@@ -50,14 +50,16 @@ public class TerrainGenerator
 
             for (int y = this.sea.Average; y < terrainHeight; y++)
             {
-                chunk.BlockMesh[x + chunk.Coord.X, y] = new Water() { Amount = 4, Wall = new EmptyWall() };
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Water() { Amount = 4 };
+                chunk.WallMesh[x + chunk.Coord.X, y] = new EmptyWall();
             }
 
             for (int y = terrainHeight; y < stoneHeight; y++)
             {
                 if (y == terrainHeight)
                 {
-                    chunk.BlockMesh[x + chunk.Coord.X, y] = new Grass() { Wall = new DirtWall() };
+                    chunk.BlockMesh[x + chunk.Coord.X, y] = new Grass();
+                    chunk.WallMesh[x + chunk.Coord.X, y] = new DirtWall();
 
                     if (y - 1 < this.sea.Average)
                     {
@@ -77,12 +79,14 @@ public class TerrainGenerator
                     continue;
                 }
 
-                chunk.BlockMesh[x + chunk.Coord.X, y] = new Dirt() { Wall = new DirtWall() };
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Dirt();
+                chunk.WallMesh[x + chunk.Coord.X, y] = new DirtWall();
             }
 
             for (int y = stoneHeight; y < chunk.Coord.Y + h; y++)
             {
-                chunk.BlockMesh[x + chunk.Coord.X, y] = new Stone() { Wall = new StoneWall() };
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Stone();
+                chunk.WallMesh[x + chunk.Coord.X, y] = new StoneWall();
             }
         }
     }

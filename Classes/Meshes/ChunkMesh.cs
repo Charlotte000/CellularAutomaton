@@ -2,13 +2,14 @@
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Utils;
+using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
 using SFML.System;
 
-public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
+public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Block, Wall)>
 {
-    public ChunkMesh()
-        : base(new Vector2i(4, 4), new Vector2i(0, 0))
+    public ChunkMesh(Scene scene)
+        : base(scene, new Vector2i(4, 4), new Vector2i(0, 0))
     {
         for (int x = 0; x < this.Width; x++)
         {
@@ -95,6 +96,20 @@ public class ChunkMesh : Mesh<Chunk>, IEnumerable<Block>
             foreach (var block in chunk.BlockMesh.Grid)
             {
                 yield return block;
+            }
+        }
+    }
+
+    IEnumerator<(Block, Wall)> IEnumerable<(Block, Wall)>.GetEnumerator()
+    {
+        foreach (var chunk in this.Grid)
+        {
+            for (int x = 0; x < Chunk.Size.X; x++)
+            {
+                for (int y = 0; y < Chunk.Size.Y; y++)
+                {
+                    yield return (chunk.BlockMesh.Grid[x, y], chunk.WallMesh.Grid[x, y]);
+                }
             }
         }
     }

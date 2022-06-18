@@ -4,10 +4,10 @@ using CellularAutomaton.Classes.Blocks;
 using SFML.Graphics;
 using SFML.System;
 
-public class PressureMesh : Mesh<Vector2f>
+public class PressureMesh : Mesh<Vector2f, Chunk>
 {
-    public PressureMesh(Vector2i coord)
-        : base(Chunk.Size, coord)
+    public PressureMesh(Chunk chunk, Vector2i coord)
+        : base(chunk, Chunk.Size, coord)
     {
         this[new Vector2i(0, 0)] = new Vector2f(0, 0);
     }

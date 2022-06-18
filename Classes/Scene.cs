@@ -38,6 +38,7 @@ public class Scene
         this.TerrainGenerator.Scene = this;
 
         // Generate terrain
+        this.ChunkMesh = new (this);
         foreach (var chunk in this.ChunkMesh)
         {
             this.TerrainGenerator.Generate(chunk);
@@ -94,7 +95,7 @@ public class Scene
 
     public float Daylight { get; set; } = 0;
 
-    public ChunkMesh ChunkMesh { get; set; } = new ();
+    public ChunkMesh ChunkMesh { get; set; }
 
     public List<IEntity> Entities { get; set; } = new ()
     {
@@ -208,8 +209,10 @@ public class Scene
             var hasNeighbour = false;
             foreach (var delta in Scene.Neighborhood)
             {
-                var neighbour = scene.ChunkMesh[coords + delta]?.BlockMesh[coords + delta];
-                if (neighbour is not Empty || neighbour?.Wall is not EmptyWall)
+                var chunk = scene.ChunkMesh[coords + delta];
+                var neighbourBlock = chunk?.BlockMesh[coords + delta];
+                var neighbourWall = chunk?.WallMesh[coords + delta];
+                if (neighbourBlock is not Empty || neighbourWall is not EmptyWall)
                 {
                     hasNeighbour = true;
                     break;
@@ -301,15 +304,15 @@ public class Scene
             this.Camera.Center - (this.Camera.Size / 2) - blockSize,
             this.Camera.Size + (blockSize * 2));
 
-        foreach (var block in this.ChunkMesh as IEnumerable<Block>)
+        foreach (var pair in this.ChunkMesh as IEnumerable<(Block, Wall)>)
         {
-            if (block is Empty && block.Wall is EmptyWall)
+            if (pair.Item1 is Empty && pair.Item2 is EmptyWall)
             {
                 continue;
             }
 
-            var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
-            block.IsVisible = isVisible;
+            var isVisible = viewRect.Intersects(pair.Item1.CollisionBox.GetGlobalBounds());
+            pair.Item1.IsVisible = isVisible;
         }
     }
 
@@ -318,17 +321,17 @@ public class Scene
         // Light source
         var light = (int)(this.Daylight * 255);
         var maxLight = light;
-        foreach (var block in this.ChunkMesh as IEnumerable<Block>)
+        foreach (var pair in this.ChunkMesh as IEnumerable<(Block, Wall)>)
         {
-            if (block is ILightSource lightSource)
+            if (pair.Item1 is ILightSource lightSource)
             {
-                block.Light = lightSource.Brightness;
-                maxLight = Math.Max(maxLight, block.Light);
+                pair.Item1.Light = lightSource.Brightness;
+                maxLight = Math.Max(maxLight, pair.Item1.Light);
                 continue;
             }
 
-            block.Light = block.IsTransparent && block.Wall is EmptyWall ? light : 0;
-            maxLight = Math.Max(maxLight, block.Light);
+            pair.Item1.Light = pair.Item1.IsTransparent && pair.Item2 is EmptyWall ? light : 0;
+            maxLight = Math.Max(maxLight, pair.Item1.Light);
         }
 
         // Light fading

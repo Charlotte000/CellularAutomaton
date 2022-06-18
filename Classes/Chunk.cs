@@ -10,8 +10,9 @@ public class Chunk : Drawable
     {
         this.Coord = new Vector2i(x, y);
 
-        this.BlockMesh = new (this.Coord);
-        this.PressureMesh = new (this.Coord);
+        this.BlockMesh = new (this, this.Coord);
+        this.PressureMesh = new (this, this.Coord);
+        this.WallMesh = new (this, this.Coord);
     }
 
     public static Vector2i Size { get; } = new (20, 20);
@@ -22,10 +23,13 @@ public class Chunk : Drawable
 
     public PressureMesh PressureMesh { get; set; }
 
+    public WallMesh WallMesh { get; set; }
+
     public void Draw(RenderTarget target, RenderStates states)
     {
         // this.BlockMesh.DrawMesh(target);
         // this.PressureMesh.DrawMesh(target);
+        target.Draw(this.WallMesh, states);
         target.Draw(this.BlockMesh, states);
         target.Draw(this.PressureMesh, states);
     }

@@ -24,7 +24,6 @@ public class Liana : Block, IClimbable
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coords = this.Coords,
             Light = this.Light,
-            Wall = this.Wall?.Copy(),
             WasUpdated = this.WasUpdated,
         };
 
@@ -33,13 +32,15 @@ public class Liana : Block, IClimbable
         for (int i = 1; i < length; i++)
         {
             var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
-            var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
-            if (block is null || block is not Empty || block.Wall is EmptyWall)
+            var chunk = scene.ChunkMesh[coord];
+            var block = chunk?.BlockMesh[coord];
+            var wall = chunk?.WallMesh[coord];
+            if (block is null || block is not Empty || wall is EmptyWall)
             {
                 return;
             }
 
-            scene.SetBlock(new Liana(), this.Coords.X, this.Coords.Y + i, false, true);
+            scene.SetBlock(new Liana(), coord, false, true);
         }
     }
 }

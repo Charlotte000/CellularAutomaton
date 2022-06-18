@@ -5,16 +5,16 @@ using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
 using SFML.System;
 
-public class BlockMesh : Mesh<Block>
+public class BlockMesh : Mesh<Block, Chunk>
 {
-    public BlockMesh(Vector2i coord)
-        : base(Chunk.Size, coord)
+    public BlockMesh(Chunk chunk, Vector2i coord)
+        : base(chunk, Chunk.Size, coord)
     {
         for (int x = 0; x < this.Width; x++)
         {
             for (int y = 0; y < this.Height; y++)
             {
-                this[x + this.Coord.X, y + this.Coord.Y] = new Empty() { Wall = new EmptyWall() };
+                this[x + this.Coord.X, y + this.Coord.Y] = new Empty();
             }
         }
     }
@@ -28,11 +28,6 @@ public class BlockMesh : Mesh<Block>
                 var oldBlock = this[x, y];
                 if (oldBlock is not null)
                 {
-                    if (value!.Wall is null)
-                    {
-                        value!.Wall = oldBlock.Wall?.Copy();
-                    }
-
                     value!.Light = oldBlock.Light;
                     oldBlock.OnDelete();
                 }
