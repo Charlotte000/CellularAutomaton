@@ -8,19 +8,19 @@ public class Water : Block
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
-        new (Scene.Texture, new IntRect(Block.Size, Block.Size * 3 / 4, Block.Size, Block.Size / 4))
+        new (Scene.Texture, new IntRect(80, 75, 20, 5))
         {
-            Origin = new Vector2f(0, -Block.Size * 3 / 4),
+            Origin = new Vector2f(0, -15),
         },
-        new (Scene.Texture, new IntRect(Block.Size, Block.Size / 2, Block.Size, Block.Size / 2))
+        new (Scene.Texture, new IntRect(80, 70, 20, 10))
         {
-            Origin = new Vector2f(0, -Block.Size / 2),
+            Origin = new Vector2f(0, -10),
         },
-        new (Scene.Texture, new IntRect(Block.Size, Block.Size / 4, Block.Size, Block.Size * 3 / 4))
+        new (Scene.Texture, new IntRect(80, 65, 20, 15))
         {
-            Origin = new Vector2f(0, -Block.Size / 4),
+            Origin = new Vector2f(0, -5),
         },
-        new (Scene.Texture, new IntRect(Block.Size, 0, Block.Size, Block.Size)),
+        new (Scene.Texture, new IntRect(80, 60, 20, 20)),
     };
 
     public override Sprite Sprite { get => Water.SpriteSource[this.Amount - 1]; }

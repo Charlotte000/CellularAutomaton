@@ -80,7 +80,7 @@ public class Leaf : IMovingEntity
 
         if (this.Vel.X == 0 && this.Vel.Y == 0)
         {
-            this.Scene.Entities.Remove(this);
+            this.Scene.RemoveEntity(this);
             return;
         }
     }

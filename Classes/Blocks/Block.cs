@@ -9,7 +9,7 @@ public class Block : IEntity
 {
     public static readonly int Size = 20;
 
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 2, Block.Size, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(80, 40, 20, 20));
 
     public virtual Sprite Sprite { get => Block.SpriteSource; }
 
@@ -66,6 +66,21 @@ public class Block : IEntity
     public virtual void OnDelete()
     {
         this.CollisionBox.Dispose();
+    }
+
+    public bool IsBoundary()
+    {
+        foreach (var delta in Scene.ExpandedNeighborhood)
+        {
+            var coord = this.Coords + delta;
+            var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+            if (block is Empty || (block is not null && (block.IsTransparent || block is not ICollidable)))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public virtual Block Copy()

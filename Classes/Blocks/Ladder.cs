@@ -6,7 +6,7 @@ using SFML.System;
 
 public class Ladder : Block, IClimbable
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 4, 0, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 40, 20, 20));
 
     public override Sprite Sprite { get => Ladder.SpriteSource; }
 

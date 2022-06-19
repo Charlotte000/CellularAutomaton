@@ -5,7 +5,7 @@ using SFML.Graphics;
 
 public class DirtWall : Wall
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, Block.Size, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 20, 20, 20));
 
     public override Sprite Sprite { get => DirtWall.SpriteSource; }
 

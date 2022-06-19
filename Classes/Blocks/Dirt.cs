@@ -5,7 +5,7 @@ using SFML.Graphics;
 
 public class Dirt : Block, ICollidable
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(0, 0, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(20, 20, 20, 20));
 
     public override Sprite Sprite { get => Dirt.SpriteSource; }
 

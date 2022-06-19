@@ -5,7 +5,7 @@ using SFML.Graphics;
 
 public class StoneWall : Wall
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 3, Block.Size, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 0, 20, 20));
 
     public override Sprite Sprite { get => StoneWall.SpriteSource; }
 

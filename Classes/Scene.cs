@@ -17,10 +17,12 @@ public class Scene
 
     public static readonly Vector2i[] Neighborhood = new Vector2i[]
     {
-        new Vector2i(-1, 0),
-        new Vector2i(1, 0),
-        new Vector2i(0, -1),
-        new Vector2i(0, 1),
+        new (-1, 0), new (1, 0), new (0, -1), new (0, 1),
+    };
+
+    public static readonly Vector2i[] ExpandedNeighborhood = new Vector2i[]
+    {
+        new (-1, 0), new (1, 0), new (0, -1), new (0, 1), new (-1, -1), new (1, -1), new (1, 1), new (-1, 1),
     };
 
     public static readonly Random RandomGenerator = new ();
@@ -252,15 +254,6 @@ public class Scene
         return block;
     }
 
-    public Block? TrySetBlock(
-        Scene scene,
-        Block block,
-        int x,
-        int y,
-        bool updateLights = true,
-        bool saveToHistory = true)
-        => this.TrySetBlock(scene, block, new Vector2i(x, y), updateLights, saveToHistory);
-
     public void AddEntity(IMovingEntity entity)
     {
         entity.Scene = this;
@@ -300,12 +293,37 @@ public class Scene
     {
         if (Mouse.IsButtonPressed(Mouse.Button.Left))
         {
-            this.TrySetBlock(this, this.inventoryMenu.GetValue(), this.GetMouseCoords())?.OnCreate();
+            var coord = this.GetMouseCoords();
+            var chunk = this.ChunkMesh[coord];
+            var selected = this.inventoryMenu.GetValue();
+            if (selected.Item1 is not null)
+            {
+                this.TrySetBlock(this, selected.Item1, coord)?.OnCreate();
+            }
+            else
+            {
+                if (chunk is not null)
+                {
+                    chunk.WallMesh[coord] = selected.Item2!;
+                }
+            }
         }
 
         if (Mouse.IsButtonPressed(Mouse.Button.Right))
         {
-            this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate();
+            if (Keyboard.IsKeyPressed(Keyboard.Key.LShift))
+            {
+                var coord = this.GetMouseCoords();
+                var chunk = this.ChunkMesh[coord];
+                if (chunk is not null)
+                {
+                    chunk.WallMesh[coord] = new EmptyWall();
+                }
+            }
+            else
+            {
+                this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate();
+            }
         }
     }
 

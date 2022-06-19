@@ -8,14 +8,14 @@ public class Tree : Block
 {
     private static readonly List<Sprite> SpriteSource = new ()
     {
-        new (Scene.Texture, new IntRect(0, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(40, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(80, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(120, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(160, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(200, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(240, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
-        new (Scene.Texture, new IntRect(280, 40, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(0, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(40, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(80, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(120, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(160, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(200, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(240, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
+        new (Scene.Texture, new IntRect(280, 80, 40, 200)) { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) },
     };
 
     private int treeType = Scene.RandomGenerator.Next(0, 8);

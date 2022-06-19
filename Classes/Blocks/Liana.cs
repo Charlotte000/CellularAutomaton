@@ -7,7 +7,7 @@ using SFML.System;
 
 public class Liana : Block, IClimbable
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(Block.Size * 5, 0, Block.Size, Block.Size));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(140, 0, 20, 20));
 
     public override Sprite Sprite { get => Liana.SpriteSource; }
 
