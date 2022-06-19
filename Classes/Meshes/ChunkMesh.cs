@@ -6,7 +6,7 @@ using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
 using SFML.System;
 
-public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Block, Wall)>
+public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Block block, Wall wall)>
 {
     public ChunkMesh(Scene scene)
         : base(scene, new Vector2i(4, 4), new Vector2i(0, 0))
@@ -100,7 +100,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         }
     }
 
-    IEnumerator<(Block, Wall)> IEnumerable<(Block, Wall)>.GetEnumerator()
+    IEnumerator<(Block block, Wall wall)> IEnumerable<(Block block, Wall wall)>.GetEnumerator()
     {
         foreach (var chunk in this.Grid)
         {

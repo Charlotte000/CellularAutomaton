@@ -296,15 +296,15 @@ public class Scene
             var coord = this.GetMouseCoords();
             var chunk = this.ChunkMesh[coord];
             var selected = this.inventoryMenu.GetValue();
-            if (selected.Item1 is not null)
+            if (selected.block is not null)
             {
-                this.TrySetBlock(this, selected.Item1, coord)?.OnCreate();
+                this.TrySetBlock(this, selected.block, coord)?.OnCreate();
             }
             else
             {
                 if (chunk is not null)
                 {
-                    chunk.WallMesh[coord] = selected.Item2!;
+                    chunk.WallMesh[coord] = selected.wall!;
                 }
             }
         }
@@ -334,15 +334,15 @@ public class Scene
             this.Camera.Center - (this.Camera.Size / 2) - blockSize,
             this.Camera.Size + (blockSize * 2));
 
-        foreach (var pair in this.ChunkMesh as IEnumerable<(Block, Wall)>)
+        foreach (var pair in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
         {
-            if (pair.Item1 is Empty && pair.Item2 is EmptyWall)
+            if (pair.block is Empty && pair.wall is EmptyWall)
             {
                 continue;
             }
 
-            var isVisible = viewRect.Intersects(pair.Item1.CollisionBox.GetGlobalBounds());
-            pair.Item1.IsVisible = isVisible;
+            var isVisible = viewRect.Intersects(pair.block.CollisionBox.GetGlobalBounds());
+            pair.block.IsVisible = isVisible;
         }
     }
 
@@ -351,17 +351,17 @@ public class Scene
         // Light source
         var light = (int)(this.Daylight * 255);
         var maxLight = light;
-        foreach (var pair in this.ChunkMesh as IEnumerable<(Block, Wall)>)
+        foreach (var pair in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
         {
-            if (pair.Item1 is ILightSource lightSource)
+            if (pair.block is ILightSource lightSource)
             {
-                pair.Item1.Light = lightSource.Brightness;
-                maxLight = Math.Max(maxLight, pair.Item1.Light);
+                pair.block.Light = lightSource.Brightness;
+                maxLight = Math.Max(maxLight, pair.block.Light);
                 continue;
             }
 
-            pair.Item1.Light = pair.Item1.IsTransparent && pair.Item2 is EmptyWall ? light : 0;
-            maxLight = Math.Max(maxLight, pair.Item1.Light);
+            pair.block.Light = pair.block.IsTransparent && pair.wall is EmptyWall ? light : 0;
+            maxLight = Math.Max(maxLight, pair.block.Light);
         }
 
         // Light fading

@@ -63,7 +63,7 @@ public class InventoryMenu : Interface
         }
     }
 
-    public (Block?, Wall?) GetValue()
+    public (Block? block, Wall? wall) GetValue()
         => (this.items[this.selected].Block?.Copy(), this.items[this.selected].Wall?.Copy());
 
     private void OnMouseScrolled(object? sender, MouseWheelScrollEventArgs e)
