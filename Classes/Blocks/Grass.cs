@@ -44,109 +44,79 @@ public class Grass : Block, ICollidable
                 return Grass.SpriteSource[14];
             }
 
-            var ns = new bool[4];
+            var neighborhood = new Vector2i[] { new (-1, 0), new (1, 0), new (0, -1), new (0, 1) };
 
+            var neighbors = new bool[4];
             for (int i = 0; i < 4; i++)
             {
-                var coord = this.Coords + Scene.Neighborhood[i];
+                var coord = this.Coords + neighborhood[i];
                 var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-                ns[i] = block is not null && block is not Empty && !block.IsTransparent;
+                neighbors[i] = block is not null && block is not Empty && !block.IsTransparent;
             }
 
-            if (!ns[0] && ns[1] && !ns[2] && ns[3])
+            switch (neighbors[0], neighbors[1], neighbors[2], neighbors[3])
             {
-                return Grass.SpriteSource[0];
-            }
-            else if (ns[0] && ns[1] && !ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[1];
-            }
-            else if (ns[0] && !ns[1] && !ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[2];
-            }
-            else if (ns[0] && !ns[1] && ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[3];
-            }
-            else if (ns[0] && !ns[1] && ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[4];
-            }
-            else if (ns[0] && ns[1] && ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[5];
-            }
-            else if (!ns[0] && ns[1] && ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[6];
-            }
-            else if (!ns[0] && ns[1] && ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[7];
-            }
-            else if (!ns[0] && !ns[1] && !ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[8];
-            }
-            else if (!ns[0] && !ns[1] && ns[2] && ns[3])
-            {
-                return Grass.SpriteSource[9];
-            }
-            else if (!ns[0] && !ns[1] && ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[10];
-            }
-            else if (!ns[0] && ns[1] && !ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[11];
-            }
-            else if (ns[0] && ns[1] && !ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[12];
-            }
-            else if (ns[0] && !ns[1] && !ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[13];
-            }
-            else if (!ns[0] && !ns[1] && !ns[2] && !ns[3])
-            {
-                return Grass.SpriteSource[14];
-            }
-            else if (ns[0] && ns[1] && ns[2] && ns[3])
-            {
-                var coord = this.Coords + new Vector2i(1, 1);
-                var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-                if (!(block is not null && block is not Empty && !block.IsTransparent))
-                {
-                    return Grass.SpriteSource[16];
-                }
+                case (false, true, false, true):
+                    return Grass.SpriteSource[0];
+                case (true, true, false, true):
+                    return Grass.SpriteSource[1];
+                case (true, false, false, true):
+                    return Grass.SpriteSource[2];
+                case (true, false, true, true):
+                    return Grass.SpriteSource[3];
+                case (true, false, true, false):
+                    return Grass.SpriteSource[4];
+                case (true, true, true, false):
+                    return Grass.SpriteSource[5];
+                case (false, true, true, false):
+                    return Grass.SpriteSource[6];
+                case (false, true, true, true):
+                    return Grass.SpriteSource[7];
+                case (false, false, false, true):
+                    return Grass.SpriteSource[8];
+                case (false, false, true, true):
+                    return Grass.SpriteSource[9];
+                case (false, false, true, false):
+                    return Grass.SpriteSource[10];
+                case (false, true, false, false):
+                    return Grass.SpriteSource[11];
+                case (true, true, false, false):
+                    return Grass.SpriteSource[12];
+                case (true, false, false, false):
+                    return Grass.SpriteSource[13];
+                case (false, false, false, false):
+                    return Grass.SpriteSource[14];
+                case (true, true, true, true):
+                    var coord = this.Coords + new Vector2i(1, 1);
+                    var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+                    if (!(block is not null && block is not Empty && !block.IsTransparent))
+                    {
+                        return Grass.SpriteSource[16];
+                    }
 
-                coord = this.Coords + new Vector2i(-1, 1);
-                block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-                if (!(block is not null && block is not Empty && !block.IsTransparent))
-                {
-                    return Grass.SpriteSource[17];
-                }
+                    coord = this.Coords + new Vector2i(-1, 1);
+                    block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+                    if (!(block is not null && block is not Empty && !block.IsTransparent))
+                    {
+                        return Grass.SpriteSource[17];
+                    }
 
-                coord = this.Coords + new Vector2i(-1, -1);
-                block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-                if (!(block is not null && block is not Empty && !block.IsTransparent))
-                {
-                    return Grass.SpriteSource[18];
-                }
+                    coord = this.Coords + new Vector2i(-1, -1);
+                    block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+                    if (!(block is not null && block is not Empty && !block.IsTransparent))
+                    {
+                        return Grass.SpriteSource[18];
+                    }
 
-                coord = this.Coords + new Vector2i(1, -1);
-                block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-                if (!(block is not null && block is not Empty && !block.IsTransparent))
-                {
-                    return Grass.SpriteSource[19];
-                }
+                    coord = this.Coords + new Vector2i(1, -1);
+                    block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+                    if (!(block is not null && block is not Empty && !block.IsTransparent))
+                    {
+                        return Grass.SpriteSource[19];
+                    }
 
-                return Grass.SpriteSource[15];
+                    return Grass.SpriteSource[15];
             }
-
-            return Grass.SpriteSource[15];
         }
     }
 
