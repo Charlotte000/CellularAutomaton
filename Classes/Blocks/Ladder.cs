@@ -1,10 +1,9 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Ladder : Block, IClimbable
+public class Ladder : Block
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 40, 20, 20));
 
@@ -12,7 +11,11 @@ public class Ladder : Block, IClimbable
 
     public override int LightDiffusion { get => 15; }
 
+    public override bool IsCollidable { get => false; }
+
     public override bool IsTransparent { get => true; }
+
+    public override bool IsClimbable { get => true; }
 
     public override void OnCreate()
     {

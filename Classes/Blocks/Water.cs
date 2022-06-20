@@ -29,6 +29,10 @@ public class Water : Block
 
     public override bool IsTransparent { get => true; }
 
+    public override bool IsCollidable { get => false; }
+
+    public override bool IsClimbable { get => false; }
+
     public int Amount { get; set; } = 4;
 
     public static bool Push(Scene scene, Water water)
@@ -121,7 +125,7 @@ public class Water : Block
     {
         var coord = new Vector2i(this.Coords.X, this.Coords.Y + 1);
         var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-        if (block is not null && block is not Water && block is not ICollidable)
+        if (block is not null && block is not Water && !block.IsCollidable)
         {
             this.Chunk.Scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
             this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
@@ -154,7 +158,7 @@ public class Water : Block
     {
         var coord = new Vector2i(this.Coords.X + deltaX, this.Coords.Y);
         var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-        if (block is not null && block is not Water && block is not ICollidable)
+        if (block is not null && block is not Water && !block.IsCollidable)
         {
             var prevAmount = this.Amount;
 

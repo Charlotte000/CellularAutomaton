@@ -13,6 +13,10 @@ public class Torch : Block, ILightSource
 
     public override bool IsTransparent { get => true; }
 
+    public override bool IsCollidable { get => false; }
+
+    public override bool IsClimbable { get => false; }
+
     public int Brightness { get; set; } = 300;
 
     public override Block Copy()

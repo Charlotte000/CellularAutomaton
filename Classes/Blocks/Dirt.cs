@@ -1,9 +1,8 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 
-public class Dirt : Block, ICollidable
+public class Dirt : Block
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(20, 20, 20, 20));
 
@@ -12,6 +11,10 @@ public class Dirt : Block, ICollidable
     public override int LightDiffusion { get => 50; }
 
     public override bool IsTransparent { get => false; }
+
+    public override bool IsCollidable { get => true; }
+
+    public override bool IsClimbable { get => false; }
 
     public override Block Copy()
         => new Dirt()

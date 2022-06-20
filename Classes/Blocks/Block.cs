@@ -17,7 +17,11 @@ public class Block : IEntity
 
     public virtual bool IsTransparent { get => false; }
 
-    public virtual RectangleShape CollisionBox { get; set; } = new RectangleShape(new Vector2f(Block.Size, Block.Size));
+    public virtual bool IsCollidable { get => true; }
+
+    public virtual bool IsClimbable { get => false; }
+
+    public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
     public Vector2i Coords { get; set; }
 
@@ -28,14 +32,6 @@ public class Block : IEntity
     public bool IsVisible { get; set; } = false;
 
     public Chunk Chunk { get; set; }
-
-    public virtual void OnCreate()
-    {
-    }
-
-    public virtual void OnUpdate()
-    {
-    }
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
@@ -59,7 +55,19 @@ public class Block : IEntity
         target.Draw(shadow, states);
     }
 
+    public virtual void OnCreate()
+    {
+    }
+
+    public virtual void OnUpdate()
+    {
+    }
+
     public virtual void OnCollision(IEntity entity, Vector2f? normal)
+    {
+    }
+
+    public virtual void OnClick()
     {
     }
 
@@ -74,7 +82,7 @@ public class Block : IEntity
         {
             var coord = this.Coords + delta;
             var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-            if (block is Empty || (block is not null && (block.IsTransparent || block is not ICollidable)))
+            if (block is Empty || (block is not null && (block.IsTransparent || !block.IsCollidable)))
             {
                 return true;
             }

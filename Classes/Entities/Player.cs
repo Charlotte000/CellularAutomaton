@@ -7,7 +7,7 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-public class Player : IMovingEntity, ILivingEntity, ICollidable
+public class Player : IMovingEntity, ILivingEntity
 {
     public Player(float x, float y)
     {
@@ -30,13 +30,11 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
 
     public bool IsVisible { get; set; } = false;
 
+    public bool IsCollidable { get => true; }
+
     public int Light { get; set; }
 
     public Scene Scene { get; set; }
-
-    public void OnCreate()
-    {
-    }
 
     public void Draw(RenderTarget target, RenderStates states)
     {
@@ -47,6 +45,10 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
             FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
         };
         target.Draw(shadow, states);
+    }
+
+    public void OnCreate()
+    {
     }
 
     public void OnUpdate()
@@ -71,8 +73,12 @@ public class Player : IMovingEntity, ILivingEntity, ICollidable
 
     public void OnCollision(IEntity entity, Vector2f? contactNormal)
     {
-        this.IsOnGround |= contactNormal?.Y == -1 && entity is ICollidable;
-        this.IsClimbing |= entity is IClimbable;
+        this.IsOnGround |= contactNormal?.Y == -1 && entity.IsCollidable;
+        this.IsClimbing |= entity is Block block && block.IsClimbable;
+    }
+
+    public void OnClick()
+    {
     }
 
     public void OnDelete()

@@ -24,6 +24,8 @@ public class Leaf : IMovingEntity
 
     public bool IsVisible { get; set; }
 
+    public bool IsCollidable { get => false; }
+
     public int Light { get; set; }
 
     public Scene Scene { get; set; }
@@ -39,21 +41,8 @@ public class Leaf : IMovingEntity
         target.Draw(shadow, states);
     }
 
-    public void OnCollision(IEntity entity, Vector2f? contactNormal)
-    {
-        if (entity is ICollidable)
-        {
-            this.Vel *= 0;
-        }
-    }
-
     public void OnCreate()
     {
-    }
-
-    public void OnDelete()
-    {
-        this.CollisionBox.Dispose();
     }
 
     public void OnUpdate()
@@ -83,6 +72,23 @@ public class Leaf : IMovingEntity
             this.Scene.RemoveEntity(this);
             return;
         }
+    }
+
+    public void OnCollision(IEntity entity, Vector2f? contactNormal)
+    {
+        if (entity.IsCollidable)
+        {
+            this.Vel *= 0;
+        }
+    }
+
+    public void OnClick()
+    {
+    }
+
+    public void OnDelete()
+    {
+        this.CollisionBox.Dispose();
     }
 
     private void Collision()

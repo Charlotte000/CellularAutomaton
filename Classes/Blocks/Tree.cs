@@ -26,6 +26,10 @@ public class Tree : Block
 
     public override bool IsTransparent { get => true; }
 
+    public override bool IsCollidable { get => false; }
+
+    public override bool IsClimbable { get => false; }
+
     public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(40, 200))
     { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) };
 

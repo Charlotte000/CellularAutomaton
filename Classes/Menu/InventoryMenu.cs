@@ -24,8 +24,11 @@ public class InventoryMenu : Interface
         this.items.Add(new (window, size, position, 6, block: new TallGrass()));
         this.items.Add(new (window, size, position, 7, block: new Water()));
         this.items.Add(new (window, size, position, 8, block: new Block()));
-        this.items.Add(new (window, size, position, 9, wall: new DirtWall()));
-        this.items.Add(new (window, size, position, 10, wall: new StoneWall()));
+        this.items.Add(new (window, size, position, 9, block: new Door()));
+        this.items.Add(new (window, size, position, 10, block: new Trapdoor()));
+        this.items.Add(new (window, size, position, 11, block: new Tree()));
+        this.items.Add(new (window, size, position, 12, wall: new DirtWall()));
+        this.items.Add(new (window, size, position, 13, wall: new StoneWall()));
 
         this.selected = 0;
     }
@@ -114,13 +117,15 @@ public class InventoryMenu : Interface
                       originPosition.Y + Interface.Margin),
                   new Vector2f(originSize.Y - (InventoryMenu.Margin * 2), originSize.Y - (InventoryMenu.Margin * 2)))
         {
-            this.sprite = new Sprite((block?.Sprite ?? wall?.Sprite) !)
-            {
-                Position = this.Shape.Position + new Vector2f(InventoryMenu.Margin, InventoryMenu.Margin),
-            };
-            this.sprite.Scale = new Vector2f(
+            this.sprite = new Sprite((block?.Sprite ?? wall?.Sprite) !);
+
+            var scale = Math.Min(
                 (this.Shape.Size.X - (InventoryMenu.Margin * 2)) / this.sprite!.TextureRect.Width,
                 (this.Shape.Size.Y - (InventoryMenu.Margin * 2)) / this.sprite.TextureRect.Height);
+
+            this.sprite.Scale = new Vector2f(scale, scale);
+            this.sprite.Origin = new Vector2f(this.sprite.TextureRect.Width, this.sprite.TextureRect.Height) / 2;
+            this.sprite.Position = this.Shape.Position + (this.Shape.Size / 2);
 
             this.Block = block?.Copy();
             this.Wall = wall?.Copy();

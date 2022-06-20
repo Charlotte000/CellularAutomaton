@@ -1,10 +1,9 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Grass : Block, ICollidable
+public class Grass : Block
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
@@ -123,6 +122,10 @@ public class Grass : Block, ICollidable
     public override int LightDiffusion { get => 50; }
 
     public override bool IsTransparent { get => false; }
+
+    public override bool IsCollidable { get => true; }
+
+    public override bool IsClimbable { get => false; }
 
     public override void OnUpdate()
     {

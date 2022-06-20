@@ -1,19 +1,22 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
 using CellularAutomaton.Classes.Walls;
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Liana : Block, IClimbable
+public class Liana : Block
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(140, 0, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(180, 40, 20, 20));
 
     public override Sprite Sprite { get => Liana.SpriteSource; }
 
     public override int LightDiffusion { get => 15; }
 
     public override bool IsTransparent { get => true; }
+
+    public override bool IsCollidable { get => false; }
+
+    public override bool IsClimbable { get => true; }
 
     public override void OnCreate()
         => this.Expand(Scene.RandomGenerator.Next(3, 10));

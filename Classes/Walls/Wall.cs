@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Walls;
 
-using CellularAutomaton.Classes.Blocks;
 using SFML.Graphics;
 using SFML.System;
 

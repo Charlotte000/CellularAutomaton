@@ -38,12 +38,15 @@ public static class AABBCollision
         {
             var coord = (Vector2i)((staticEntity.CollisionBox.Position / Block.Size) + normal);
             var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
-            if (neighbour is ICollidable)
+            if (neighbour is not null &&
+                neighbour.IsCollidable &&
+                neighbour.CollisionBox.Size.X == Block.Size &&
+                neighbour.CollisionBox.Size.Y == Block.Size)
             {
                 return false;
             }
 
-            if (staticEntity is ICollidable)
+            if (staticEntity.IsCollidable)
             {
                 dynamicEntity.Vel += AABBCollision.Mult(
                     normal,

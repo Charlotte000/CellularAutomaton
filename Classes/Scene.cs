@@ -57,6 +57,16 @@ public class Scene
 
         this.inventoryMenu = new (this.Window, new Vector2f(0, windowHeight - 50), new Vector2f(windowWidth, 50));
 
+        // Click event listener
+        this.Window.MouseButtonPressed += (s, e) =>
+        {
+            if (e.Button == Mouse.Button.Left)
+            {
+                var coord = this.GetMouseCoords();
+                this.ChunkMesh[coord]?.BlockMesh[coord]?.OnClick();
+            }
+        };
+
         // Run block update & light threads.
         new Thread(() =>
         {
@@ -227,7 +237,7 @@ public class Scene
         }
 
         // Attempt to build up an entity
-        if (block is ICollidable)
+        if (block.IsCollidable)
         {
             foreach (var entity in this.Entities)
             {
@@ -295,16 +305,16 @@ public class Scene
         {
             var coord = this.GetMouseCoords();
             var chunk = this.ChunkMesh[coord];
-            var selected = this.inventoryMenu.GetValue();
-            if (selected.block is not null)
+            var (block, wall) = this.inventoryMenu.GetValue();
+            if (block is not null)
             {
-                this.TrySetBlock(this, selected.block, coord)?.OnCreate();
+                this.TrySetBlock(this, block, coord)?.OnCreate();
             }
             else
             {
                 if (chunk is not null)
                 {
-                    chunk.WallMesh[coord] = selected.wall!;
+                    chunk.WallMesh[coord] = wall!;
                 }
             }
         }
@@ -334,15 +344,15 @@ public class Scene
             this.Camera.Center - (this.Camera.Size / 2) - blockSize,
             this.Camera.Size + (blockSize * 2));
 
-        foreach (var pair in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
+        foreach (var (block, wall) in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
         {
-            if (pair.block is Empty && pair.wall is EmptyWall)
+            if (block is Empty && wall is EmptyWall)
             {
                 continue;
             }
 
-            var isVisible = viewRect.Intersects(pair.block.CollisionBox.GetGlobalBounds());
-            pair.block.IsVisible = isVisible;
+            var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
+            block.IsVisible = isVisible;
         }
     }
 
@@ -351,17 +361,17 @@ public class Scene
         // Light source
         var light = (int)(this.Daylight * 255);
         var maxLight = light;
-        foreach (var pair in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
+        foreach (var (block, wall) in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
         {
-            if (pair.block is ILightSource lightSource)
+            if (block is ILightSource lightSource)
             {
-                pair.block.Light = lightSource.Brightness;
-                maxLight = Math.Max(maxLight, pair.block.Light);
+                block.Light = lightSource.Brightness;
+                maxLight = Math.Max(maxLight, block.Light);
                 continue;
             }
 
-            pair.block.Light = pair.block.IsTransparent && pair.wall is EmptyWall ? light : 0;
-            maxLight = Math.Max(maxLight, pair.block.Light);
+            block.Light = block.IsTransparent && wall is EmptyWall ? light : 0;
+            maxLight = Math.Max(maxLight, block.Light);
         }
 
         // Light fading
