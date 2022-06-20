@@ -19,7 +19,7 @@ public class Door : Block
 
     private Door? lower;
 
-    public Door()
+    public Door() // ToDo: door blockHistory
     {
         this.CollisionBox = new (new Vector2f(Block.Size / 5, Block.Size))
         { Origin = this.IsLeft ? new Vector2f(0, 0) : new Vector2f(-Block.Size * 4f / 5f, 0) };
@@ -33,8 +33,6 @@ public class Door : Block
     public override bool IsTransparent { get => true; }
 
     public override bool IsCollidable { get => !this.IsOpened; }
-
-    public override bool IsClimbable { get => false; }
 
     public bool IsOpened { get; set; } = true;
 
@@ -54,7 +52,7 @@ public class Door : Block
             target.Draw(this.Sprite, states);
         }
 
-        Drawable shadow = this.Chunk.WallMesh[this.Coords] is not EmptyWall ?
+        Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall ?
             new RectangleShape(this.CollisionBox)
             {
                 FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
@@ -73,7 +71,7 @@ public class Door : Block
 
     public override void OnCreate()
     {
-        var upperCoord = this.Coords + new Vector2i(0, -1);
+        var upperCoord = this.Coord + new Vector2i(0, -1);
         var upperChunk = this.Chunk.Scene.ChunkMesh[upperCoord];
         if (upperChunk?.BlockMesh[upperCoord] is Empty)
         {
@@ -82,7 +80,7 @@ public class Door : Block
         }
         else
         {
-            var lowerCoord = this.Coords + new Vector2i(0, 1);
+            var lowerCoord = this.Coord + new Vector2i(0, 1);
             var lowerChunk = this.Chunk.Scene.ChunkMesh[lowerCoord];
             if (lowerChunk?.BlockMesh[lowerCoord] is Empty)
             {
@@ -91,7 +89,7 @@ public class Door : Block
             }
             else
             {
-                this.Chunk.BlockMesh[this.Coords] = new Empty();
+                this.Chunk.BlockMesh[this.Coord] = new Empty();
             }
         }
     }
@@ -126,13 +124,13 @@ public class Door : Block
         if (this.upper is not null)
         {
             this.upper.lower = null;
-            this.upper.Chunk.BlockMesh[this.upper.Coords] = new Empty();
+            this.upper.Chunk.BlockMesh[this.upper.Coord] = new Empty();
         }
 
         if (this.lower is not null)
         {
             this.lower.upper = null;
-            this.lower.Chunk.BlockMesh[this.lower.Coords] = new Empty();
+            this.lower.Chunk.BlockMesh[this.lower.Coord] = new Empty();
         }
     }
 
@@ -140,8 +138,10 @@ public class Door : Block
         => new Door()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
+            IsOpened = this.IsOpened,
+            IsLeft = this.IsLeft,
         };
 }

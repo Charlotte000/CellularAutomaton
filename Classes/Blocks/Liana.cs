@@ -25,7 +25,7 @@ public class Liana : Block
         => new Liana()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
@@ -34,7 +34,7 @@ public class Liana : Block
     {
         for (int i = 1; i < length; i++)
         {
-            var coord = new Vector2i(this.Coords.X, this.Coords.Y + i);
+            var coord = new Vector2i(this.Coord.X, this.Coord.Y + i);
             var chunk = this.Chunk.Scene.ChunkMesh[coord];
             var block = chunk?.BlockMesh[coord];
             var wall = chunk?.WallMesh[coord];

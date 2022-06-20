@@ -48,7 +48,7 @@ public class Grass : Block
             var neighbors = new bool[4];
             for (int i = 0; i < 4; i++)
             {
-                var coord = this.Coords + neighborhood[i];
+                var coord = this.Coord + neighborhood[i];
                 var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                 neighbors[i] = block is not null && block is not Empty && !block.IsTransparent;
             }
@@ -86,28 +86,28 @@ public class Grass : Block
                 case (false, false, false, false):
                     return Grass.SpriteSource[14];
                 case (true, true, true, true):
-                    var coord = this.Coords + new Vector2i(1, 1);
+                    var coord = this.Coord + new Vector2i(1, 1);
                     var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                     if (!(block is not null && block is not Empty && !block.IsTransparent))
                     {
                         return Grass.SpriteSource[16];
                     }
 
-                    coord = this.Coords + new Vector2i(-1, 1);
+                    coord = this.Coord + new Vector2i(-1, 1);
                     block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                     if (!(block is not null && block is not Empty && !block.IsTransparent))
                     {
                         return Grass.SpriteSource[17];
                     }
 
-                    coord = this.Coords + new Vector2i(-1, -1);
+                    coord = this.Coord + new Vector2i(-1, -1);
                     block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                     if (!(block is not null && block is not Empty && !block.IsTransparent))
                     {
                         return Grass.SpriteSource[18];
                     }
 
-                    coord = this.Coords + new Vector2i(1, -1);
+                    coord = this.Coord + new Vector2i(1, -1);
                     block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                     if (!(block is not null && block is not Empty && !block.IsTransparent))
                     {
@@ -119,27 +119,19 @@ public class Grass : Block
         }
     }
 
-    public override int LightDiffusion { get => 50; }
-
-    public override bool IsTransparent { get => false; }
-
-    public override bool IsCollidable { get => true; }
-
-    public override bool IsClimbable { get => false; }
-
     public override void OnUpdate()
     {
         if (Scene.RandomGenerator.Next(0, 3) == 0)
         {
             foreach (var delta in Scene.ExpandedNeighborhood)
             {
-                var coord = this.Coords + delta;
+                var coord = this.Coord + delta;
                 var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
                 if (block is Dirt)
                 {
                     if (block.IsBoundary())
                     {
-                        block.Chunk.BlockMesh[block.Coords] = new Grass();
+                        block.Chunk.BlockMesh[block.Coord] = new Grass();
                         return;
                     }
                 }
@@ -151,7 +143,7 @@ public class Grass : Block
         => new Grass()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

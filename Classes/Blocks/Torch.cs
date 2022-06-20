@@ -15,15 +15,13 @@ public class Torch : Block, ILightSource
 
     public override bool IsCollidable { get => false; }
 
-    public override bool IsClimbable { get => false; }
-
     public int Brightness { get; set; } = 300;
 
     public override Block Copy()
         => new Torch()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

@@ -23,7 +23,7 @@ public class Block : IEntity
 
     public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
-    public Vector2i Coords { get; set; }
+    public Vector2i Coord { get; set; }
 
     public int Light { get; set; }
 
@@ -40,7 +40,7 @@ public class Block : IEntity
             target.Draw(this.Sprite, states);
         }
 
-        Drawable shadow = this.Chunk.WallMesh[this.Coords] is not EmptyWall && this.IsTransparent ?
+        Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall && this.IsTransparent ?
             new RectangleShape(this.CollisionBox)
             {
                 FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
@@ -80,7 +80,7 @@ public class Block : IEntity
     {
         foreach (var delta in Scene.ExpandedNeighborhood)
         {
-            var coord = this.Coords + delta;
+            var coord = this.Coord + delta;
             var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (block is Empty || (block is not null && (block.IsTransparent || !block.IsCollidable)))
             {
@@ -95,7 +95,7 @@ public class Block : IEntity
         => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

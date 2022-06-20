@@ -27,8 +27,9 @@ public class InventoryMenu : Interface
         this.items.Add(new (window, size, position, 9, block: new Door()));
         this.items.Add(new (window, size, position, 10, block: new Trapdoor()));
         this.items.Add(new (window, size, position, 11, block: new Tree()));
-        this.items.Add(new (window, size, position, 12, wall: new DirtWall()));
-        this.items.Add(new (window, size, position, 13, wall: new StoneWall()));
+        this.items.Add(new (window, size, position, 12, block: new Dynamite()));
+        this.items.Add(new (window, size, position, 13, wall: new DirtWall()));
+        this.items.Add(new (window, size, position, 14, wall: new StoneWall()));
 
         this.selected = 0;
     }

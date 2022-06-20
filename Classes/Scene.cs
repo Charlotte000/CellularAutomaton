@@ -383,7 +383,7 @@ public class Scene
                 {
                     foreach (var delta in Scene.Neighborhood)
                     {
-                        var neighbour = this.ChunkMesh[block.Coords + delta]?.BlockMesh[block.Coords + delta];
+                        var neighbour = this.ChunkMesh[block.Coord + delta]?.BlockMesh[block.Coord + delta];
                         if (neighbour is not null && neighbour.Light < currentLight)
                         {
                             neighbour.Light = Math.Max(

@@ -14,13 +14,11 @@ public class TallGrass : Block
 
     public override bool IsCollidable { get => false; }
 
-    public override bool IsClimbable { get => false; }
-
     public override Block Copy()
         => new TallGrass()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

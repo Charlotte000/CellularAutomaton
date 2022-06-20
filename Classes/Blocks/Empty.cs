@@ -10,11 +10,9 @@ public class Empty : Block
 
     public override bool IsCollidable { get => false; }
 
-    public override bool IsClimbable { get => false; }
-
     public override void Draw(RenderTarget target, RenderStates states)
     {
-        var wall = this.Chunk.WallMesh[this.Coords];
+        var wall = this.Chunk.WallMesh[this.Coord];
         if (wall?.Sprite is not null)
         {
             var shadow = new Sprite(wall.Sprite)
@@ -29,7 +27,7 @@ public class Empty : Block
         => new Empty()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

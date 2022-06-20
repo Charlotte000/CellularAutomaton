@@ -33,7 +33,7 @@ public class Trapdoor : Block
             target.Draw(this.Sprite, states);
         }
 
-        Drawable shadow = this.Chunk.WallMesh[this.Coords] is not EmptyWall ?
+        Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall ?
             new RectangleShape(this.CollisionBox)
             {
                 FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
@@ -63,14 +63,17 @@ public class Trapdoor : Block
         }
 
         this.IsOpened = !this.IsOpened;
+
+        this.Chunk.Scene.BlockHistory.SaveBlock(this.Chunk, this);
     }
 
     public override Block Copy()
     => new Trapdoor()
     {
         CollisionBox = new RectangleShape(this.CollisionBox),
-        Coords = this.Coords,
+        Coord = this.Coord,
         Light = this.Light,
         WasUpdated = this.WasUpdated,
+        IsOpened = this.IsOpened,
     };
 }

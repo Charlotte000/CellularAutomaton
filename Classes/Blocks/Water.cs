@@ -31,19 +31,17 @@ public class Water : Block
 
     public override bool IsCollidable { get => false; }
 
-    public override bool IsClimbable { get => false; }
-
     public int Amount { get; set; } = 4;
 
     public static bool Push(Scene scene, Water water)
     {
-        var coord = water.Coords + new Vector2i(0, -1);
+        var coord = water.Coord + new Vector2i(0, -1);
         var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is Empty || block is Water)
         {
             if (Water.Push(scene, block, water.Amount))
             {
-                scene.SetBlock(new Empty(), water.Coords, false, true);
+                scene.SetBlock(new Empty(), water.Coord, false, true);
                 return true;
             }
         }
@@ -79,7 +77,7 @@ public class Water : Block
         => new Water()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             Amount = this.Amount,
             WasUpdated = this.WasUpdated,
@@ -94,7 +92,7 @@ public class Water : Block
 
         if (block is Empty)
         {
-            scene.SetBlock(new Water() { WasUpdated = true, Light = block.Light, Amount = amount }, block.Coords, false);
+            scene.SetBlock(new Water() { WasUpdated = true, Light = block.Light, Amount = amount }, block.Coord, false);
             return true;
         }
 
@@ -106,7 +104,7 @@ public class Water : Block
                 return true;
             }
 
-            var coord = block.Coords + new Vector2i(0, -1);
+            var coord = block.Coord + new Vector2i(0, -1);
             var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (neighbour is Water || neighbour is Empty)
             {
@@ -123,12 +121,12 @@ public class Water : Block
 
     private bool FallDown()
     {
-        var coord = new Vector2i(this.Coords.X, this.Coords.Y + 1);
+        var coord = new Vector2i(this.Coord.X, this.Coord.Y + 1);
         var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && !block.IsCollidable)
         {
-            this.Chunk.Scene.SetBlock(this.Copy(), this.Coords.X, this.Coords.Y + 1, false);
-            this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+            this.Chunk.Scene.SetBlock(this.Copy(), this.Coord.X, this.Coord.Y + 1, false);
+            this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
             return true;
         }
 
@@ -145,7 +143,7 @@ public class Water : Block
 
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
             }
 
             return true;
@@ -156,7 +154,7 @@ public class Water : Block
 
     private bool SpreadOut(int deltaX)
     {
-        var coord = new Vector2i(this.Coords.X + deltaX, this.Coords.Y);
+        var coord = new Vector2i(this.Coord.X + deltaX, this.Coord.Y);
         var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && !block.IsCollidable)
         {
@@ -171,13 +169,13 @@ public class Water : Block
                     Light = this.Light,
                     WasUpdated = true,
                 },
-                this.Coords.X + deltaX,
-                this.Coords.Y,
+                this.Coord.X + deltaX,
+                this.Coord.Y,
                 false);
 
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
             }
 
             return true;
@@ -190,7 +188,7 @@ public class Water : Block
             this.Amount--;
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coords, false);
+                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
             }
 
             return true;

@@ -28,8 +28,8 @@ public class BlockHistory
         {
             if (block is Water || block is Tree)
             {
-                chunkHistory.Remove(block.Coords);
-                chunkHistory.Add(block.Coords, block.Copy());
+                chunkHistory.Remove(block.Coord);
+                chunkHistory.Add(block.Coord, block.Copy());
             }
         }
 
@@ -56,8 +56,8 @@ public class BlockHistory
             chunkHistory = new ();
         }
 
-        chunkHistory.Remove(block.Coords);
-        chunkHistory.Add(block.Coords, block.Copy());
+        chunkHistory.Remove(block.Coord);
+        chunkHistory.Add(block.Coord, block.Copy());
 
         this.blockHistory.Remove(chunk.Coord);
         this.blockHistory.Add(chunk.Coord, chunkHistory);

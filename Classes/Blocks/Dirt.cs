@@ -8,19 +8,11 @@ public class Dirt : Block
 
     public override Sprite Sprite { get => Dirt.SpriteSource; }
 
-    public override int LightDiffusion { get => 50; }
-
-    public override bool IsTransparent { get => false; }
-
-    public override bool IsCollidable { get => true; }
-
-    public override bool IsClimbable { get => false; }
-
     public override Block Copy()
         => new Dirt()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
-            Coords = this.Coords,
+            Coord = this.Coord,
             Light = this.Light,
             WasUpdated = this.WasUpdated,
         };

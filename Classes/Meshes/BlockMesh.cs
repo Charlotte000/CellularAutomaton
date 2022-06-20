@@ -31,8 +31,8 @@ public class BlockMesh : Mesh<Block, Chunk>
                     oldBlock.OnDelete();
                 }
 
-                value!.Coords = new Vector2i(x, y);
-                value.CollisionBox.Position = (Vector2f)value.Coords * Block.Size;
+                value!.Coord = new Vector2i(x, y);
+                value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
                 value.Chunk = this.Parent;
                 this.Grid[x - this.Coord.X, y - this.Coord.Y] = value!;
             }
