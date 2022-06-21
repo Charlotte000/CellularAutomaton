@@ -117,6 +117,8 @@ public class Scene
 
     public View Camera { get; set; }
 
+    public Vector2i Coord { get => this.ChunkMesh.Grid[0, 0].Coord; }
+
     public Clock Clock { get; set; } = new Clock();
 
     public void Run()

@@ -143,5 +143,7 @@ public class Door : Block
             WasUpdated = this.WasUpdated,
             IsOpened = this.IsOpened,
             IsLeft = this.IsLeft,
+            upper = this.upper,
+            lower = this.lower,
         };
 }

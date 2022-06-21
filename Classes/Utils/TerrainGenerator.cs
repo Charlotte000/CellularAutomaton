@@ -50,7 +50,7 @@ public class TerrainGenerator
 
             for (int y = this.sea.Average; y < terrainHeight; y++)
             {
-                chunk.BlockMesh[x + chunk.Coord.X, y] = new Water() { Amount = 4 };
+                chunk.BlockMesh[x + chunk.Coord.X, y] = new Water();
                 chunk.WallMesh[x + chunk.Coord.X, y] = new EmptyWall();
             }
 

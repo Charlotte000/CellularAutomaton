@@ -6,22 +6,23 @@ using SFML.System;
 
 public class Water : Block
 {
-    private static readonly Sprite[] SpriteSource = new Sprite[]
+    private static readonly Sprite[] SpriteSource;
+
+    private static readonly int MaxAmount = 10;
+
+    static Water()
     {
-        new (Scene.Texture, new IntRect(80, 75, 20, 5))
+        Water.SpriteSource = new Sprite[Water.MaxAmount];
+
+        var step = Block.Size / Water.MaxAmount;
+        for (int i = 1; i <= Water.MaxAmount; i++)
         {
-            Origin = new Vector2f(0, -15),
-        },
-        new (Scene.Texture, new IntRect(80, 70, 20, 10))
-        {
-            Origin = new Vector2f(0, -10),
-        },
-        new (Scene.Texture, new IntRect(80, 65, 20, 15))
-        {
-            Origin = new Vector2f(0, -5),
-        },
-        new (Scene.Texture, new IntRect(80, 60, 20, 20)),
-    };
+            Water.SpriteSource[i - 1] = new (Scene.Texture, new IntRect(80, 80 - (step * i), 20, step * i))
+            {
+                Origin = new (0, -20 + (step * i)),
+            };
+        }
+    }
 
     public override Sprite Sprite { get => Water.SpriteSource[this.Amount - 1]; }
 
@@ -31,7 +32,7 @@ public class Water : Block
 
     public override bool IsCollidable { get => false; }
 
-    public int Amount { get; set; } = 4;
+    public int Amount { get; set; } = Water.MaxAmount;
 
     public static bool Push(Scene scene, Water water)
     {
@@ -76,7 +77,6 @@ public class Water : Block
     public override Block Copy()
         => new Water()
         {
-            CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
             Light = this.Light,
             Amount = this.Amount,
@@ -98,7 +98,7 @@ public class Water : Block
 
         if (block is Water waterBlock)
         {
-            if (waterBlock.Amount + amount <= 4)
+            if (waterBlock.Amount + amount <= Water.MaxAmount)
             {
                 waterBlock.Amount += amount;
                 return true;
@@ -108,9 +108,9 @@ public class Water : Block
             var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (neighbour is Water || neighbour is Empty)
             {
-                if (Water.Push(scene, neighbour, amount - 4 + waterBlock.Amount))
+                if (Water.Push(scene, neighbour, amount - Water.MaxAmount + waterBlock.Amount))
                 {
-                    waterBlock.Amount = 4;
+                    waterBlock.Amount = Water.MaxAmount;
                     return true;
                 }
             }
@@ -130,15 +130,15 @@ public class Water : Block
             return true;
         }
 
-        if (block is Water water && water.Amount < 4)
+        if (block is Water water && water.Amount < Water.MaxAmount)
         {
             water.WasUpdated = true;
             water.Amount += this.Amount;
             this.Amount = 0;
-            if (water.Amount > 4)
+            if (water.Amount > Water.MaxAmount)
             {
-                this.Amount = water.Amount - 4;
-                water.Amount = 4;
+                this.Amount = water.Amount - Water.MaxAmount;
+                water.Amount = Water.MaxAmount;
             }
 
             if (this.Amount < 1)
@@ -181,11 +181,12 @@ public class Water : Block
             return true;
         }
 
-        if (block is Water water && water.Amount < 4 && water.Amount < this.Amount)
+        if (block is Water water && water.Amount < Water.MaxAmount && water.Amount < this.Amount)
         {
+            var delta = Math.Max((int)((this.Amount - water.Amount) / 2f), 1);
             water.WasUpdated = true;
-            water.Amount++;
-            this.Amount--;
+            water.Amount += delta;
+            this.Amount -= delta;
             if (this.Amount < 1)
             {
                 this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);

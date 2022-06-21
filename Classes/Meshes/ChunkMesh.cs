@@ -9,7 +9,7 @@ using SFML.System;
 public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Block block, Wall wall)>
 {
     public ChunkMesh(Scene scene)
-        : base(scene, new Vector2i(4, 4), new Vector2i(0, 0))
+        : base(scene, new Vector2i(4, 4))
     {
         for (int x = 0; x < this.Width; x++)
         {
@@ -20,7 +20,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         }
     }
 
-    public override Vector2i Coord { get => this.Grid[0, 0].Coord; }
+    public override Vector2i Coord { get => this.Parent.Coord; }
 
     public override Chunk? this[int x, int y]
     {
@@ -38,7 +38,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
 
     public override bool IsValidCoord(int x, int y)
     {
-        var topLeftCoord = this.Grid[0, 0].Coord;
+        var topLeftCoord = this.Coord;
         var bottomRightCoord = this.Grid[this.Width - 1, this.Height - 1].Coord + Chunk.Size;
         return x >= topLeftCoord.X && x < bottomRightCoord.X && y >= topLeftCoord.Y && y < bottomRightCoord.Y;
     }

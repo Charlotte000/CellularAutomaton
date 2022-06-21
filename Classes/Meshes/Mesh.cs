@@ -13,6 +13,12 @@ public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
         this.Parent = parent;
     }
 
+    public Mesh(TParent parent, Vector2i size)
+    {
+        this.Grid = new TValue[size.X, size.Y];
+        this.Parent = parent;
+    }
+
     public TParent Parent { get; set; }
 
     public TValue[,] Grid { get; set; }
