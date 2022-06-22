@@ -15,14 +15,6 @@ public class PauseMenu : Menu
 
         this.Childs.Add(new Button(
             window,
-            new Vector2f((size.X / 2) - 50, 100),
-            new Vector2f(100, 50),
-            "Close",
-            this,
-            () => this.IsActive = false));
-
-        this.Childs.Add(new Button(
-            window,
             new Vector2f((size.X / 2) - 50, 200),
             new Vector2f(100, 50),
             "Exit",

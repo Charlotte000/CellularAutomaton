@@ -68,11 +68,11 @@ public class InventoryMenu : Menu
 
     private void OnKeyPressed(object? sender, KeyEventArgs e)
     {
-        for (int i = 27; i < 36; i++)
+        for (var i = Keyboard.Key.Num1; i <= Keyboard.Key.Num9; i++)
         {
-            if (((int)e.Code) == i)
+            if (e.Code == i)
             {
-                this.selected = Math.Min(i - 27, this.items.Count - 1);
+                this.selected = Math.Min((int)(i - Keyboard.Key.Num1), this.items.Count - 1);
                 break;
             }
         }
@@ -97,8 +97,6 @@ public class InventoryMenu : Menu
     {
         private readonly int index;
 
-        private readonly Button button;
-
         public InventoryItem(
             RenderWindow window,
             Vector2f position,
@@ -109,13 +107,13 @@ public class InventoryMenu : Menu
             : base(window, position, size, parent)
         {
             this.index = parent.items.Count;
-            this.button = new (
+            this.Childs.Add(new Button(
                 window,
                 new Vector2f(0, 0),
                 this.Shape.Size,
                 new Sprite((block?.Sprite ?? wall?.Sprite) !),
                 this,
-                () => ((InventoryMenu)this.Parent!).selected = this.index);
+                () => ((InventoryMenu)this.Parent!).selected = this.index));
 
             this.Block = block?.Copy();
             this.Wall = wall?.Copy();
@@ -127,17 +125,14 @@ public class InventoryMenu : Menu
 
         public override void Draw(RenderTarget target, RenderStates states)
         {
-            this.button.Shape.FillColor = this.index == ((InventoryMenu)this.Parent!).selected ?
+            this.Childs[0].Shape.FillColor = this.index == ((InventoryMenu)this.Parent!).selected ?
                 new Color(150, 150, 150) : new Color(100, 100, 100);
-            target.Draw(this.button, states);
-
+            base.Draw(target, states);
         }
 
         public override void OnDelete()
         {
             base.OnDelete();
-
-            this.button.OnDelete();
             this.Block?.OnDelete();
             this.Wall?.OnDelete();
         }
