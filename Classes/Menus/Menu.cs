@@ -1,17 +1,21 @@
-﻿namespace CellularAutomaton.Classes.Menu;
+﻿namespace CellularAutomaton.Classes.Menus;
 
 using SFML.Graphics;
 using SFML.System;
 
-public class Interface : Drawable
+public abstract class Menu : Drawable
 {
     public static readonly int Margin = 7;
+
+    public static readonly Font Font = new (@"..\..\..\Data\arial.ttf");
 
     internal readonly RectangleShape Shape;
 
     internal readonly RenderWindow Window;
 
-    public Interface(RenderWindow window, Vector2f position, Vector2f size)
+    internal bool IsActive = true;
+
+    public Menu(RenderWindow window, Vector2f position, Vector2f size)
     {
         this.Shape = new (size)
         {
@@ -36,7 +40,10 @@ public class Interface : Drawable
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        target.Draw(this.Shape, states);
+        if (this.IsActive)
+        {
+            target.Draw(this.Shape, states);
+        }
     }
 
     public virtual void OnDelete()

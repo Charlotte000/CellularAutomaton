@@ -2,7 +2,7 @@
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Entities;
-using CellularAutomaton.Classes.Menu;
+using CellularAutomaton.Classes.Menus;
 using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
@@ -29,11 +29,9 @@ public class Scene
 
     private static readonly int DayDuration = 3600;
 
-    private readonly Clock fpsClock = new ();
-
     private readonly Mutex mutex = new ();
 
-    private readonly InventoryMenu inventoryMenu;
+    private readonly List<Menu> menu;
 
     public Scene(uint windowWidth, uint windowHeight)
     {
@@ -49,13 +47,18 @@ public class Scene
         }
 
         // Init window
-        this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
+        this.Window = new RenderWindow(VideoMode.DesktopMode, "Cellular Automaton", Styles.Fullscreen);
         this.Window.SetFramerateLimit(60);
         this.Window.Closed += (obj, e) => this.Window.Close();
 
         this.Camera = new View(this.Window.GetView());
 
-        this.inventoryMenu = new (this.Window, new Vector2f(0, windowHeight - 50), new Vector2f(windowWidth, 50));
+        this.menu = new ()
+        {
+            new InventoryMenu(this.Window, new Vector2f(0, this.Window.Size.Y - 50), new Vector2f(this.Window.Size.X, 50)),
+            new PauseMenu(this.Window, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
+            new FPSMenu(this.Window, new Vector2f(0, 0), new Vector2f(20, 20)),
+        };
 
         // Click event listener
         this.Window.MouseButtonPressed += (s, e) =>
@@ -125,9 +128,6 @@ public class Scene
     {
         while (this.Window.IsOpen)
         {
-            this.Window.SetTitle($"FPS: {MathF.Round(1 / this.fpsClock.ElapsedTime.AsSeconds())}");
-            this.fpsClock.Restart();
-
             this.Window.DispatchEvents();
 
             this.mutex.WaitOne();
@@ -298,7 +298,11 @@ public class Scene
 
         // UI
         this.Window.SetView(this.Window.DefaultView);
-        this.Window.Draw(this.inventoryMenu);
+
+        foreach (var m in this.menu)
+        {
+            this.Window.Draw(m);
+        }
     }
 
     private void KeyListen()
@@ -307,7 +311,7 @@ public class Scene
         {
             var coord = this.GetMouseCoords();
             var chunk = this.ChunkMesh[coord];
-            var (block, wall) = this.inventoryMenu.GetValue();
+            var (block, wall) = ((InventoryMenu)this.menu[0]).GetValue();
             if (block is not null)
             {
                 this.TrySetBlock(this, block, coord)?.OnCreate();

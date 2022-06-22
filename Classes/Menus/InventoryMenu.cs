@@ -1,4 +1,4 @@
-﻿namespace CellularAutomaton.Classes.Menu;
+﻿namespace CellularAutomaton.Classes.Menus;
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Walls;
@@ -6,7 +6,7 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-public class InventoryMenu : Interface
+public class InventoryMenu : Menu
 {
     private readonly List<InventoryItem> items = new ();
 
@@ -15,20 +15,20 @@ public class InventoryMenu : Interface
     public InventoryMenu(RenderWindow window, Vector2f position, Vector2f size)
         : base(window, position, size)
     {
-        this.items.Add(new (window, size, position, 0, block: new Dirt()));
-        this.items.Add(new (window, size, position, 1, block: new Grass()));
-        this.items.Add(new (window, size, position, 2, block: new Torch()));
-        this.items.Add(new (window, size, position, 3, block: new Ladder()));
-        this.items.Add(new (window, size, position, 4, block: new Liana()));
-        this.items.Add(new (window, size, position, 5, block: new Stone()));
-        this.items.Add(new (window, size, position, 6, block: new TallGrass()));
-        this.items.Add(new (window, size, position, 7, block: new Water()));
-        this.items.Add(new (window, size, position, 8, block: new Block()));
-        this.items.Add(new (window, size, position, 9, block: new Door()));
-        this.items.Add(new (window, size, position, 10, block: new Trapdoor()));
-        this.items.Add(new (window, size, position, 11, block: new Tree()));
-        this.items.Add(new (window, size, position, 12, wall: new DirtWall()));
-        this.items.Add(new (window, size, position, 13, wall: new StoneWall()));
+        this.AddItem(block: new Dirt());
+        this.AddItem(block: new Grass());
+        this.AddItem(block: new Torch());
+        this.AddItem(block: new Ladder());
+        this.AddItem(block: new Liana());
+        this.AddItem(block: new Stone());
+        this.AddItem(block: new TallGrass());
+        this.AddItem(block: new Water());
+        this.AddItem(block: new Block());
+        this.AddItem(block: new Door());
+        this.AddItem(block: new Trapdoor());
+        this.AddItem(block: new Tree());
+        this.AddItem(wall: new DirtWall());
+        this.AddItem(wall: new StoneWall());
 
         this.selected = 0;
     }
@@ -51,7 +51,6 @@ public class InventoryMenu : Interface
 
         for (int i = 0; i < this.items.Count; i++)
         {
-            this.items[i].Shape.FillColor = i == this.selected ? new Color(150, 150, 150) : new Color(100, 100, 100);
             target.Draw(this.items[i], states);
         }
     }
@@ -99,33 +98,41 @@ public class InventoryMenu : Interface
         }
     }
 
-    private class InventoryItem : Interface
+    private void AddItem(Block? block = null, Wall? wall = null)
+        => this.items.Add(new (
+            this.Window,
+            new Vector2f(
+                this.Shape.Position.X + Menu.Margin + (this.Shape.Size.Y * this.items.Count),
+                this.Shape.Position.Y + Menu.Margin),
+            new Vector2f(
+                this.Shape.Size.Y - (InventoryMenu.Margin * 2),
+                this.Shape.Size.Y - (InventoryMenu.Margin * 2)), this, block, wall));
+
+    private class InventoryItem : Menu
     {
-        private readonly Sprite sprite;
+        private readonly InventoryMenu parent;
+
+        private readonly int index;
+
+        private readonly Button button;
 
         public InventoryItem(
             RenderWindow window,
-            Vector2f originSize,
-            Vector2f originPosition,
-            int index,
+            Vector2f position,
+            Vector2f size,
+            InventoryMenu parent,
             Block? block = null,
             Wall? wall = null)
-            : base(
-                  window,
-                  new Vector2f(
-                      originPosition.X + Interface.Margin + (originSize.Y * index),
-                      originPosition.Y + Interface.Margin),
-                  new Vector2f(originSize.Y - (InventoryMenu.Margin * 2), originSize.Y - (InventoryMenu.Margin * 2)))
+            : base(window, position, size)
         {
-            this.sprite = new Sprite((block?.Sprite ?? wall?.Sprite) !);
-
-            var scale = Math.Min(
-                (this.Shape.Size.X - (InventoryMenu.Margin * 2)) / this.sprite!.TextureRect.Width,
-                (this.Shape.Size.Y - (InventoryMenu.Margin * 2)) / this.sprite.TextureRect.Height);
-
-            this.sprite.Scale = new Vector2f(scale, scale);
-            this.sprite.Origin = new Vector2f(this.sprite.TextureRect.Width, this.sprite.TextureRect.Height) / 2;
-            this.sprite.Position = this.Shape.Position + (this.Shape.Size / 2);
+            this.parent = parent;
+            this.index = parent.items.Count;
+            this.button = new (
+                window,
+                this.Shape.Position,
+                this.Shape.Size,
+                new Sprite((block?.Sprite ?? wall?.Sprite) !),
+                () => this.parent.selected = this.index);
 
             this.Block = block?.Copy();
             this.Wall = wall?.Copy();
@@ -137,17 +144,16 @@ public class InventoryMenu : Interface
 
         public override void Draw(RenderTarget target, RenderStates states)
         {
-            base.Draw(target, states);
+            this.button.Shape.FillColor = this.index == this.parent.selected ? new Color(150, 150, 150) : new Color(100, 100, 100);
+            target.Draw(this.button, states);
 
-            target.Draw(this.Shape, states);
-            target.Draw(this.sprite, states);
         }
 
         public override void OnDelete()
         {
             base.OnDelete();
 
-            this.sprite.Dispose();
+            this.button.OnDelete();
             this.Block?.OnDelete();
             this.Wall?.OnDelete();
         }
