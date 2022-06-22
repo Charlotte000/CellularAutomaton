@@ -47,7 +47,7 @@ public class Scene
         }
 
         // Init window
-        this.Window = new RenderWindow(VideoMode.DesktopMode, "Cellular Automaton", Styles.Fullscreen);
+        this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
         this.Window.SetFramerateLimit(60);
         this.Window.Closed += (obj, e) => this.Window.Close();
 

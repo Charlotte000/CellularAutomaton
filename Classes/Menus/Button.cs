@@ -10,14 +10,14 @@ public class Button : Menu
 
     private readonly Action onClicked;
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, Action onClicked)
-    : base(window, position, size)
+    public Button(RenderWindow window, Vector2f position, Vector2f size, Menu parent, Action onClicked)
+    : base(window, position, size, parent)
     {
         this.onClicked = onClicked;
     }
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, Sprite sprite, Action onClicked)
-        : base(window, position, size)
+    public Button(RenderWindow window, Vector2f position, Vector2f size, Sprite sprite, Menu parent, Action onClicked)
+        : base(window, position, size, parent)
     {
         this.sprite = sprite;
         this.sprite.Origin = new Vector2f(0, 0);
@@ -35,8 +35,8 @@ public class Button : Menu
         this.onClicked = onClicked;
     }
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, string str, Action onClicked)
-        : this(window, position, size, Button.GetTextSprite(str), onClicked)
+    public Button(RenderWindow window, Vector2f position, Vector2f size, string str, Menu parent, Action onClicked)
+        : this(window, position, size, Button.GetTextSprite(str), parent, onClicked)
     {
     }
 

@@ -45,26 +45,6 @@ public class InventoryMenu : Menu
         this.Window.KeyPressed -= this.OnKeyPressed;
     }
 
-    public override void Draw(RenderTarget target, RenderStates states)
-    {
-        base.Draw(target, states);
-
-        for (int i = 0; i < this.items.Count; i++)
-        {
-            target.Draw(this.items[i], states);
-        }
-    }
-
-    public override void OnDelete()
-    {
-        base.OnDelete();
-
-        foreach (var item in this.items)
-        {
-            item.OnDelete();
-        }
-    }
-
     public (Block? block, Wall? wall) GetValue()
         => (this.items[this.selected].Block?.Copy(), this.items[this.selected].Wall?.Copy());
 
@@ -99,19 +79,22 @@ public class InventoryMenu : Menu
     }
 
     private void AddItem(Block? block = null, Wall? wall = null)
-        => this.items.Add(new (
+    {
+        var item = new InventoryItem(
             this.Window,
-            new Vector2f(
-                this.Shape.Position.X + Menu.Margin + (this.Shape.Size.Y * this.items.Count),
-                this.Shape.Position.Y + Menu.Margin),
+            new Vector2f(Menu.Margin + (this.Shape.Size.Y * this.items.Count), Menu.Margin),
             new Vector2f(
                 this.Shape.Size.Y - (InventoryMenu.Margin * 2),
-                this.Shape.Size.Y - (InventoryMenu.Margin * 2)), this, block, wall));
+                this.Shape.Size.Y - (InventoryMenu.Margin * 2)),
+            this,
+            block,
+            wall);
+        this.Childs.Add(item);
+        this.items.Add(item);
+    }
 
     private class InventoryItem : Menu
     {
-        private readonly InventoryMenu parent;
-
         private readonly int index;
 
         private readonly Button button;
@@ -123,16 +106,16 @@ public class InventoryMenu : Menu
             InventoryMenu parent,
             Block? block = null,
             Wall? wall = null)
-            : base(window, position, size)
+            : base(window, position, size, parent)
         {
-            this.parent = parent;
             this.index = parent.items.Count;
             this.button = new (
                 window,
-                this.Shape.Position,
+                new Vector2f(0, 0),
                 this.Shape.Size,
                 new Sprite((block?.Sprite ?? wall?.Sprite) !),
-                () => this.parent.selected = this.index);
+                this,
+                () => ((InventoryMenu)this.Parent!).selected = this.index);
 
             this.Block = block?.Copy();
             this.Wall = wall?.Copy();
@@ -144,7 +127,8 @@ public class InventoryMenu : Menu
 
         public override void Draw(RenderTarget target, RenderStates states)
         {
-            this.button.Shape.FillColor = this.index == this.parent.selected ? new Color(150, 150, 150) : new Color(100, 100, 100);
+            this.button.Shape.FillColor = this.index == ((InventoryMenu)this.Parent!).selected ?
+                new Color(150, 150, 150) : new Color(100, 100, 100);
             target.Draw(this.button, states);
 
         }

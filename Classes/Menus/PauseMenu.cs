@@ -6,28 +6,30 @@ using SFML.Window;
 
 public class PauseMenu : Menu
 {
-    private readonly Button[] buttons;
+    private Text PauseText = new ("Pause", Menu.Font, 50);
 
     public PauseMenu(RenderWindow window, Vector2f position, Vector2f size)
         : base(window, position, size)
     {
-        this.IsActive = false;
+        this.PauseText.Position = position + new Vector2f(size.X / 2, 0);
 
-        this.buttons = new Button[]
-        {
-            new (window, position, new Vector2f(100, 50), "Close", () =>
-            {
-                this.IsActive = false;
-                foreach (var button in this.buttons!)
-                {
-                    button.IsActive = this.IsActive;
-                }
-            }),
-            new (window, new Vector2f(200, 100), new Vector2f(100, 100), "Exit", () =>
-            {
-                this.Window.Close();
-            }),
-        };
+        this.Childs.Add(new Button(
+            window,
+            new Vector2f((size.X / 2) - 50, 100),
+            new Vector2f(100, 50),
+            "Close",
+            this,
+            () => this.IsActive = false));
+
+        this.Childs.Add(new Button(
+            window,
+            new Vector2f((size.X / 2) - 50, 200),
+            new Vector2f(100, 50),
+            "Exit",
+            this,
+            () => this.Window.Close()));
+
+        this.IsActive = false;
     }
 
     public override void AddEvents()
@@ -37,11 +39,6 @@ public class PauseMenu : Menu
             if (e.Code == Keyboard.Key.Escape)
             {
                 this.IsActive = !this.IsActive;
-
-                foreach (var button in this.buttons)
-                {
-                    button.IsActive = this.IsActive;
-                }
             }
         };
     }
@@ -51,11 +48,7 @@ public class PauseMenu : Menu
         if (this.IsActive)
         {
             base.Draw(target, states);
-
-            foreach (var button in this.buttons)
-            {
-                target.Draw(button, states);
-            }
+            target.Draw(this.PauseText, states);
         }
     }
 }
