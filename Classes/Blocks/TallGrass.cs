@@ -4,7 +4,7 @@ using SFML.Graphics;
 
 public class TallGrass : Block
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 60, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 20, 20, 20));
 
     public override Sprite Sprite { get => TallGrass.SpriteSource; }
 

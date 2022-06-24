@@ -76,11 +76,13 @@ public class Button : Menu
         var text = new Text(str, Menu.Font, 25) { FillColor = Color.Yellow };
 
         var textBound = text.GetGlobalBounds();
-        var renderTexture = new RenderTexture((uint)(textBound.Left + textBound.Width), (uint)(textBound.Top + textBound.Height));
+        var renderTexture = new RenderTexture(
+            (uint)((textBound.Left * 2) + textBound.Width),
+            (uint)((textBound.Top * 2) + textBound.Height));
         renderTexture.Draw(text);
         renderTexture.Display();
 
-        return new (new Texture(renderTexture.Texture.CopyToImage()));
+        return new (new Texture(renderTexture.Texture));
     }
 
     private void OnMouseButtonPressed(object? sender, MouseButtonEventArgs e)

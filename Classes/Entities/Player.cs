@@ -11,7 +11,7 @@ public class Player : IMovingEntity, ILivingEntity
 {
     public Player(float x, float y)
     {
-        this.CollisionBox = new RectangleShape(new Vector2f(Block.Size * .9f, Block.Size * 1.9f))
+        this.CollisionBox = new RectangleShape(new Vector2f(19, 39))
         {
             Position = new Vector2f(x, y),
             FillColor = new Color(255, 0, 0),

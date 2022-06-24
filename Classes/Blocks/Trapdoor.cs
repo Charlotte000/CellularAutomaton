@@ -8,8 +8,8 @@ public class Trapdoor : Block
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
-        new (Scene.Texture, new IntRect(180, 0, 20, 20)),
-        new (Scene.Texture, new IntRect(180, 20, 20, 20)),
+        new (Scene.Texture, new IntRect(80, 40, 20, 20)),
+        new (Scene.Texture, new IntRect(80, 60, 20, 20)),
     };
 
     public override Sprite Sprite { get => Trapdoor.SpriteSource[this.IsOpened ? 1 : 0]; }

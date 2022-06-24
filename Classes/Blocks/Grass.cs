@@ -2,11 +2,17 @@
 
 using CellularAutomaton.Classes.Utils;
 using SFML.Graphics;
-using SFML.System;
 
 public class Grass : Block
 {
-    private static readonly Sprite[] SpriteSource = TilesGenerator.GenerateSource(new Vector2i(0, 0));
+    private static readonly Sprite[] SpriteSource = TilesGenerator.GenerateSource(
+        new (Scene.Texture, new (0, 0, 20, 20)),
+        new (Scene.Texture, new (20, 0, 20, 20)),
+        new (Scene.Texture, new (40, 0, 20, 20)),
+        new (Scene.Texture, new (60, 0, 20, 20)),
+        new (Scene.Texture, new (0, 20, 20, 20)),
+        new (Scene.Texture, new (20, 20, 20, 20)),
+        new (Scene.Texture, new (40, 20, 20, 20)));
 
     public override Sprite Sprite
     {

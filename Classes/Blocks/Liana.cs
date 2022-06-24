@@ -6,7 +6,7 @@ using SFML.System;
 
 public class Liana : Block
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(180, 40, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 0, 20, 20));
 
     public override Sprite Sprite { get => Liana.SpriteSource; }
 

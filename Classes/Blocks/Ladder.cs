@@ -5,7 +5,7 @@ using SFML.System;
 
 public class Ladder : Block
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(120, 40, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(100, 0, 20, 20));
 
     public override Sprite Sprite { get => Ladder.SpriteSource; }
 

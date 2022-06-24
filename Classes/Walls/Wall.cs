@@ -5,7 +5,7 @@ using SFML.System;
 
 public class Wall : Drawable
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(80, 40, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(60, 20, 20, 20));
 
     public virtual Sprite Sprite { get => Wall.SpriteSource; }
 

@@ -4,7 +4,7 @@ using SFML.Graphics;
 
 public class Stone : Block
 {
-    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(100, 40, 20, 20));
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(80, 20, 20, 20));
 
     public override Sprite Sprite { get => Stone.SpriteSource; }
 

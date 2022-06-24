@@ -17,7 +17,7 @@ public class Water : Block
         var step = Block.Size / Water.MaxAmount;
         for (int i = 1; i <= Water.MaxAmount; i++)
         {
-            Water.SpriteSource[i - 1] = new (Scene.Texture, new IntRect(80, 80 - (step * i), 20, step * i))
+            Water.SpriteSource[i - 1] = new (Scene.Texture, new IntRect(80, 20 - (step * i), 20, step * i))
             {
                 Origin = new (0, -20 + (step * i)),
             };

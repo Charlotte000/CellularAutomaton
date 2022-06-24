@@ -8,11 +8,11 @@ public class Door : Block
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
-        new (Scene.Texture, new IntRect(140, 0, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
-        new (Scene.Texture, new IntRect(160, 0, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
+        new (Scene.Texture, new IntRect(0, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
+        new (Scene.Texture, new IntRect(20, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
 
-        new (Scene.Texture, new IntRect(140, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
-        new (Scene.Texture, new IntRect(160, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
+        new (Scene.Texture, new IntRect(40, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
+        new (Scene.Texture, new IntRect(60, 40, 20, 40)) { Origin = new Vector2f(0, Block.Size) },
     };
 
     private Door? upper;
@@ -36,7 +36,7 @@ public class Door : Block
 
     public bool IsOpened { get; set; } = true;
 
-    public bool IsLeft { get; set; } = true;
+    public bool IsLeft { get; set; } = false;
 
     public override RectangleShape CollisionBox { get; set; }
 

@@ -6,7 +6,7 @@ using SFML.Window;
 
 public class PauseMenu : Menu
 {
-    private Text PauseText = new ("Pause", Menu.Font, 50);
+    private readonly Text PauseText = new ("Pause", Menu.Font, 50);
 
     public PauseMenu(RenderWindow window, Vector2f position, Vector2f size)
         : base(window, position, size)
