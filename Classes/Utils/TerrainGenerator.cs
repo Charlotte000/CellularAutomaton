@@ -122,6 +122,11 @@ public class TerrainGenerator
             bool isHole = true;
             for (int y = 0; y < h; y++)
             {
+                if (chunk.BlockMesh.Grid[x, y] is Dirt && chunk.BlockMesh.Grid[x, y].IsBoundary())
+                {
+                    chunk.BlockMesh[x + chunk.Coord.X, y + chunk.Coord.Y] = new Grass();
+                }
+
                 if (caveMap[x, y] > .5 && chunk.Coord.Y + y > this.dirt.Average + this.dirt.Dispersion)
                 {
                     if (!isHole && vegetationMap[x, y] > .6)
