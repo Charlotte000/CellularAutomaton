@@ -111,9 +111,9 @@ public class InventoryMenu : Menu
                 window,
                 new Vector2f(0, 0),
                 this.Shape.Size,
-                new Sprite((block?.Sprite ?? wall?.Sprite) !),
                 this,
-                () => ((InventoryMenu)this.Parent!).selected = this.index));
+                () => ((InventoryMenu)this.Parent!).selected = this.index,
+                new Sprite((block?.Sprite ?? wall?.Sprite) !)));
 
             this.Block = block?.Copy();
             this.Wall = wall?.Copy();

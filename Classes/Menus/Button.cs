@@ -16,7 +16,7 @@ public class Button : Menu
         this.onClicked = onClicked;
     }
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, Sprite sprite, Menu parent, Action onClicked)
+    public Button(RenderWindow window, Vector2f position, Vector2f size, Menu parent, Action onClicked, Sprite sprite)
         : base(window, position, size, parent)
     {
         this.sprite = sprite;
@@ -35,9 +35,17 @@ public class Button : Menu
         this.onClicked = onClicked;
     }
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, string str, Menu parent, Action onClicked)
-        : this(window, position, size, Button.GetTextSprite(str), parent, onClicked)
+    public Button(
+        RenderWindow window,
+        Vector2f position,
+        Vector2f size,
+        Menu parent,
+        Action onClicked,
+        string str,
+        uint fontSize = 30)
+        : this(window, position, size, parent, onClicked)
     {
+        this.Childs.Add(new Label(window, size / 2, this, str, fontSize));
     }
 
     public override void AddEvents()

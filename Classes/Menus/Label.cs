@@ -19,8 +19,7 @@ public class Label : Menu
         };
 
         var bound = this.text.GetLocalBounds();
-        this.Shape.Size = new Vector2f(bound.Width, bound.Height);
-        this.text.Origin = this.Shape.Size / 2;
+        this.text.Origin = new Vector2f((bound.Left * 2) + bound.Width, (bound.Top * 2) + bound.Height) / 2;
     }
 
     public override void Draw(RenderTarget target, RenderStates states)

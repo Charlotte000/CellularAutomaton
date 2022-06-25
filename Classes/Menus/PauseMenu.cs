@@ -15,9 +15,9 @@ public class PauseMenu : Menu
             window,
             new Vector2f((size.X / 2) - 50, 200),
             new Vector2f(100, 50),
-            "Exit",
             this,
-            () => this.Window.Close()));
+            () => this.Window.Close(),
+            "Exit"));
 
         this.IsActive = false;
     }
