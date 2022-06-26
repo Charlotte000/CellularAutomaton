@@ -42,7 +42,7 @@ public class Water : Block
         {
             if (Water.Push(scene, block, water.Amount))
             {
-                scene.SetBlock(new Empty(), water.Coord, false, true);
+                water.Chunk.BlockMesh[water.Coord] = new Empty();
                 return true;
             }
         }
@@ -78,7 +78,6 @@ public class Water : Block
         => new Water()
         {
             Coord = this.Coord,
-            Light = this.Light,
             Amount = this.Amount,
             WasUpdated = this.WasUpdated,
         };
@@ -92,7 +91,7 @@ public class Water : Block
 
         if (block is Empty)
         {
-            scene.SetBlock(new Water() { WasUpdated = true, Light = block.Light, Amount = amount }, block.Coord, false);
+            block.Chunk.BlockMesh[block.Coord] = new Water() { WasUpdated = true, Amount = amount };
             return true;
         }
 
@@ -125,8 +124,8 @@ public class Water : Block
         var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
         if (block is not null && block is not Water && !block.IsCollidable)
         {
-            this.Chunk.Scene.SetBlock(this.Copy(), this.Coord.X, this.Coord.Y + 1, false);
-            this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
+            block.Chunk.BlockMesh[block.Coord] = this.Copy();
+            this.Chunk.BlockMesh[this.Coord] = new Empty();
             return true;
         }
 
@@ -143,7 +142,7 @@ public class Water : Block
 
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
+                this.Chunk.BlockMesh[this.Coord] = new Empty() { WasUpdated = true };
             }
 
             return true;
@@ -162,20 +161,11 @@ public class Water : Block
 
             this.Amount /= 2;
 
-            this.Chunk.Scene.SetBlock(
-                new Water()
-                {
-                    Amount = prevAmount - this.Amount,
-                    Light = this.Light,
-                    WasUpdated = true,
-                },
-                this.Coord.X + deltaX,
-                this.Coord.Y,
-                false);
+            block.Chunk.BlockMesh[block.Coord] = new Water() { WasUpdated = true, Amount = prevAmount - this.Amount };
 
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
+                this.Chunk.BlockMesh[this.Coord] = new Empty();
             }
 
             return true;
@@ -189,7 +179,7 @@ public class Water : Block
             this.Amount -= delta;
             if (this.Amount < 1)
             {
-                this.Chunk.Scene.SetBlock(new Empty() { WasUpdated = true, Light = this.Light }, this.Coord, false);
+                this.Chunk.BlockMesh[this.Coord] = new Empty();
             }
 
             return true;

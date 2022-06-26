@@ -51,42 +51,48 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         }
     }
 
-    public override void Update()
+    public override void SlowUpdate()
     {
         foreach (var chunk in this.Grid)
         {
-            chunk.Update();
+            chunk.SlowUpdate();
         }
     }
 
-    public bool Move(Scene scene)
+    public override void FastUpdate()
+    {
+        foreach (var chunk in this.Grid)
+        {
+            chunk.FastUpdate();
+        }
+    }
+
+    public void Move(Scene scene)
     {
         var cameraCoord = scene.Entities[0].CollisionBox.Position / Block.Size;
         if (cameraCoord.X < this.Grid[1, 0].Coord.X)
         {
             ChunkMoveHelper.MoveChunksLeft(scene);
-            return true;
+            return;
         }
 
         if (cameraCoord.X > this.Grid[this.Width - 2, 0].Coord.X + Chunk.Size.X)
         {
             ChunkMoveHelper.MoveChunksRight(scene);
-            return true;
+            return;
         }
 
         if (cameraCoord.Y < this.Grid[0, 1].Coord.Y)
         {
             ChunkMoveHelper.MoveChunksUp(scene);
-            return true;
+            return;
         }
 
         if (cameraCoord.Y > this.Grid[0, this.Height - 2].Coord.Y + Chunk.Size.Y)
         {
             ChunkMoveHelper.MoveChunksDown(scene);
-            return true;
+            return;
         }
-
-        return false;
     }
 
     IEnumerator<Block> IEnumerable<Block>.GetEnumerator()

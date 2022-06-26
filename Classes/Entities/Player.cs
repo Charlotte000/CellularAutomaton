@@ -11,11 +11,7 @@ public class Player : IMovingEntity, ILivingEntity
 {
     public Player(float x, float y)
     {
-        this.CollisionBox = new RectangleShape(new Vector2f(19, 39))
-        {
-            Position = new Vector2f(x, y),
-            FillColor = new Color(255, 0, 0),
-        };
+        this.CollisionBox.Position = new Vector2f(x, y);
     }
 
     public Vector2f Vel { get; set; } = new Vector2f(0, 0);
@@ -26,13 +22,15 @@ public class Player : IMovingEntity, ILivingEntity
 
     public bool IsClimbing { get; set; } = false;
 
-    public RectangleShape CollisionBox { get; set; }
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(19, 39)) { FillColor = new Color(255, 0, 0) };
 
-    public bool IsVisible { get; set; } = false;
+    public Vector2i Coord
+    {
+        get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
+        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
+    }
 
     public bool IsCollidable { get => true; }
-
-    public int Light { get; set; }
 
     public Scene Scene { get; set; }
 
@@ -40,9 +38,12 @@ public class Player : IMovingEntity, ILivingEntity
     {
         target.Draw(this.CollisionBox, states);
 
+        var coord = this.Coord;
+        var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
+
         var shadow = new RectangleShape(this.CollisionBox)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
         };
         target.Draw(shadow, states);
     }
@@ -61,13 +62,11 @@ public class Player : IMovingEntity, ILivingEntity
         this.Collision();
         this.CollisionBox.Position += this.Vel;
 
-        var coord = (Vector2i)(this.CollisionBox.Position / Block.Size);
-        var block = this.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-        this.Light = block is not null ? block.Light : this.Light;
-
-        if (this.Scene.ChunkMesh.IsValidCoord(coord.X, coord.Y))
+        var coord = this.Coord;
+        var chunk = this.Scene.ChunkMesh[coord];
+        if (chunk is not null)
         {
-            this.Scene.ChunkMesh[coord] !.PressureMesh[coord] += this.Vel / 20;
+            chunk.PressureMesh[coord] += this.Vel / 20;
         }
     }
 

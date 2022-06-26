@@ -22,7 +22,6 @@ public class Torch : Block, ILightSource
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
 }

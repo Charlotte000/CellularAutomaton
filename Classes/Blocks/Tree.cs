@@ -47,7 +47,6 @@ public class Tree : Block
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
             treeType = this.treeType,
         };

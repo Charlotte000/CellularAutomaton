@@ -26,7 +26,6 @@ public class Liana : Block
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
 
@@ -43,7 +42,9 @@ public class Liana : Block
                 return;
             }
 
-            this.Chunk.Scene.SetBlock(new Liana(), coord, false, true);
+            var newLiana = new Liana();
+            chunk!.BlockMesh[coord] = newLiana;
+            this.Chunk.Scene.BlockHistory.SaveBlock(chunk, newLiana);
         }
     }
 }

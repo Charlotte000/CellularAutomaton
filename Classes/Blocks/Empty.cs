@@ -1,6 +1,7 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
 using SFML.Graphics;
+using SFML.System;
 
 public class Empty : Block
 {
@@ -17,7 +18,7 @@ public class Empty : Block
         {
             var shadow = new Sprite(wall.Sprite)
             {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Chunk.LightMesh[this.Coord]))),
             };
             target.Draw(shadow, states);
         }
@@ -28,7 +29,6 @@ public class Empty : Block
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
 }

@@ -72,7 +72,7 @@ public class InventoryMenu : Menu
         {
             if (e.Code == i)
             {
-                this.selected = Math.Min((int)(i - Keyboard.Key.Num1), this.items.Count - 1);
+                this.selected = Math.Min(i - Keyboard.Key.Num1, this.items.Count - 1);
                 break;
             }
         }

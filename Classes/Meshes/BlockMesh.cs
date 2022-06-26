@@ -24,12 +24,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         {
             if (this.IsValidCoord(x, y))
             {
-                var oldBlock = this[x, y];
-                if (oldBlock is not null)
-                {
-                    value!.Light = oldBlock.Light;
-                    oldBlock.OnDelete();
-                }
+                this[x, y]?.OnDelete();
 
                 value!.Coord = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
@@ -43,7 +38,7 @@ public class BlockMesh : Mesh<Block, Chunk>
     {
         foreach (var block in this.Grid)
         {
-            if (block.IsVisible)
+            if (this.Parent.VisibilityMesh[block.Coord])
             {
                 var blockRenderState = new RenderStates(states);
                 blockRenderState.Transform.Translate(block.CollisionBox.Position);
@@ -64,7 +59,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         target.Draw(border);
     }
 
-    public override void Update()
+    public override void SlowUpdate()
     {
         foreach (var block in this.Grid)
         {

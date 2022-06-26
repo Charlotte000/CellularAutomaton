@@ -27,7 +27,6 @@ public class Ladder : Block
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
 
@@ -36,12 +35,15 @@ public class Ladder : Block
         for (int i = 1; i < length; i++)
         {
             var coord = new Vector2i(this.Coord.X, this.Coord.Y + i);
-            if (this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord] is not Empty)
+            var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+            if (block is not Empty)
             {
                 return;
             }
 
-            this.Chunk.Scene.SetBlock(new Ladder(), this.Coord.X, this.Coord.Y + i, false, true);
+            var newLadder = new Ladder();
+            block.Chunk.BlockMesh[block.Coord] = newLadder;
+            this.Chunk.Scene.BlockHistory.SaveBlock(block.Chunk, newLadder);
         }
     }
 }

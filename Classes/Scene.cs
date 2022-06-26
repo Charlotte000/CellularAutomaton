@@ -85,10 +85,10 @@ public class Scene
                     this.Daylight = 2 - this.Daylight;
                 }
 
-                this.UpdateLights();
+                LightMesh.Update(this.ChunkMesh);
 
                 this.mutex.ReleaseMutex();
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
             }
         }) { IsBackground = true }.Start();
 
@@ -98,7 +98,7 @@ public class Scene
             {
                 this.mutex.WaitOne();
 
-                this.ChunkMesh.Update();
+                this.ChunkMesh.SlowUpdate();
 
                 this.mutex.ReleaseMutex();
                 Thread.Sleep(100);
@@ -132,16 +132,13 @@ public class Scene
 
             this.mutex.WaitOne();
 
-            if (this.ChunkMesh.Move(this))
-            {
-                this.UpdateLights();
-            }
+            this.ChunkMesh.Move(this);
 
             this.KeyListen();
 
             this.MoveCamera();
 
-            this.UpdateVisibility();
+            this.ChunkMesh.FastUpdate();
 
             for (int i = 0; i < this.Entities.Count; i++)
             {
@@ -165,37 +162,15 @@ public class Scene
         return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
     }
 
-    public void SetBlock(Block block, Vector2i coords, bool updateLights = true, bool saveToHistory = false)
+    public Block? TrySetBlock(Scene scene, Block block, Vector2i coords, bool saveToHistory = true)
     {
         var chunk = this.ChunkMesh[coords];
         if (chunk is null)
         {
-            return;
+            return null;
         }
 
-        chunk.BlockMesh[coords] = block;
-        if (updateLights)
-        {
-            this.UpdateLights();
-        }
-
-        if (saveToHistory)
-        {
-            this.BlockHistory.SaveBlock(chunk, block);
-        }
-    }
-
-    public void SetBlock(Block block, int x, int y, bool updateLights = true, bool saveToHistory = false)
-        => this.SetBlock(block, new Vector2i(x, y), updateLights, saveToHistory);
-
-    public Block? TrySetBlock(
-        Scene scene,
-        Block block,
-        Vector2i coords,
-        bool updateLights = true,
-        bool saveToHistory = true)
-    {
-        var oldBlock = this.ChunkMesh[coords]?.BlockMesh[coords];
+        var oldBlock = chunk.BlockMesh[coords];
         block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
 
         // Attempt to build up an existing block
@@ -222,9 +197,9 @@ public class Scene
             var hasNeighbour = false;
             foreach (var delta in Scene.Neighborhood)
             {
-                var chunk = scene.ChunkMesh[coords + delta];
-                var neighbourBlock = chunk?.BlockMesh[coords + delta];
-                var neighbourWall = chunk?.WallMesh[coords + delta];
+                var neighbourChunk = scene.ChunkMesh[coords + delta];
+                var neighbourBlock = neighbourChunk?.BlockMesh[coords + delta];
+                var neighbourWall = neighbourChunk?.WallMesh[coords + delta];
                 if (neighbourBlock is not Empty || neighbourWall is not EmptyWall)
                 {
                     hasNeighbour = true;
@@ -255,14 +230,23 @@ public class Scene
         {
             if (Water.Push(this, oldBlockWater))
             {
-                this.SetBlock(block, coords, updateLights, saveToHistory);
+                chunk.BlockMesh[coords] = block;
+                if (saveToHistory)
+                {
+                    this.BlockHistory.SaveBlock(oldBlock.Chunk, block);
+                }
             }
 
             return block;
         }
 
         // Creating block
-        this.SetBlock(block, coords, updateLights, saveToHistory);
+        chunk.BlockMesh[coords] = block;
+        if (saveToHistory)
+        {
+            this.BlockHistory.SaveBlock(chunk, block);
+        }
+
         return block;
     }
 
@@ -339,65 +323,6 @@ public class Scene
             else
             {
                 this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate();
-            }
-        }
-    }
-
-    private void UpdateVisibility()
-    {
-        var blockSize = new Vector2f(Block.Size, Block.Size);
-        var viewRect = new FloatRect(
-            this.Camera.Center - (this.Camera.Size / 2) - blockSize,
-            this.Camera.Size + (blockSize * 2));
-
-        foreach (var (block, wall) in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
-        {
-            if (block is Empty && wall is EmptyWall)
-            {
-                continue;
-            }
-
-            var isVisible = viewRect.Intersects(block.CollisionBox.GetGlobalBounds());
-            block.IsVisible = isVisible;
-        }
-    }
-
-    private void UpdateLights()
-    {
-        // Light source
-        var light = (int)(this.Daylight * 255);
-        var maxLight = light;
-        foreach (var (block, wall) in this.ChunkMesh as IEnumerable<(Block block, Wall wall)>)
-        {
-            if (block is ILightSource lightSource)
-            {
-                block.Light = lightSource.Brightness;
-                maxLight = Math.Max(maxLight, block.Light);
-                continue;
-            }
-
-            block.Light = block.IsTransparent && wall is EmptyWall ? light : 0;
-            maxLight = Math.Max(maxLight, block.Light);
-        }
-
-        // Light fading
-        for (int currentLight = maxLight; currentLight >= 1; currentLight--)
-        {
-            foreach (var block in this.ChunkMesh as IEnumerable<Block>)
-            {
-                if (block.Light == currentLight)
-                {
-                    foreach (var delta in Scene.Neighborhood)
-                    {
-                        var neighbour = this.ChunkMesh[block.Coord + delta]?.BlockMesh[block.Coord + delta];
-                        if (neighbour is not null && neighbour.Light < currentLight)
-                        {
-                            neighbour.Light = Math.Max(
-                                neighbour.Light,
-                                currentLight - neighbour.LightDiffusion);
-                        }
-                    }
-                }
             }
         }
     }

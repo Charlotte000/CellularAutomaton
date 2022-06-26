@@ -17,16 +17,15 @@ public class Leaf : IMovingEntity
 
     public Vector2f Vel { get; set; }
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(3, 3))
-    {
-        FillColor = Color.Green,
-    };
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(3, 3)) { FillColor = Color.Green };
 
-    public bool IsVisible { get; set; }
+    public Vector2i Coord
+    {
+        get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
+        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
+    }
 
     public bool IsCollidable { get => false; }
-
-    public int Light { get; set; }
 
     public Scene Scene { get; set; }
 
@@ -34,9 +33,12 @@ public class Leaf : IMovingEntity
     {
         target.Draw(this.CollisionBox, states);
 
+        var coord = this.Coord;
+        var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
+
         var shadow = new RectangleShape(this.CollisionBox)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
         };
         target.Draw(shadow, states);
     }
@@ -47,7 +49,7 @@ public class Leaf : IMovingEntity
 
     public void OnUpdate()
     {
-        var coord = (Vector2i)(this.CollisionBox.Position / Block.Size);
+        var coord = this.Coord;
 
         this.Vel += Leaf.gravity;
         this.Vel += new Vector2f(
@@ -60,8 +62,6 @@ public class Leaf : IMovingEntity
         this.CollisionBox.Position += this.Vel;
 
         var block = this.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-        this.Light = block is not null ? block.Light : this.Light;
-
         if (block is null)
         {
             this.Vel *= 0;

@@ -43,12 +43,15 @@ public class WallMesh : Mesh<Wall, Chunk>
         {
             for (int y = 0; y < this.Height; y++)
             {
-                var block = this.Parent.BlockMesh.Grid[x, y];
-                if (block.IsTransparent)
+                if (this.Parent.VisibilityMesh.Grid[x, y])
                 {
-                    var wallRenderState = new RenderStates(states);
-                    wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coords * Block.Size);
-                    target.Draw(this.Grid[x, y], wallRenderState);
+                    var block = this.Parent.BlockMesh.Grid[x, y];
+                    if (block.IsTransparent)
+                    {
+                        var wallRenderState = new RenderStates(states);
+                        wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coords * Block.Size);
+                        target.Draw(this.Grid[x, y], wallRenderState);
+                    }
                 }
             }
         }

@@ -25,17 +25,14 @@ public class Block : IEntity
 
     public Vector2i Coord { get; set; }
 
-    public int Light { get; set; }
-
     public bool WasUpdated { get; set; } = false;
-
-    public bool IsVisible { get; set; } = false;
 
     public Chunk Chunk { get; set; }
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        if (this.Light > 0)
+        var light = this.Chunk.LightMesh[this.Coord];
+        if (light > 0)
         {
             target.Draw(this.Sprite, states);
         }
@@ -43,13 +40,13 @@ public class Block : IEntity
         Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall && this.IsTransparent ?
             new RectangleShape(this.CollisionBox)
             {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
                 Position = new Vector2f(0, 0),
             }
             :
             new Sprite(this.Sprite)
             {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
             };
 
         target.Draw(shadow, states);
@@ -96,7 +93,6 @@ public class Block : IEntity
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
         };
 }

@@ -7,11 +7,9 @@ public interface IEntity : Drawable
 {
     public RectangleShape CollisionBox { get; set; }
 
-    public bool IsVisible { get; set; }
+    public Vector2i Coord { get; set; }
 
     public bool IsCollidable { get; }
-
-    public int Light { get; set; }
 
     public void OnCreate();
 

@@ -79,7 +79,11 @@ public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
     {
     }
 
-    public virtual void Update()
+    public virtual void SlowUpdate()
+    {
+    }
+
+    public virtual void FastUpdate()
     {
     }
 

@@ -36,7 +36,7 @@ public class Door : Block
 
     public bool IsOpened { get; set; } = true;
 
-    public bool IsLeft { get; set; } = false;
+    public bool IsLeft { get; set; } = true;
 
     public override RectangleShape CollisionBox { get; set; }
 
@@ -47,7 +47,8 @@ public class Door : Block
             return;
         }
 
-        if (this.Light > 0)
+        var light = this.Chunk.LightMesh[this.Coord];
+        if (light > 0)
         {
             target.Draw(this.Sprite, states);
         }
@@ -55,7 +56,7 @@ public class Door : Block
         Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall ?
             new RectangleShape(this.CollisionBox)
             {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
                 Position = new Vector2f(0, 0),
                 Origin = new Vector2f(0, Block.Size),
                 Size = new Vector2f(Block.Size, Block.Size * 2),
@@ -63,7 +64,7 @@ public class Door : Block
             :
             new Sprite(this.Sprite)
             {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Light))),
+                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
             };
 
         target.Draw(shadow, states);
@@ -139,7 +140,6 @@ public class Door : Block
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
-            Light = this.Light,
             WasUpdated = this.WasUpdated,
             IsOpened = this.IsOpened,
             IsLeft = this.IsLeft,
