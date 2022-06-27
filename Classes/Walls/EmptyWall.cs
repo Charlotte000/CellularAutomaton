@@ -6,10 +6,14 @@ public class EmptyWall : Wall
 {
     public override Sprite Sprite { get; }
 
-    public override Wall Copy()
-        => new EmptyWall();
-
     public override void Draw(RenderTarget target, RenderStates states)
     {
     }
+
+    public override EmptyWall Copy()
+        => new ()
+        {
+            Coord = this.Coord,
+            CollisionBox = new RectangleShape(this.CollisionBox),
+        };
 }

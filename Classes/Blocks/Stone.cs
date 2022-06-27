@@ -8,8 +8,8 @@ public class Stone : Block
 
     public override Sprite Sprite { get => Stone.SpriteSource; }
 
-    public override Block Copy()
-        => new Stone()
+    public override Stone Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

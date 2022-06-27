@@ -1,7 +1,9 @@
 ﻿namespace CellularAutomaton.Classes.Menus;
 
 using CellularAutomaton.Classes.Blocks;
+using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Classes.Walls;
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -15,20 +17,22 @@ public class InventoryMenu : Menu
     public InventoryMenu(RenderWindow window, Vector2f position, Vector2f size)
         : base(window, position, size)
     {
-        this.AddItem(block: new Dirt());
-        this.AddItem(block: new Grass());
-        this.AddItem(block: new Torch());
-        this.AddItem(block: new Ladder());
-        this.AddItem(block: new Liana());
-        this.AddItem(block: new Stone());
-        this.AddItem(block: new TallGrass());
-        this.AddItem(block: new Water());
-        this.AddItem(block: new Block());
-        this.AddItem(block: new Door());
-        this.AddItem(block: new Trapdoor());
-        this.AddItem(block: new Tree());
-        this.AddItem(wall: new DirtWall());
-        this.AddItem(wall: new StoneWall());
+        this.AddItem(new Dirt());
+        this.AddItem(new Grass());
+        this.AddItem(new Torch());
+        this.AddItem(new Ladder());
+        this.AddItem(new Liana());
+        this.AddItem(new Stone());
+        this.AddItem(new TallGrass());
+        this.AddItem(new Water());
+        this.AddItem(new Block());
+        this.AddItem(new Door());
+        this.AddItem(new Trapdoor());
+        this.AddItem(new Tree());
+        this.AddItem(new DirtWall());
+        this.AddItem(new StoneWall());
+        this.AddItem(new LightStick());
+        this.AddItem(new Leaf(new Vector2f(0, 0)));
 
         this.selected = 0;
     }
@@ -45,8 +49,8 @@ public class InventoryMenu : Menu
         this.Window.KeyPressed -= this.OnKeyPressed;
     }
 
-    public (Block? block, Wall? wall) GetValue()
-        => (this.items[this.selected].Block?.Copy(), this.items[this.selected].Wall?.Copy());
+    public IEntity GetValue()
+        => this.items[this.selected].Entity;
 
     private void OnMouseScrolled(object? sender, MouseWheelScrollEventArgs e)
     {
@@ -78,7 +82,7 @@ public class InventoryMenu : Menu
         }
     }
 
-    private void AddItem(Block? block = null, Wall? wall = null)
+    private void AddItem(IEntity entity)
     {
         var item = new InventoryItem(
             this.Window,
@@ -87,8 +91,7 @@ public class InventoryMenu : Menu
                 this.Shape.Size.Y - (InventoryMenu.Margin * 2),
                 this.Shape.Size.Y - (InventoryMenu.Margin * 2)),
             this,
-            block,
-            wall);
+            entity);
         this.Childs.Add(item);
         this.items.Add(item);
     }
@@ -102,8 +105,7 @@ public class InventoryMenu : Menu
             Vector2f position,
             Vector2f size,
             InventoryMenu parent,
-            Block? block = null,
-            Wall? wall = null)
+            IEntity entity)
             : base(window, position, size, parent)
         {
             this.index = parent.items.Count;
@@ -113,15 +115,12 @@ public class InventoryMenu : Menu
                 this.Shape.Size,
                 this,
                 () => ((InventoryMenu)this.Parent!).selected = this.index,
-                new Sprite((block?.Sprite ?? wall?.Sprite) !)));
+                new Sprite(entity.Sprite)));
 
-            this.Block = block?.Copy();
-            this.Wall = wall?.Copy();
+            this.Entity = entity;
         }
 
-        public Block? Block { get; set; }
-
-        public Wall? Wall { get; set; }
+        public IEntity Entity { get; set; }
 
         public override void Draw(RenderTarget target, RenderStates states)
         {
@@ -133,8 +132,7 @@ public class InventoryMenu : Menu
         public override void OnDestroy()
         {
             base.OnDestroy();
-            this.Block?.OnDestroy();
-            this.Wall?.OnDestroy();
+            this.Entity.OnDestroy();
         }
     }
 }

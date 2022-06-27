@@ -8,6 +8,10 @@ public class StoneWall : Wall
 
     public override Sprite Sprite { get => StoneWall.SpriteSource; }
 
-    public override Wall Copy()
-        => new StoneWall();
+    public override StoneWall Copy()
+        => new ()
+        {
+            Coord = this.Coord,
+            CollisionBox = new RectangleShape(this.CollisionBox),
+        };
 }

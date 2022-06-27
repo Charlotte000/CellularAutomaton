@@ -8,8 +8,8 @@ public class Dirt : Block
 
     public override Sprite Sprite { get => Dirt.SpriteSource; }
 
-    public override Block Copy()
-        => new Dirt()
+    public override Dirt Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

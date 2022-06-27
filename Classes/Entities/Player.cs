@@ -9,10 +9,24 @@ using SFML.Window;
 
 public class Player : IMovingEntity, ILivingEntity
 {
+    private static readonly Sprite SpriteSource;
+
+    private static Vector2f gravity = new (0, 1f);
+
+    static Player()
+    {
+        using var renderTexture = new RenderTexture(19, 39);
+        renderTexture.Draw(new RectangleShape(new Vector2f(19, 39)) { FillColor = Color.Red });
+        renderTexture.Display();
+        Player.SpriteSource = new Sprite(new Texture(renderTexture.Texture));
+    }
+
     public Player(float x, float y)
     {
         this.CollisionBox.Position = new Vector2f(x, y);
     }
+
+    public Sprite Sprite { get => Player.SpriteSource; }
 
     public Vector2f Vel { get; set; } = new Vector2f(0, 0);
 
@@ -22,7 +36,7 @@ public class Player : IMovingEntity, ILivingEntity
 
     public bool IsClimbing { get; set; } = false;
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(19, 39)) { FillColor = new Color(255, 0, 0) };
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(19, 39));
 
     public Vector2i Coord
     {
@@ -36,7 +50,7 @@ public class Player : IMovingEntity, ILivingEntity
 
     public void Draw(RenderTarget target, RenderStates states)
     {
-        target.Draw(this.CollisionBox, states);
+        target.Draw(this.Sprite, states);
 
         var coord = this.Coord;
         var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
@@ -54,7 +68,7 @@ public class Player : IMovingEntity, ILivingEntity
 
     public void OnUpdate()
     {
-        this.Vel += IMovingEntity.Gravity * (this.IsOnWater ? .2f : 1f) * (this.IsClimbing ? 0 : 1);
+        this.Vel += Player.gravity * (this.IsOnWater ? .2f : 1f) * (this.IsClimbing ? 0 : 1);
         this.Control();
 
         this.Vel *= this.IsOnWater || this.IsClimbing ? .8f : .87f;
@@ -88,6 +102,9 @@ public class Player : IMovingEntity, ILivingEntity
     {
         this.CollisionBox.Dispose();
     }
+
+    public IEntity Copy()
+        => new Player(this.CollisionBox.Position.X, this.CollisionBox.Position.Y);
 
     private void Control()
     {

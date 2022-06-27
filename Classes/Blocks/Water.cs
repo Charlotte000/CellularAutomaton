@@ -74,8 +74,8 @@ public class Water : Block
         }
     }
 
-    public override Block Copy()
-        => new Water()
+    public override Water Copy()
+        => new ()
         {
             Coord = this.Coord,
             Amount = this.Amount,

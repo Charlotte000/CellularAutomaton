@@ -54,7 +54,6 @@ public class Chunk : IMonoBehaviour, Drawable, IEnumerable<(Block block, Wall wa
 
     public void OnCreate()
     {
-
     }
 
     public void OnFixedUpdate()

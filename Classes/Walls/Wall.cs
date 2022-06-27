@@ -11,8 +11,6 @@ public class Wall : IEntity
 
     public virtual Sprite Sprite { get => Wall.SpriteSource; }
 
-    public Vector2i Coords { get; set; }
-
     public RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
     public Vector2i Coord { get; set; }
@@ -21,7 +19,7 @@ public class Wall : IEntity
 
     public Chunk Chunk { get; set; }
 
-    public virtual Wall Copy()
+    public virtual IEntity Copy()
         => new Wall()
         {
             Coord = this.Coord,

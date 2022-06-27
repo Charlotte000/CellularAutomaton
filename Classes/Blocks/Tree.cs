@@ -42,8 +42,8 @@ public class Tree : Block
         }
     }
 
-    public override Block Copy()
-        => new Tree()
+    public override Tree Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

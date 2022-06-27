@@ -17,8 +17,8 @@ public class Torch : Block, ILightSource
 
     public int Brightness { get; set; } = 300;
 
-    public override Block Copy()
-        => new Torch()
+    public override Torch Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

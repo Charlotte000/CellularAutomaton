@@ -26,8 +26,8 @@ public class Button : Menu
         var w = spriteBound.Left + spriteBound.Width;
         var h = spriteBound.Top + spriteBound.Height;
         var scale = Math.Min(
-         (this.Shape.Size.X - (InventoryMenu.Margin * 2)) / w,
-         (this.Shape.Size.Y - (InventoryMenu.Margin * 2)) / h);
+            (this.Shape.Size.X - (InventoryMenu.Margin * 2)) / w,
+            (this.Shape.Size.Y - (InventoryMenu.Margin * 2)) / h);
         this.sprite.Scale = new Vector2f(scale, scale);
         this.sprite.Origin = new Vector2f(w, h) / 2;
         this.sprite.Position = this.Shape.Position + (this.Shape.Size / 2);
@@ -77,20 +77,6 @@ public class Button : Menu
     {
         base.OnDestroy();
         this.sprite?.Dispose();
-    }
-
-    private static Sprite GetTextSprite(string str)
-    {
-        var text = new Text(str, Menu.Font, 25) { FillColor = Color.Yellow };
-
-        var textBound = text.GetGlobalBounds();
-        var renderTexture = new RenderTexture(
-            (uint)((textBound.Left * 2) + textBound.Width),
-            (uint)((textBound.Top * 2) + textBound.Height));
-        renderTexture.Draw(text);
-        renderTexture.Display();
-
-        return new (new Texture(renderTexture.Texture));
     }
 
     private void OnMouseButtonPressed(object? sender, MouseButtonEventArgs e)

@@ -14,8 +14,8 @@ public class TallGrass : Block
 
     public override bool IsCollidable { get => false; }
 
-    public override Block Copy()
-        => new TallGrass()
+    public override TallGrass Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

@@ -92,8 +92,8 @@ public class Block : IEntity
         return false;
     }
 
-    public virtual Block Copy()
-        => new ()
+    public virtual IEntity Copy()
+        => new Block()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

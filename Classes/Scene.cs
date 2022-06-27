@@ -25,9 +25,9 @@ public class Scene
         new (-1, 0), new (1, 0), new (0, -1), new (0, 1), new (-1, -1), new (1, -1), new (1, 1), new (-1, 1),
     };
 
-    public static readonly Random RandomGenerator = new ();
+    public static readonly int DayDuration = 3600;
 
-    private static readonly int DayDuration = 3600;
+    public static readonly Random RandomGenerator = new ();
 
     private readonly Mutex mutex = new ();
 
@@ -70,52 +70,41 @@ public class Scene
             }
         };
 
-        // Light update thread.
+        // Fixed update thread
         new Thread(() =>
         {
             while (this.Window.IsOpen)
             {
+                // Light update
                 this.mutex.WaitOne();
 
-                this.Daylight = ((this.Clock.ElapsedTime.AsSeconds() +
-                (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
-
-                if (this.Daylight > 1)
-                {
-                    this.Daylight = 2 - this.Daylight;
-                }
-
-                LightMesh.Update(this.ChunkMesh);
+                LightMesh.OnFixedUpdate(this.ChunkMesh);
 
                 this.mutex.ReleaseMutex();
-                Thread.Sleep(100);
-            }
-        }) { IsBackground = true }.Start();
 
-        // Chunk update thread.
-        new Thread(() =>
-        {
-            while (this.Window.IsOpen)
-            {
+                // Meshes update
                 this.mutex.WaitOne();
 
                 this.ChunkMesh.OnFixedUpdate();
 
                 this.mutex.ReleaseMutex();
-                Thread.Sleep(100);
-            }
-        }) { IsBackground = true }.Start();
 
-        // Menu update thread.
-        new Thread(() =>
-        {
-            while (this.Window.IsOpen)
-            {
+                // Menus update
                 this.mutex.WaitOne();
 
                 foreach (var menu in this.menu)
                 {
                     menu.OnFixedUpdate();
+                }
+
+                this.mutex.ReleaseMutex();
+
+                // Entities update
+                this.mutex.WaitOne();
+
+                foreach (var entity in this.Entities)
+                {
+                    entity.OnFixedUpdate();
                 }
 
                 this.mutex.ReleaseMutex();
@@ -151,23 +140,11 @@ public class Scene
 
             this.mutex.WaitOne();
 
-            this.ChunkMesh.Move(this);
-
             this.KeyListen();
 
             this.MoveCamera();
 
-            this.ChunkMesh.OnUpdate();
-
-            for (int i = 0; i < this.Entities.Count; i++)
-            {
-                this.Entities[i].OnUpdate();
-            }
-
-            foreach (var menu in this.menu)
-            {
-                menu.OnUpdate();
-            }
+            this.Update();
 
             this.Draw();
 
@@ -287,6 +264,21 @@ public class Scene
         this.Entities.Remove(entity);
     }
 
+    private void Update()
+    {
+        this.ChunkMesh.OnUpdate();
+
+        for (int i = 0; i < this.Entities.Count; i++)
+        {
+            this.Entities[i].OnUpdate();
+        }
+
+        foreach (var menu in this.menu)
+        {
+            menu.OnUpdate();
+        }
+    }
+
     private void Draw()
     {
         // Sky
@@ -301,7 +293,9 @@ public class Scene
         // Entitues
         foreach (var entity in this.Entities)
         {
-            this.Window.Draw(entity);
+            var renderState = RenderStates.Default;
+            renderState.Transform.Translate(entity.CollisionBox.Position);
+            this.Window.Draw(entity, renderState);
         }
 
         // UI
@@ -319,17 +313,33 @@ public class Scene
         {
             var coord = this.GetMouseCoords();
             var chunk = this.ChunkMesh[coord];
-            var (block, wall) = ((InventoryMenu)this.menu[0]).GetValue();
-            if (block is not null)
+            if (chunk is null)
             {
-                this.TrySetBlock(this, block, coord)?.OnCreate();
+                return;
             }
-            else
+
+            var entity = ((InventoryMenu)this.menu[0]).GetValue();
+            if (entity is Block block)
             {
-                if (chunk is not null)
+                this.TrySetBlock(this, (Block)block.Copy(), coord)?.OnCreate();
+            }
+            else if (entity is Wall wall)
+            {
+                chunk.WallMesh[coord] = (Wall)wall.Copy();
+            }
+            else if (entity is IMovingEntity moving)
+            {
+                var newMoving = (IMovingEntity)moving.Copy();
+                newMoving.Coord = coord;
+
+                if (newMoving is LightStick light)
                 {
-                    chunk.WallMesh[coord] = wall!;
+                    light.CollisionBox.Position = this.Entities[0].CollisionBox.Position;
+                    var delta = (Vector2f)(coord * Block.Size) - light.CollisionBox.Position;
+                    light.Vel = delta / 10;
                 }
+
+                this.AddEntity(newMoving);
             }
         }
 

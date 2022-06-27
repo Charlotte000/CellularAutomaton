@@ -12,8 +12,17 @@ public class LightMesh : Mesh<int, Chunk>
     {
     }
 
-    public static void Update(ChunkMesh chunkMesh)
+    public static void OnFixedUpdate(ChunkMesh chunkMesh)
     {
+        // Update daylight
+        chunkMesh.Parent.Daylight = ((chunkMesh.Parent.Clock.ElapsedTime.AsSeconds() +
+            (Scene.DayDuration / 2)) % Scene.DayDuration) / Scene.DayDuration * 2;
+
+        if (chunkMesh.Parent.Daylight > 1)
+        {
+            chunkMesh.Parent.Daylight = 2 - chunkMesh.Parent.Daylight;
+        }
+
         // Light source
         var light = (int)(chunkMesh.Parent.Daylight * 255);
         var maxLight = light;

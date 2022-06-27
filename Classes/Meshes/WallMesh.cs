@@ -27,7 +27,7 @@ public class WallMesh : Mesh<Wall, Chunk>
             {
                 this[x, y]?.OnDestroy();
 
-                value!.Coords = new Vector2i(x, y);
+                value!.Coord = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
                 value.Chunk = this.Parent;
                 this.Grid[x - this.Coord.X, y - this.Coord.Y] = value!;
@@ -47,7 +47,7 @@ public class WallMesh : Mesh<Wall, Chunk>
                     if (block.IsTransparent)
                     {
                         var wallRenderState = new RenderStates(states);
-                        wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coords * Block.Size);
+                        wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coord * Block.Size);
                         target.Draw(this.Grid[x, y], wallRenderState);
                     }
                 }

@@ -187,7 +187,7 @@ public static class TilesGenerator
 
     private static Sprite AddCorner(Sprite origin, Sprite corner, params int[] angles)
     {
-        var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
+        using var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
         renderTexture.Draw(origin);
 
         foreach (var angle in angles)
@@ -207,7 +207,7 @@ public static class TilesGenerator
         var renderState = RenderStates.Default;
         renderState.Transform.Rotate(angle, new Vector2f(Block.Size, Block.Size) / 2);
 
-        var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
+        using var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
         renderTexture.Draw(origin, renderState);
         renderTexture.Display();
 
@@ -219,7 +219,7 @@ public static class TilesGenerator
         var renderState = RenderStates.Default;
         renderState.Transform.Scale(new Vector2f(-1, 1), new Vector2f(Block.Size, Block.Size) / 2);
 
-        var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
+        using var renderTexture = new RenderTexture((uint)Block.Size, (uint)Block.Size);
         renderTexture.Draw(origin, renderState);
         renderTexture.Display();
 

@@ -29,7 +29,7 @@ public class BlockHistory
             if (block is Water || block is Tree)
             {
                 chunkHistory.Remove(block.Coord);
-                chunkHistory.Add(block.Coord, block.Copy());
+                chunkHistory.Add(block.Coord, (Block)block.Copy());
             }
         }
 
@@ -43,7 +43,7 @@ public class BlockHistory
         {
             foreach (var block in chunkHistory)
             {
-                chunk.BlockMesh[block.Key] = block.Value.Copy();
+                chunk.BlockMesh[block.Key] = (Block)block.Value.Copy();
             }
         }
     }
@@ -57,7 +57,7 @@ public class BlockHistory
         }
 
         chunkHistory.Remove(block.Coord);
-        chunkHistory.Add(block.Coord, block.Copy());
+        chunkHistory.Add(block.Coord, (Block)block.Copy());
 
         this.blockHistory.Remove(chunk.Coord);
         this.blockHistory.Add(chunk.Coord, chunkHistory);

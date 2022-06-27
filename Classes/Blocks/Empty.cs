@@ -24,8 +24,8 @@ public class Empty : Block
         }
     }
 
-    public override Block Copy()
-        => new Empty()
+    public override Empty Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

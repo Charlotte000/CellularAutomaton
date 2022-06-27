@@ -61,37 +61,11 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
 
     public override void OnUpdate()
     {
+        this.Move();
+
         foreach (var chunk in this.Grid)
         {
             chunk.OnUpdate();
-        }
-    }
-
-    public void Move(Scene scene)
-    {
-        var cameraCoord = scene.Entities[0].CollisionBox.Position / Block.Size;
-        if (cameraCoord.X < this.Grid[1, 0].Coord.X)
-        {
-            ChunkMoveHelper.MoveChunksLeft(scene);
-            return;
-        }
-
-        if (cameraCoord.X > this.Grid[this.Width - 2, 0].Coord.X + Chunk.Size.X)
-        {
-            ChunkMoveHelper.MoveChunksRight(scene);
-            return;
-        }
-
-        if (cameraCoord.Y < this.Grid[0, 1].Coord.Y)
-        {
-            ChunkMoveHelper.MoveChunksUp(scene);
-            return;
-        }
-
-        if (cameraCoord.Y > this.Grid[0, this.Height - 2].Coord.Y + Chunk.Size.Y)
-        {
-            ChunkMoveHelper.MoveChunksDown(scene);
-            return;
         }
     }
 
@@ -117,6 +91,34 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
                     yield return (chunk.BlockMesh.Grid[x, y], chunk.WallMesh.Grid[x, y]);
                 }
             }
+        }
+    }
+
+    private void Move()
+    {
+        var cameraCoord = this.Parent.Entities[0].CollisionBox.Position / Block.Size;
+        if (cameraCoord.X < this.Grid[1, 0].Coord.X)
+        {
+            ChunkMoveHelper.MoveChunksLeft(this.Parent);
+            return;
+        }
+
+        if (cameraCoord.X > this.Grid[this.Width - 2, 0].Coord.X + Chunk.Size.X)
+        {
+            ChunkMoveHelper.MoveChunksRight(this.Parent);
+            return;
+        }
+
+        if (cameraCoord.Y < this.Grid[0, 1].Coord.Y)
+        {
+            ChunkMoveHelper.MoveChunksUp(this.Parent);
+            return;
+        }
+
+        if (cameraCoord.Y > this.Grid[0, this.Height - 2].Coord.Y + Chunk.Size.Y)
+        {
+            ChunkMoveHelper.MoveChunksDown(this.Parent);
+            return;
         }
     }
 }

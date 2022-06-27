@@ -6,30 +6,38 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Leaf : IMovingEntity
+public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and somehow single throw
 {
     private static readonly Sprite SpriteSource;
 
     private static Vector2f gravity = new (0, .1f);
 
-    static Leaf()
+    private readonly float angleDelta = (float)((Scene.RandomGenerator.NextDouble() * 20) - 10);
+
+    private float angle = (float)(Scene.RandomGenerator.NextDouble() * 360);
+
+    static LightStick()
     {
-        using var renderTexture = new RenderTexture(3, 3);
-        renderTexture.Draw(new RectangleShape(new Vector2f(3, 3)) { FillColor = Color.Green });
+        using var renderTexture = new RenderTexture(10, 4);
+        renderTexture.Draw(new RectangleShape(new Vector2f(10, 4)) { FillColor = Color.Magenta });
         renderTexture.Display();
-        Leaf.SpriteSource = new Sprite(new Texture(renderTexture.Texture));
+        LightStick.SpriteSource = new Sprite(new Texture(renderTexture.Texture)) { Origin = new (5, 2) };
     }
-
-    public Leaf(Vector2f position)
-    {
-        this.CollisionBox.Position = position;
-    }
-
-    public Sprite Sprite { get => Leaf.SpriteSource; }
 
     public Vector2f Vel { get; set; }
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(3, 3)) { FillColor = Color.Green };
+    public Scene Scene { get; set; }
+
+    public Sprite Sprite
+    {
+        get
+        {
+            LightStick.SpriteSource.Rotation = this.angle;
+            return LightStick.SpriteSource;
+        }
+    }
+
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5)) { Origin = new (-2.5f, -2.5f) };
 
     public Vector2i Coord
     {
@@ -39,7 +47,10 @@ public class Leaf : IMovingEntity
 
     public bool IsCollidable { get => false; }
 
-    public Scene Scene { get; set; }
+    public int Brightness { get; set; } = 300;
+
+    public IEntity Copy()
+        => new LightStick();
 
     public void Draw(RenderTarget target, RenderStates states)
     {
@@ -55,64 +66,40 @@ public class Leaf : IMovingEntity
         target.Draw(shadow, states);
     }
 
+    public void OnClick()
+    {
+    }
+
+    public void OnCollision(IEntity entity, Vector2f? contactNormal)
+    {
+    }
+
     public void OnCreate()
     {
     }
 
-    public void OnUpdate()
+    public void OnDestroy()
     {
-        var coord = this.Coord;
-
-        this.Vel += Leaf.gravity;
-        this.Vel += new Vector2f(
-            (float)((Scene.RandomGenerator.NextDouble() * .5) - .25),
-            (float)((Scene.RandomGenerator.NextDouble() * .5) - .25));
-        this.Vel *= .7f;
-        this.Vel += this.Scene.ChunkMesh[coord]?.PressureMesh[coord] ?? new Vector2f(0, 0);
-
-        this.Collision();
-        this.CollisionBox.Position += this.Vel;
-
-        var block = this.Scene.ChunkMesh[coord]?.BlockMesh[coord];
-        if (block is null)
-        {
-            this.Vel *= 0;
-        }
-
-        if (this.Vel.X == 0 && this.Vel.Y == 0)
-        {
-            this.Scene.RemoveEntity(this);
-            return;
-        }
+        this.CollisionBox.Dispose();
     }
 
     public void OnFixedUpdate()
     {
     }
 
-    public void OnDestroy()
+    public void OnUpdate()
     {
-    }
+        this.Vel += LightStick.gravity;
+        this.Vel *= .98f;
 
-    public void OnCollision(IEntity entity, Vector2f? contactNormal)
-    {
-        if (entity.IsCollidable)
+        this.Collision();
+        this.CollisionBox.Position += this.Vel;
+
+        if (this.Vel.Y != 0)
         {
-            this.Vel *= 0;
+            this.angle += this.angleDelta;
         }
     }
-
-    public void OnClick()
-    {
-    }
-
-    public void OnDelete()
-    {
-        this.CollisionBox.Dispose();
-    }
-
-    public IEntity Copy()
-        => new Leaf(this.CollisionBox.Position);
 
     private void Collision()
     {

@@ -69,8 +69,8 @@ public class Trapdoor : Block
         this.Chunk.Scene.BlockHistory.SaveBlock(this.Chunk, this);
     }
 
-    public override Block Copy()
-    => new Trapdoor()
+    public override Trapdoor Copy()
+    => new ()
     {
         CollisionBox = new RectangleShape(this.CollisionBox),
         Coord = this.Coord,

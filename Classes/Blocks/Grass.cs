@@ -39,8 +39,8 @@ public class Grass : Block
         }
     }
 
-    public override Block Copy()
-        => new Grass()
+    public override Grass Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

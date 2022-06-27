@@ -8,6 +8,10 @@ public class DirtWall : Wall
 
     public override Sprite Sprite { get => DirtWall.SpriteSource; }
 
-    public override Wall Copy()
-        => new DirtWall();
+    public override DirtWall Copy()
+        => new ()
+        {
+            Coord = this.Coord,
+            CollisionBox = new RectangleShape(this.CollisionBox),
+        };
 }

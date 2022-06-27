@@ -22,8 +22,8 @@ public class Ladder : Block
         this.Expand(10);
     }
 
-    public override Block Copy()
-        => new Ladder()
+    public override Ladder Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,

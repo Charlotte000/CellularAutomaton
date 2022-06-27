@@ -21,8 +21,8 @@ public class Liana : Block
     public override void OnCreate()
         => this.Expand(Scene.RandomGenerator.Next(3, 10));
 
-    public override Block Copy()
-        => new Liana()
+    public override Liana Copy()
+        => new ()
         {
             CollisionBox = new RectangleShape(this.CollisionBox),
             Coord = this.Coord,
