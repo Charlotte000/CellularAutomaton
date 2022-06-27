@@ -1,9 +1,10 @@
 ﻿namespace CellularAutomaton.Classes.Menus;
 
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public abstract class Menu : Drawable
+public abstract class Menu : IMonoBehaviour, Drawable
 {
     public static readonly int Margin = 7;
 
@@ -69,12 +70,23 @@ public abstract class Menu : Drawable
         }
     }
 
-    public virtual void OnDelete()
+    public virtual void OnCreate()
     {
-        this.Shape.Dispose();
+    }
+
+    public virtual void OnUpdate()
+    {
+    }
+
+    public virtual void OnFixedUpdate()
+    {
+    }
+
+    public virtual void OnDestroy()
+    {
         foreach (var child in this.Childs)
         {
-            child.OnDelete();
+            child.OnDestroy();
         }
 
         this.DeleteEvents();

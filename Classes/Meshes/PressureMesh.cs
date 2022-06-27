@@ -11,7 +11,7 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
     {
     }
 
-    public override void SlowUpdate()
+    public override void OnFixedUpdate()
     {
         var tempPressureMap = new Vector2f[this.Width, this.Height];
 

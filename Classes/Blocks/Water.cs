@@ -50,7 +50,7 @@ public class Water : Block
         return false;
     }
 
-    public override void OnUpdate()
+    public override void OnFixedUpdate()
     {
         // Fall down
         if (this.FallDown())

@@ -11,7 +11,7 @@ public class VisibilityMesh : Mesh<bool, Chunk>
     {
     }
 
-    public override void FastUpdate()
+    public override void OnUpdate()
     {
         var blockSize = new Vector2f(Block.Size, Block.Size);
         var viewRect = new FloatRect(

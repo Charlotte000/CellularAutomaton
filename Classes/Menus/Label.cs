@@ -28,9 +28,9 @@ public class Label : Menu
         target.Draw(this.text, states);
     }
 
-    public override void OnDelete()
+    public override void OnDestroy()
     {
-        base.OnDelete();
+        base.OnDestroy();
         this.text.Dispose();
     }
 }

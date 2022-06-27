@@ -31,7 +31,7 @@ public class Tree : Block
     public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(40, 200))
     { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) };
 
-    public override void OnUpdate()
+    public override void OnFixedUpdate()
     {
         if (Scene.RandomGenerator.Next(0, 40) == 0)
         {

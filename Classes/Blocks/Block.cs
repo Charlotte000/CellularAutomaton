@@ -60,6 +60,10 @@ public class Block : IEntity
     {
     }
 
+    public virtual void OnFixedUpdate()
+    {
+    }
+
     public virtual void OnCollision(IEntity entity, Vector2f? normal)
     {
     }
@@ -68,7 +72,7 @@ public class Block : IEntity
     {
     }
 
-    public virtual void OnDelete()
+    public virtual void OnDestroy()
     {
         this.CollisionBox.Dispose();
     }

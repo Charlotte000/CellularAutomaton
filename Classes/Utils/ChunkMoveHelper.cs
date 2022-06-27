@@ -11,7 +11,7 @@ public static class ChunkMoveHelper
                 if (x == scene.ChunkMesh.Width - 1)
                 {
                     scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, y]);
-                    scene.ChunkMesh.Grid[x, y].Dispose();
+                    scene.ChunkMesh.Grid[x, y].OnDestroy();
                 }
 
                 scene.ChunkMesh.Grid[x, y] = scene.ChunkMesh.Grid[x - 1, y];
@@ -37,7 +37,7 @@ public static class ChunkMoveHelper
                 if (x == 0)
                 {
                     scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[0, y]);
-                    scene.ChunkMesh.Grid[0, y].Dispose();
+                    scene.ChunkMesh.Grid[0, y].OnDestroy();
                 }
 
                 scene.ChunkMesh.Grid[x, y] = scene.ChunkMesh.Grid[x + 1, y];
@@ -63,7 +63,7 @@ public static class ChunkMoveHelper
                 if (y == scene.ChunkMesh.Height - 1)
                 {
                     scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, y]);
-                    scene.ChunkMesh.Grid[x, y].Dispose();
+                    scene.ChunkMesh.Grid[x, y].OnDestroy();
                 }
 
                 scene.ChunkMesh.Grid[x, y] = scene.ChunkMesh.Grid[x, y - 1];
@@ -89,7 +89,7 @@ public static class ChunkMoveHelper
                 if (y == 0)
                 {
                     scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, 0]);
-                    scene.ChunkMesh.Grid[x, 0].Dispose();
+                    scene.ChunkMesh.Grid[x, 0].OnDestroy();
                 }
 
                 scene.ChunkMesh.Grid[x, y] = scene.ChunkMesh.Grid[x, y + 1];

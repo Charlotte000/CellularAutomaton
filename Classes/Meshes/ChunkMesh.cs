@@ -51,19 +51,19 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
         }
     }
 
-    public override void SlowUpdate()
+    public override void OnFixedUpdate()
     {
         foreach (var chunk in this.Grid)
         {
-            chunk.SlowUpdate();
+            chunk.OnFixedUpdate();
         }
     }
 
-    public override void FastUpdate()
+    public override void OnUpdate()
     {
         foreach (var chunk in this.Grid)
         {
-            chunk.FastUpdate();
+            chunk.OnUpdate();
         }
     }
 

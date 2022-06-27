@@ -74,6 +74,11 @@ public class Leaf : IMovingEntity
         }
     }
 
+    public void OnFixedUpdate()
+    {
+    }
+
+
     public void OnCollision(IEntity entity, Vector2f? contactNormal)
     {
         if (entity.IsCollidable)
@@ -86,7 +91,7 @@ public class Leaf : IMovingEntity
     {
     }
 
-    public void OnDelete()
+    public void OnDestroy()
     {
         this.CollisionBox.Dispose();
     }

@@ -3,7 +3,7 @@
 using SFML.Graphics;
 using SFML.System;
 
-public interface IEntity : Drawable
+public interface IEntity : IMonoBehaviour
 {
     public RectangleShape CollisionBox { get; set; }
 
@@ -11,13 +11,7 @@ public interface IEntity : Drawable
 
     public bool IsCollidable { get; }
 
-    public void OnCreate();
-
-    public void OnUpdate();
-
     public void OnCollision(IEntity entity, Vector2f? contactNormal);
 
     public void OnClick();
-
-    public void OnDelete();
 }

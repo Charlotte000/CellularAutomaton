@@ -70,6 +70,10 @@ public class Player : IMovingEntity, ILivingEntity
         }
     }
 
+    public void OnFixedUpdate()
+    {
+    }
+
     public void OnCollision(IEntity entity, Vector2f? contactNormal)
     {
         this.IsOnGround |= contactNormal?.Y == -1 && entity.IsCollidable;
@@ -80,7 +84,7 @@ public class Player : IMovingEntity, ILivingEntity
     {
     }
 
-    public void OnDelete()
+    public void OnDestroy()
     {
         this.CollisionBox.Dispose();
     }

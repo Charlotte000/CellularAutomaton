@@ -24,7 +24,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         {
             if (this.IsValidCoord(x, y))
             {
-                this[x, y]?.OnDelete();
+                this[x, y]?.OnDestroy();
 
                 value!.Coord = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
@@ -59,7 +59,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         target.Draw(border);
     }
 
-    public override void SlowUpdate()
+    public override void OnUpdate()
     {
         foreach (var block in this.Grid)
         {
@@ -76,11 +76,28 @@ public class BlockMesh : Mesh<Block, Chunk>
         }
     }
 
-    public override void Dispose()
+    public override void OnFixedUpdate()
     {
         foreach (var block in this.Grid)
         {
-            block.OnDelete();
+            block.WasUpdated = false;
+        }
+
+        foreach (var block in this.Grid)
+        {
+            if (!block.WasUpdated)
+            {
+                block.WasUpdated = true;
+                block.OnFixedUpdate();
+            }
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        foreach (var block in this.Grid)
+        {
+            block.OnDestroy();
         }
     }
 }

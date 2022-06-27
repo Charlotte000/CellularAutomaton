@@ -130,11 +130,11 @@ public class InventoryMenu : Menu
             base.Draw(target, states);
         }
 
-        public override void OnDelete()
+        public override void OnDestroy()
         {
-            base.OnDelete();
-            this.Block?.OnDelete();
-            this.Wall?.OnDelete();
+            base.OnDestroy();
+            this.Block?.OnDestroy();
+            this.Wall?.OnDestroy();
         }
     }
 }

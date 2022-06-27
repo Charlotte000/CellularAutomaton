@@ -1,16 +1,18 @@
 ﻿namespace CellularAutomaton.Classes.Meshes;
 
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using System.Collections;
 
-public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
+public abstract class Mesh<TValue, TParent> : IMesh, IEnumerable<TValue>, Drawable
 {
     public Mesh(TParent parent, Vector2i size, Vector2i coord)
     {
         this.Grid = new TValue[size.X, size.Y];
         this.Coord = coord;
         this.Parent = parent;
+        this.OnCreate();
     }
 
     public Mesh(TParent parent, Vector2i size)
@@ -79,15 +81,19 @@ public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
     {
     }
 
-    public virtual void SlowUpdate()
+    public virtual void OnCreate()
     {
     }
 
-    public virtual void FastUpdate()
+    public virtual void OnUpdate()
     {
     }
 
-    public virtual void Dispose()
+    public virtual void OnFixedUpdate()
+    {
+    }
+
+    public virtual void OnDestroy()
     {
     }
 
@@ -101,5 +107,4 @@ public abstract class Mesh<TValue, TParent> : IEnumerable<TValue>, Drawable
 
     IEnumerator IEnumerable.GetEnumerator()
         => this.Grid.GetEnumerator();
-
 }

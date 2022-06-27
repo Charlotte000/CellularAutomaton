@@ -73,9 +73,9 @@ public class Button : Menu
         }
     }
 
-    public override void OnDelete()
+    public override void OnDestroy()
     {
-        base.OnDelete();
+        base.OnDestroy();
         this.sprite?.Dispose();
     }
 

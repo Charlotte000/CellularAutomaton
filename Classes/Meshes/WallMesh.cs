@@ -14,7 +14,7 @@ public class WallMesh : Mesh<Wall, Chunk>
         {
             for (int y = 0; y < this.Height; y++)
             {
-                this.Grid[x, y] = new EmptyWall();
+                this[x + this.Coord.X, y + this.Coord.Y] = new EmptyWall();
             }
         }
     }
@@ -25,13 +25,11 @@ public class WallMesh : Mesh<Wall, Chunk>
         {
             if (this.IsValidCoord(x, y))
             {
-                var oldWall = this[x, y];
-                if (oldWall is not null)
-                {
-                    oldWall.OnDelete();
-                }
+                this[x, y]?.OnDestroy();
 
                 value!.Coords = new Vector2i(x, y);
+                value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
+                value.Chunk = this.Parent;
                 this.Grid[x - this.Coord.X, y - this.Coord.Y] = value!;
             }
         }

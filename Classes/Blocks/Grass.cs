@@ -19,7 +19,7 @@ public class Grass : Block
         get => Grass.SpriteSource[TilesGenerator.GetSpriteIndex(this)];
     }
 
-    public override void OnUpdate()
+    public override void OnFixedUpdate()
     {
         if (Scene.RandomGenerator.Next(0, 3) == 0)
         {

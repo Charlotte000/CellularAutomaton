@@ -120,7 +120,7 @@ public class Door : Block
         }
     }
 
-    public override void OnDelete()
+    public override void OnDestroy()
     {
         if (this.upper is not null)
         {

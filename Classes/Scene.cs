@@ -70,7 +70,7 @@ public class Scene
             }
         };
 
-        // Run block update & light threads.
+        // Light update thread.
         new Thread(() =>
         {
             while (this.Window.IsOpen)
@@ -92,15 +92,34 @@ public class Scene
             }
         }) { IsBackground = true }.Start();
 
+        // Chunk update thread.
         new Thread(() =>
         {
             while (this.Window.IsOpen)
             {
                 this.mutex.WaitOne();
 
-                this.ChunkMesh.SlowUpdate();
+                this.ChunkMesh.OnFixedUpdate();
 
                 this.mutex.ReleaseMutex();
+                Thread.Sleep(100);
+            }
+        }) { IsBackground = true }.Start();
+
+        // Menu update thread.
+        new Thread(() =>
+        {
+            while (this.Window.IsOpen)
+            {
+                this.mutex.WaitOne();
+
+                foreach (var menu in this.menu)
+                {
+                    menu.OnFixedUpdate();
+                }
+
+                this.mutex.ReleaseMutex();
+
                 Thread.Sleep(100);
             }
         }) { IsBackground = true }.Start();
@@ -138,11 +157,16 @@ public class Scene
 
             this.MoveCamera();
 
-            this.ChunkMesh.FastUpdate();
+            this.ChunkMesh.OnUpdate();
 
             for (int i = 0; i < this.Entities.Count; i++)
             {
                 this.Entities[i].OnUpdate();
+            }
+
+            foreach (var menu in this.menu)
+            {
+                menu.OnUpdate();
             }
 
             this.Draw();
@@ -259,7 +283,7 @@ public class Scene
 
     public void RemoveEntity(IMovingEntity entity)
     {
-        entity.OnDelete();
+        entity.OnDestroy();
         this.Entities.Remove(entity);
     }
 

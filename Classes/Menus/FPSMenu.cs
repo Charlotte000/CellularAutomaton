@@ -21,6 +21,12 @@ public class FPSMenu : Menu
 
     public override void Draw(RenderTarget target, RenderStates states)
     {
+        base.Draw(target, states);
+        target.Draw(this.FPS, states);
+    }
+
+    public override void OnUpdate()
+    {
         this.framesCount++;
         if (this.framesCount >= 20)
         {
@@ -33,14 +39,11 @@ public class FPSMenu : Menu
         var w = bound.Left + bound.Width;
         var h = bound.Top + bound.Height;
         this.FPS.Origin = new Vector2f(w, h) / 2;
-
-        base.Draw(target, states);
-        target.Draw(this.FPS, states);
     }
 
-    public override void OnDelete()
+    public override void OnDestroy()
     {
-        base.OnDelete();
+        base.OnDestroy();
         this.FPS.Dispose();
         this.fpsClock.Dispose();
     }

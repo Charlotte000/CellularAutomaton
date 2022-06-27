@@ -3,12 +3,15 @@
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Walls;
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using System.Collections;
 
-public class Chunk : Drawable, IEnumerable<(Block block, Wall wall)>
+public class Chunk : IMonoBehaviour, Drawable, IEnumerable<(Block block, Wall wall)>
 {
+    private readonly List<IMesh> meshes;
+
     public Chunk(int x, int y)
     {
         this.Coord = new Vector2i(x, y);
@@ -18,6 +21,11 @@ public class Chunk : Drawable, IEnumerable<(Block block, Wall wall)>
         this.PressureMesh = new (this, this.Coord);
         this.LightMesh = new (this, this.Coord);
         this.VisibilityMesh = new (this, this.Coord);
+
+        this.meshes = new ()
+        {
+            this.WallMesh, this.BlockMesh, this.PressureMesh, this.LightMesh, this.VisibilityMesh,
+        };
     }
 
     public static Vector2i Size { get; } = new (20, 20);
@@ -38,38 +46,39 @@ public class Chunk : Drawable, IEnumerable<(Block block, Wall wall)>
 
     public void Draw(RenderTarget target, RenderStates states)
     {
-        target.Draw(this.WallMesh, states);
-        target.Draw(this.BlockMesh, states);
-        target.Draw(this.PressureMesh, states);
-        target.Draw(this.LightMesh, states);
-        target.Draw(this.VisibilityMesh, states);
+        foreach (var mesh in this.meshes)
+        {
+            target.Draw(mesh, states);
+        }
     }
 
-    public void SlowUpdate()
+    public void OnCreate()
     {
-        this.WallMesh.SlowUpdate();
-        this.BlockMesh.SlowUpdate();
-        this.PressureMesh.SlowUpdate();
-        this.LightMesh.SlowUpdate();
-        this.VisibilityMesh.SlowUpdate();
+
     }
 
-    public void FastUpdate()
+    public void OnFixedUpdate()
     {
-        this.WallMesh.FastUpdate();
-        this.BlockMesh.FastUpdate();
-        this.PressureMesh.FastUpdate();
-        this.LightMesh.FastUpdate();
-        this.VisibilityMesh.FastUpdate();
+        foreach (var mesh in this.meshes)
+        {
+            mesh.OnFixedUpdate();
+        }
     }
 
-    public void Dispose()
+    public void OnUpdate()
     {
-        this.WallMesh.Dispose();
-        this.BlockMesh.Dispose();
-        this.PressureMesh.Dispose();
-        this.LightMesh.Dispose();
-        this.VisibilityMesh.Dispose();
+        foreach (var mesh in this.meshes)
+        {
+            mesh.OnUpdate();
+        }
+    }
+
+    public void OnDestroy()
+    {
+        foreach (var mesh in this.meshes)
+        {
+            mesh.OnDestroy();
+        }
     }
 
     public IEnumerator<(Block block, Wall wall)> GetEnumerator()
