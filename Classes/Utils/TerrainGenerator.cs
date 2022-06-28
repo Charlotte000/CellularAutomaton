@@ -1,8 +1,10 @@
 ﻿namespace CellularAutomaton.Classes.Utils;
 
 using CellularAutomaton.Classes.Blocks;
+using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Classes.Walls;
 using RandomAccessPerlinNoise;
+using SFML.System;
 
 public class TerrainGenerator
 {
@@ -48,19 +50,35 @@ public class TerrainGenerator
             var stoneNoise = (stoneMap[x, 0] * 2) - 1;
             var stoneHeight = this.stone.Calculate(stoneNoise);
 
+            // Fireflies
+            if (chunk.Scene.Daylight < .5f)
+            {
+                for (int y = 10; y < Math.Min(terrainHeight, this.sea.Average); y++)
+                {
+                    if (Scene.RandomGenerator.Next(0, 1000) == 0)
+                    {
+                        chunk.Scene.AddEntity(new Firefly(new Vector2f(x + chunk.Coord.X, y) * Block.Size));
+                    }
+                }
+            }
+
+            // Water
             for (int y = this.sea.Average; y < terrainHeight; y++)
             {
                 chunk.BlockMesh[x + chunk.Coord.X, y] = new Water();
                 chunk.WallMesh[x + chunk.Coord.X, y] = new DirtWall();
             }
 
+            // Dirt
             for (int y = terrainHeight; y < stoneHeight; y++)
             {
                 if (y == terrainHeight)
                 {
+                    // Grass
                     chunk.BlockMesh[x + chunk.Coord.X, y] = new Grass();
                     chunk.WallMesh[x + chunk.Coord.X, y] = new DirtWall();
 
+                    // Trees and tall grass
                     if (y - 1 < this.sea.Average)
                     {
                         if (vegetationMap[x, 0] > .5)
@@ -83,6 +101,7 @@ public class TerrainGenerator
                 chunk.WallMesh[x + chunk.Coord.X, y] = new DirtWall();
             }
 
+            // Stone
             for (int y = stoneHeight; y < chunk.Coord.Y + h; y++)
             {
                 chunk.BlockMesh[x + chunk.Coord.X, y] = new Stone();

@@ -1,6 +1,6 @@
 ﻿namespace CellularAutomaton.Interfaces;
 
-public interface ILivingEntity : IEntity
+public interface ILivingEntity : IGameObject
 {
     public bool IsOnGround { get; set; }
 

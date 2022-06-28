@@ -3,7 +3,7 @@
 using SFML.Graphics;
 using SFML.System;
 
-public interface IEntity : IMonoBehaviour
+public interface IGameObject : IMonoBehaviour
 {
     public Sprite Sprite { get; }
 
@@ -13,9 +13,9 @@ public interface IEntity : IMonoBehaviour
 
     public bool IsCollidable { get; }
 
-    public void OnCollision(IEntity entity, Vector2f? contactNormal);
+    public void OnCollision(IGameObject entity, Vector2f? contactNormal);
 
     public void OnClick();
 
-    public IEntity Copy();
+    public IGameObject Copy();
 }

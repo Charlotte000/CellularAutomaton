@@ -72,6 +72,8 @@ public class Door : Block
 
     public override void OnCreate()
     {
+        base.OnCreate();
+
         var upperCoord = this.Coord + new Vector2i(0, -1);
         var upperChunk = this.Chunk.Scene.ChunkMesh[upperCoord];
         if (upperChunk?.BlockMesh[upperCoord] is Empty)
@@ -97,6 +99,8 @@ public class Door : Block
 
     public override void OnClick()
     {
+        base.OnClick();
+
         if (this.IsOpened)
         {
             foreach (var entity in this.Chunk.Scene.Entities)
@@ -122,6 +126,8 @@ public class Door : Block
 
     public override void OnDestroy()
     {
+        base.OnDestroy();
+
         if (this.upper is not null)
         {
             this.upper.lower = null;

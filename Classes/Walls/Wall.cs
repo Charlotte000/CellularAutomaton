@@ -5,7 +5,7 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Wall : IEntity
+public abstract class Wall : IGameObject
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(60, 20, 20, 20));
 
@@ -19,12 +19,7 @@ public class Wall : IEntity
 
     public Chunk Chunk { get; set; }
 
-    public virtual IEntity Copy()
-        => new Wall()
-        {
-            Coord = this.Coord,
-            CollisionBox = new (this.CollisionBox),
-        };
+    public abstract IGameObject Copy();
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
@@ -48,7 +43,7 @@ public class Wall : IEntity
         this.CollisionBox.Dispose();
     }
 
-    public virtual void OnCollision(IEntity entity, Vector2f? contactNormal)
+    public virtual void OnCollision(IGameObject entity, Vector2f? contactNormal)
     {
     }
 

@@ -25,7 +25,6 @@ public class InventoryMenu : Menu
         this.AddItem(new Stone());
         this.AddItem(new TallGrass());
         this.AddItem(new Water());
-        this.AddItem(new Block());
         this.AddItem(new Door());
         this.AddItem(new Trapdoor());
         this.AddItem(new Tree());
@@ -33,6 +32,7 @@ public class InventoryMenu : Menu
         this.AddItem(new StoneWall());
         this.AddItem(new LightStick() { Angle = 0 });
         this.AddItem(new Leaf(new Vector2f(0, 0)) { Angle = 0 });
+        this.AddItem(new Firefly(new Vector2f(0, 0)) { Angle = 0 });
 
         this.selected = 0;
     }
@@ -49,7 +49,7 @@ public class InventoryMenu : Menu
         this.Window.KeyPressed -= this.OnKeyPressed;
     }
 
-    public IEntity GetValue()
+    public IGameObject GetValue()
         => this.items[this.selected].Entity;
 
     private void OnMouseScrolled(object? sender, MouseWheelScrollEventArgs e)
@@ -82,7 +82,7 @@ public class InventoryMenu : Menu
         }
     }
 
-    private void AddItem(IEntity entity)
+    private void AddItem(IGameObject entity)
     {
         var item = new InventoryItem(
             this.Window,
@@ -105,7 +105,7 @@ public class InventoryMenu : Menu
             Vector2f position,
             Vector2f size,
             InventoryMenu parent,
-            IEntity entity)
+            IGameObject entity)
             : base(window, position, size, parent)
         {
             this.index = parent.items.Count;
@@ -120,7 +120,7 @@ public class InventoryMenu : Menu
             this.Entity = entity;
         }
 
-        public IEntity Entity { get; set; }
+        public IGameObject Entity { get; set; }
 
         public override void Draw(RenderTarget target, RenderStates states)
         {

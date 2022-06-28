@@ -59,6 +59,8 @@ public class Tree : Block, ITimedEntity
 
     public override void OnFixedUpdate()
     {
+        base.OnFixedUpdate();
+
         if (Scene.RandomGenerator.Next(0, 40) == 0)
         {
             this.Chunk.Scene.AddEntity(
@@ -70,6 +72,8 @@ public class Tree : Block, ITimedEntity
 
     public override void OnClick()
     {
+        base.OnClick();
+
         this.isCutDown = true;
         this.LifeTimeStart = this.Chunk.Scene.Clock.ElapsedTime.AsSeconds();
         this.LifeTimeEnd = this.LifeTimeStart + this.LifeTime;

@@ -1,13 +1,14 @@
 ﻿namespace CellularAutomaton.Classes.Utils;
 
 using CellularAutomaton.Classes.Blocks;
+using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
 public static class AABBCollision
 {
-    public static void Collision(Scene scene, IMovingEntity dynamicEntity, List<IEntity> staticEntities)
+    public static void Collision(Scene scene, Entity dynamicEntity, List<IGameObject> staticEntities)
     {
         foreach (var entity in staticEntities)
         {
@@ -26,8 +27,8 @@ public static class AABBCollision
 
     private static bool ApplyCollision(
         Scene scene,
-        IMovingEntity dynamicEntity,
-        IEntity staticEntity,
+        Entity dynamicEntity,
+        IGameObject staticEntity,
         out Vector2f normal)
     {
         if (AABBCollision.ResolveCollision(
@@ -60,8 +61,8 @@ public static class AABBCollision
     }
 
     private static bool ResolveCollision(
-        IMovingEntity movingEntity,
-        IEntity staticEntity,
+        Entity movingEntity,
+        IGameObject staticEntity,
         out Vector2f normal,
         out float contactTime)
     {

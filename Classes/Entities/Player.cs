@@ -1,17 +1,14 @@
 ﻿namespace CellularAutomaton.Classes.Entities;
 
 using CellularAutomaton.Classes.Blocks;
-using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-public class Player : IMovingEntity, ILivingEntity
+public class Player : Entity, ILivingEntity
 {
     private static readonly Sprite SpriteSource;
-
-    private static Vector2f gravity = new (0, 1f);
 
     static Player()
     {
@@ -26,9 +23,18 @@ public class Player : IMovingEntity, ILivingEntity
         this.CollisionBox.Position = new Vector2f(x, y);
     }
 
-    public Sprite Sprite { get => Player.SpriteSource; }
+    public override Vector2f Gravity
+    { get => new Vector2f(0, 1) * (this.IsOnWater ? .2f : 1) * (this.IsClimbing ? 0 : 1); }
 
-    public Vector2f Vel { get; set; } = new Vector2f(0, 0);
+    public override float AirResistance { get => this.IsOnWater || this.IsClimbing ? .8f : .87f; }
+
+    public override float PressureOut { get => .05f; }
+
+    public override Sprite Sprite { get => Player.SpriteSource; }
+
+    public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(19, 39));
+
+    public override bool IsCollidable { get => true; }
 
     public bool IsOnGround { get; set; } = false;
 
@@ -36,74 +42,20 @@ public class Player : IMovingEntity, ILivingEntity
 
     public bool IsClimbing { get; set; } = false;
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(19, 39));
-
-    public Vector2i Coord
+    public override void OnUpdate()
     {
-        get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
-        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
-    }
-
-    public bool IsCollidable { get => true; }
-
-    public Scene Scene { get; set; }
-
-    public void Draw(RenderTarget target, RenderStates states)
-    {
-        target.Draw(this.Sprite, states);
-
-        var coord = this.Coord;
-        var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
-
-        var shadow = new Sprite(this.Sprite)
-        {
-            Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-        };
-        target.Draw(shadow, states);
-    }
-
-    public void OnCreate()
-    {
-    }
-
-    public void OnUpdate()
-    {
-        this.Vel += Player.gravity * (this.IsOnWater ? .2f : 1f) * (this.IsClimbing ? 0 : 1);
         this.Control();
-
-        this.Vel *= this.IsOnWater || this.IsClimbing ? .8f : .87f;
-
-        this.Collision();
-        this.CollisionBox.Position += this.Vel;
-
-        var coord = this.Coord;
-        var chunk = this.Scene.ChunkMesh[coord];
-        if (chunk is not null)
-        {
-            chunk.PressureMesh[coord] += this.Vel / 20;
-        }
+        base.OnUpdate();
     }
 
-    public void OnFixedUpdate()
+    public override void OnCollision(IGameObject entity, Vector2f? contactNormal)
     {
-    }
-
-    public void OnCollision(IEntity entity, Vector2f? contactNormal)
-    {
+        base.OnCollision(entity, contactNormal);
         this.IsOnGround |= contactNormal?.Y == -1 && entity.IsCollidable;
         this.IsClimbing |= entity is Block block && block.IsClimbable;
     }
 
-    public void OnClick()
-    {
-    }
-
-    public void OnDestroy()
-    {
-        this.CollisionBox.Dispose();
-    }
-
-    public IEntity Copy()
+    public override IGameObject Copy()
         => new Player(this.CollisionBox.Position.X, this.CollisionBox.Position.Y);
 
     private void Control()
@@ -132,28 +84,5 @@ public class Player : IMovingEntity, ILivingEntity
         {
             this.Vel += new Vector2f(0, .7f);
         }
-    }
-
-    private void Collision()
-    {
-        this.IsOnGround = false;
-        this.IsOnWater = false;
-        this.IsClimbing = false;
-
-        var entities = new List<IEntity>();
-        var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
-        for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
-        {
-            for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
-            {
-                var block = this.Scene.ChunkMesh[x, y]?.BlockMesh[x, y];
-                if (block is not null && block is not Empty)
-                {
-                    entities.Add(block);
-                }
-            }
-        }
-
-        AABBCollision.Collision(this.Scene, this, entities);
     }
 }

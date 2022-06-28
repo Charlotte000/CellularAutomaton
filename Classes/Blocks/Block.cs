@@ -5,7 +5,7 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Block : IEntity
+public abstract class Block : IGameObject
 {
     public static readonly int Size = 20;
 
@@ -58,13 +58,20 @@ public class Block : IEntity
 
     public virtual void OnUpdate()
     {
+        if (this is ITimedEntity timedEntity && timedEntity.IsLifeTimeActive)
+        {
+            if (this.Chunk.Scene.Clock.ElapsedTime.AsSeconds() >= timedEntity.LifeTimeEnd)
+            {
+                timedEntity.OnTimeOut();
+            }
+        }
     }
 
     public virtual void OnFixedUpdate()
     {
     }
 
-    public virtual void OnCollision(IEntity entity, Vector2f? normal)
+    public virtual void OnCollision(IGameObject entity, Vector2f? normal)
     {
     }
 
@@ -92,11 +99,5 @@ public class Block : IEntity
         return false;
     }
 
-    public virtual IEntity Copy()
-        => new Block()
-        {
-            CollisionBox = new RectangleShape(this.CollisionBox),
-            Coord = this.Coord,
-            WasUpdated = this.WasUpdated,
-        };
+    public abstract IGameObject Copy();
 }

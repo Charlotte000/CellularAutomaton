@@ -52,6 +52,8 @@ public class Water : Block
 
     public override void OnFixedUpdate()
     {
+        base.OnFixedUpdate();
+
         // Fall down
         if (this.FallDown())
         {
@@ -66,8 +68,10 @@ public class Water : Block
         }
     }
 
-    public override void OnCollision(IEntity entity, Vector2f? normal)
+    public override void OnCollision(IGameObject entity, Vector2f? normal)
     {
+        base.OnCollision(entity, normal);
+
         if (entity is ILivingEntity livingEntity)
         {
             livingEntity.IsOnWater = true;

@@ -1,17 +1,30 @@
 ﻿namespace CellularAutomaton.Classes.Entities;
 
-using CellularAutomaton.Classes.Blocks;
-using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class LightStick : IMovingEntity, ILightSource, IThrowable, ITimedEntity
+public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new (320, 80, 10, 4))
     { Origin = new Vector2f(5, 2) };
 
-    private static Vector2f gravity = new (0, .1f);
+    public override Vector2f Gravity { get => new (0, .1f); }
+
+    public override Sprite Sprite
+    {
+        get
+        {
+            LightStick.SpriteSource.Rotation = this.Angle;
+            return LightStick.SpriteSource;
+        }
+    }
+
+    public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5));
+
+    public override bool IsCollidable { get => false; }
+
+    public override float AirResistance { get => .99f; }
 
     public float ThrowMag { get => 7; }
 
@@ -25,30 +38,7 @@ public class LightStick : IMovingEntity, ILightSource, IThrowable, ITimedEntity
 
     public float AngleVel { get; set; } = (float)((Scene.RandomGenerator.NextDouble() * 20) - 10);
 
-    public float Angle { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 360);
-
-    public Vector2f Vel { get; set; }
-
-    public Scene Scene { get; set; }
-
-    public Sprite Sprite
-    {
-        get
-        {
-            LightStick.SpriteSource.Rotation = this.Angle;
-            return LightStick.SpriteSource;
-        }
-    }
-
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5));
-
-    public Vector2i Coord
-    {
-        get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
-        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
-    }
-
-    public bool IsCollidable { get => false; }
+    public float Angle { get; set; } = Scene.RandomGenerator.Next(0, 360);
 
     public int Brightness
     {
@@ -65,51 +55,12 @@ public class LightStick : IMovingEntity, ILightSource, IThrowable, ITimedEntity
         this.Scene.RemoveEntity(this);
     }
 
-    public IEntity Copy()
+    public override IGameObject Copy()
         => new LightStick();
 
-    public void Draw(RenderTarget target, RenderStates states)
+    public override void OnUpdate()
     {
-        target.Draw(this.Sprite, states);
-
-        var coord = this.Coord;
-        var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
-
-        var shadow = new Sprite(this.Sprite)
-        {
-            Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-        };
-        target.Draw(shadow, states);
-    }
-
-    public void OnClick()
-    {
-    }
-
-    public void OnCollision(IEntity entity, Vector2f? contactNormal)
-    {
-    }
-
-    public void OnCreate()
-    {
-    }
-
-    public void OnDestroy()
-    {
-        this.CollisionBox.Dispose();
-    }
-
-    public void OnFixedUpdate()
-    {
-    }
-
-    public void OnUpdate()
-    {
-        this.Vel += LightStick.gravity;
-        this.Vel *= .99f;
-
-        this.Collision();
-        this.CollisionBox.Position += this.Vel;
+        base.OnUpdate();
 
         if (this.Vel.Y != 0)
         {
@@ -117,23 +68,15 @@ public class LightStick : IMovingEntity, ILightSource, IThrowable, ITimedEntity
         }
     }
 
-    private void Collision()
+    public void Throw(IGameObject owner, Vector2f mousePosition)
     {
-        var entities = new List<IEntity>();
-        var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
+        var ownerPosition = owner.CollisionBox.Position + (owner.CollisionBox.Size / 2);
 
-        for (int x = (int)coord.X - 2; x < (int)coord.X + 3; x++)
-        {
-            for (int y = (int)coord.Y - 3; y < (int)coord.Y + 4; y++)
-            {
-                var block = this.Scene.ChunkMesh[x, y]?.BlockMesh[x, y];
-                if (block is not null && block is not Empty)
-                {
-                    entities.Add(block);
-                }
-            }
-        }
+        this.CollisionBox.Position = ownerPosition;
 
-        AABBCollision.Collision(this.Scene, this, entities);
+        var direction = mousePosition - ownerPosition;
+        var directionMag = MathF.Sqrt((direction.X * direction.X) + (direction.Y * direction.Y));
+
+        this.Vel = direction / directionMag * this.ThrowMag;
     }
 }

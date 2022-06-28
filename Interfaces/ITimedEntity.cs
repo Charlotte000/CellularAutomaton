@@ -1,6 +1,6 @@
 ﻿namespace CellularAutomaton.Interfaces;
 
-public interface ITimedEntity : IEntity
+public interface ITimedEntity : IGameObject
 {
     public bool IsLifeTimeActive { get; }
 

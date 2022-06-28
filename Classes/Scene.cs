@@ -66,10 +66,10 @@ public class Scene
             if (e.Button == Mouse.Button.Left)
             {
                 var entity = ((InventoryMenu)this.menu[0]).GetValue();
-                if (entity is IMovingEntity moving)
+                if (entity is Entity moving)
                 {
                     var coord = this.GetMouseCoords();
-                    var newMoving = (IMovingEntity)moving.Copy();
+                    var newMoving = (Entity)moving.Copy();
                     newMoving.Coord = coord;
 
                     if (newMoving is IThrowable throwable)
@@ -135,11 +135,11 @@ public class Scene
 
     public TerrainGenerator TerrainGenerator { get; set; } = new () { Seed = 125 };
 
-    public float Daylight { get; set; } = 0;
+    public float Daylight { get; set; } = 1;
 
     public ChunkMesh ChunkMesh { get; set; }
 
-    public List<IMovingEntity> Entities { get; set; } = new ();
+    public List<Entity> Entities { get; set; } = new ();
 
     public RenderWindow Window { get; set; }
 
@@ -268,20 +268,14 @@ public class Scene
         return block;
     }
 
-    public void AddEntity(IMovingEntity entity)
+    public void AddEntity(Entity entity)
     {
         entity.Scene = this;
         this.Entities.Add(entity);
         entity.OnCreate();
-
-        if (entity is ITimedEntity timedEntity && timedEntity.IsLifeTimeActive)
-        {
-            timedEntity.LifeTimeStart = this.Clock.ElapsedTime.AsSeconds();
-            timedEntity.LifeTimeEnd = timedEntity.LifeTimeStart + timedEntity.LifeTime;
-        }
     }
 
-    public void RemoveEntity(IMovingEntity entity)
+    public void RemoveEntity(Entity entity)
     {
         entity.OnDestroy();
         this.Entities.Remove(entity);
@@ -293,15 +287,6 @@ public class Scene
 
         for (int i = 0; i < this.Entities.Count; i++)
         {
-            if (this.Entities[i] is ITimedEntity timed)
-            {
-                if (this.Clock.ElapsedTime.AsSeconds() >= timed.LifeTimeEnd)
-                {
-                    timed.OnTimeOut();
-                    continue;
-                }
-            }
-
             this.Entities[i].OnUpdate();
         }
 

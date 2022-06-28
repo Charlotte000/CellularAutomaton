@@ -21,6 +21,8 @@ public class Grass : Block
 
     public override void OnFixedUpdate()
     {
+        base.OnFixedUpdate();
+
         if (Scene.RandomGenerator.Next(0, 3) == 0)
         {
             foreach (var delta in Scene.ExpandedNeighborhood)

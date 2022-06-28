@@ -53,6 +53,8 @@ public class Trapdoor : Block
 
     public override void OnClick()
     {
+        base.OnClick();
+
         if (this.IsOpened)
         {
             foreach (var entity in this.Chunk.Scene.Entities)

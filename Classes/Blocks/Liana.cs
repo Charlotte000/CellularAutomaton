@@ -19,7 +19,10 @@ public class Liana : Block
     public override bool IsClimbable { get => true; }
 
     public override void OnCreate()
-        => this.Expand(Scene.RandomGenerator.Next(3, 10));
+    {
+        base.OnCreate();
+        this.Expand(Scene.RandomGenerator.Next(3, 10));
+    }
 
     public override Liana Copy()
         => new ()

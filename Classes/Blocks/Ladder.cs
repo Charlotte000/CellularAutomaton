@@ -19,6 +19,8 @@ public class Ladder : Block
 
     public override void OnCreate()
     {
+        base.OnCreate();
+
         this.Expand(10);
     }
 
