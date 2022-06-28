@@ -2,5 +2,5 @@
 
 public interface ILightSource
 {
-    public int Brightness { get; set; }
+    public int Brightness { get; }
 }

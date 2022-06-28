@@ -8,28 +8,32 @@ using SFML.System;
 
 public class Leaf : IMovingEntity
 {
-    private static readonly Sprite SpriteSource;
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new (320, 84, 5, 5))
+    { Origin = new (2.5f, 2.5f) };
 
     private static Vector2f gravity = new (0, .1f);
-
-    static Leaf()
-    {
-        using var renderTexture = new RenderTexture(3, 3);
-        renderTexture.Draw(new RectangleShape(new Vector2f(3, 3)) { FillColor = Color.Green });
-        renderTexture.Display();
-        Leaf.SpriteSource = new Sprite(new Texture(renderTexture.Texture));
-    }
 
     public Leaf(Vector2f position)
     {
         this.CollisionBox.Position = position;
     }
 
-    public Sprite Sprite { get => Leaf.SpriteSource; }
+    public Sprite Sprite
+    {
+        get
+        {
+            Leaf.SpriteSource.Rotation = this.Angle;
+            return Leaf.SpriteSource;
+        }
+    }
+
+    public float AngleVel { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 10) - 5;
+
+    public float Angle { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 360);
 
     public Vector2f Vel { get; set; }
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(3, 3)) { FillColor = Color.Green };
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(3, 3));
 
     public Vector2i Coord
     {
@@ -47,10 +51,9 @@ public class Leaf : IMovingEntity
 
         var coord = this.Coord;
         var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
-
-        var shadow = new RectangleShape(this.CollisionBox)
+        var shadow = new Sprite(this.Sprite)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
+            Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
         };
         target.Draw(shadow, states);
     }
@@ -69,6 +72,8 @@ public class Leaf : IMovingEntity
             (float)((Scene.RandomGenerator.NextDouble() * .5) - .25));
         this.Vel *= .7f;
         this.Vel += this.Scene.ChunkMesh[coord]?.PressureMesh[coord] ?? new Vector2f(0, 0);
+
+        this.Angle += this.AngleVel;
 
         this.Collision();
         this.CollisionBox.Position += this.Vel;

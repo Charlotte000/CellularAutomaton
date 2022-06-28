@@ -55,9 +55,9 @@ public class Player : IMovingEntity, ILivingEntity
         var coord = this.Coord;
         var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
 
-        var shadow = new RectangleShape(this.CollisionBox)
+        var shadow = new Sprite(this.Sprite)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
+            Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
         };
         target.Draw(shadow, states);
     }

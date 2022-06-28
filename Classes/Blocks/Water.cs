@@ -26,7 +26,7 @@ public class Water : Block
 
     public override Sprite Sprite { get => Water.SpriteSource[this.Amount - 1]; }
 
-    public override int LightDiffusion { get => 10; }
+    public override int LightDiffusion { get => 25; }
 
     public override bool IsTransparent { get => true; }
 

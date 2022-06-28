@@ -31,8 +31,8 @@ public class InventoryMenu : Menu
         this.AddItem(new Tree());
         this.AddItem(new DirtWall());
         this.AddItem(new StoneWall());
-        this.AddItem(new LightStick());
-        this.AddItem(new Leaf(new Vector2f(0, 0)));
+        this.AddItem(new LightStick() { Angle = 0 });
+        this.AddItem(new Leaf(new Vector2f(0, 0)) { Angle = 0 });
 
         this.selected = 0;
     }

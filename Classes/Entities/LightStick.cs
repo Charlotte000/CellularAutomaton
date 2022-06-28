@@ -6,23 +6,26 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and somehow single throw
+public class LightStick : IMovingEntity, ILightSource, IThrowable, ITimedEntity
 {
-    private static readonly Sprite SpriteSource;
+    private static readonly Sprite SpriteSource = new (Scene.Texture, new (320, 80, 10, 4))
+    { Origin = new Vector2f(5, 2) };
 
     private static Vector2f gravity = new (0, .1f);
 
-    private readonly float angleDelta = (float)((Scene.RandomGenerator.NextDouble() * 20) - 10);
+    public float ThrowMag { get => 7; }
 
-    private float angle = (float)(Scene.RandomGenerator.NextDouble() * 360);
+    public bool IsLifeTimeActive { get => true; }
 
-    static LightStick()
-    {
-        using var renderTexture = new RenderTexture(10, 4);
-        renderTexture.Draw(new RectangleShape(new Vector2f(10, 4)) { FillColor = Color.Magenta });
-        renderTexture.Display();
-        LightStick.SpriteSource = new Sprite(new Texture(renderTexture.Texture)) { Origin = new (5, 2) };
-    }
+    public float LifeTimeStart { get; set; }
+
+    public float LifeTimeEnd { get; set; }
+
+    public float LifeTime { get => 20; }
+
+    public float AngleVel { get; set; } = (float)((Scene.RandomGenerator.NextDouble() * 20) - 10);
+
+    public float Angle { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 360);
 
     public Vector2f Vel { get; set; }
 
@@ -32,12 +35,12 @@ public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and 
     {
         get
         {
-            LightStick.SpriteSource.Rotation = this.angle;
+            LightStick.SpriteSource.Rotation = this.Angle;
             return LightStick.SpriteSource;
         }
     }
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5)) { Origin = new (-2.5f, -2.5f) };
+    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5));
 
     public Vector2i Coord
     {
@@ -47,7 +50,20 @@ public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and 
 
     public bool IsCollidable { get => false; }
 
-    public int Brightness { get; set; } = 300;
+    public int Brightness
+    {
+        get
+        {
+            var deltaFull = this.LifeTimeEnd - this.LifeTimeStart;
+            var delta = this.LifeTimeEnd - this.Scene.Clock.ElapsedTime.AsSeconds();
+            return (int)(300 * delta / deltaFull);
+        }
+    }
+
+    public void OnTimeOut()
+    {
+        this.Scene.RemoveEntity(this);
+    }
 
     public IEntity Copy()
         => new LightStick();
@@ -59,9 +75,9 @@ public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and 
         var coord = this.Coord;
         var light = this.Scene.ChunkMesh[coord]?.LightMesh[coord] ?? 0;
 
-        var shadow = new RectangleShape(this.CollisionBox)
+        var shadow = new Sprite(this.Sprite)
         {
-            FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
+            Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
         };
         target.Draw(shadow, states);
     }
@@ -90,14 +106,14 @@ public class LightStick : IMovingEntity, ILightSource // ToDo: add lifetime and 
     public void OnUpdate()
     {
         this.Vel += LightStick.gravity;
-        this.Vel *= .98f;
+        this.Vel *= .99f;
 
         this.Collision();
         this.CollisionBox.Position += this.Vel;
 
         if (this.Vel.Y != 0)
         {
-            this.angle += this.angleDelta;
+            this.Angle += this.AngleVel;
         }
     }
 

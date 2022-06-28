@@ -65,8 +65,25 @@ public class Scene
         {
             if (e.Button == Mouse.Button.Left)
             {
-                var coord = this.GetMouseCoords();
-                this.ChunkMesh[coord]?.BlockMesh[coord]?.OnClick();
+                var entity = ((InventoryMenu)this.menu[0]).GetValue();
+                if (entity is IMovingEntity moving)
+                {
+                    var coord = this.GetMouseCoords();
+                    var newMoving = (IMovingEntity)moving.Copy();
+                    newMoving.Coord = coord;
+
+                    if (newMoving is IThrowable throwable)
+                    {
+                        throwable.Throw(this.Entities[0], (Vector2f)(coord * Block.Size));
+                    }
+
+                    this.AddEntity(newMoving);
+                }
+                else
+                {
+                    var coord = this.GetMouseCoords();
+                    this.ChunkMesh[coord]?.BlockMesh[coord]?.OnClick();
+                }
             }
         };
 
@@ -256,6 +273,12 @@ public class Scene
         entity.Scene = this;
         this.Entities.Add(entity);
         entity.OnCreate();
+
+        if (entity is ITimedEntity timedEntity && timedEntity.IsLifeTimeActive)
+        {
+            timedEntity.LifeTimeStart = this.Clock.ElapsedTime.AsSeconds();
+            timedEntity.LifeTimeEnd = timedEntity.LifeTimeStart + timedEntity.LifeTime;
+        }
     }
 
     public void RemoveEntity(IMovingEntity entity)
@@ -270,6 +293,15 @@ public class Scene
 
         for (int i = 0; i < this.Entities.Count; i++)
         {
+            if (this.Entities[i] is ITimedEntity timed)
+            {
+                if (this.Clock.ElapsedTime.AsSeconds() >= timed.LifeTimeEnd)
+                {
+                    timed.OnTimeOut();
+                    continue;
+                }
+            }
+
             this.Entities[i].OnUpdate();
         }
 
@@ -326,20 +358,6 @@ public class Scene
             else if (entity is Wall wall)
             {
                 chunk.WallMesh[coord] = (Wall)wall.Copy();
-            }
-            else if (entity is IMovingEntity moving)
-            {
-                var newMoving = (IMovingEntity)moving.Copy();
-                newMoving.Coord = coord;
-
-                if (newMoving is LightStick light)
-                {
-                    light.CollisionBox.Position = this.Entities[0].CollisionBox.Position;
-                    var delta = (Vector2f)(coord * Block.Size) - light.CollisionBox.Position;
-                    light.Vel = delta / 10;
-                }
-
-                this.AddEntity(newMoving);
             }
         }
 

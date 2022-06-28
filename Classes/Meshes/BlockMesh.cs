@@ -1,6 +1,7 @@
 ﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
@@ -72,6 +73,14 @@ public class BlockMesh : Mesh<Block, Chunk>
             {
                 block.WasUpdated = true;
                 block.OnUpdate();
+
+                if (block is ITimedEntity timedEntity && timedEntity.IsLifeTimeActive)
+                {
+                    if (this.Parent.Scene.Clock.ElapsedTime.AsSeconds() >= timedEntity.LifeTimeEnd)
+                    {
+                        timedEntity.OnTimeOut();
+                    }
+                }
             }
         }
     }
