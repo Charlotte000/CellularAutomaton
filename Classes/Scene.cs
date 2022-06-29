@@ -72,11 +72,6 @@ public class Scene
                     var newMoving = (Entity)moving.Copy();
                     newMoving.Coord = coord;
 
-                    if (newMoving is IThrowable throwable)
-                    {
-                        throwable.Throw(this.Entities[0], (Vector2f)(coord * Block.Size));
-                    }
-
                     this.AddEntity(newMoving);
                 }
                 else
@@ -342,7 +337,9 @@ public class Scene
             }
             else if (entity is Wall wall)
             {
-                chunk.WallMesh[coord] = (Wall)wall.Copy();
+                var newWall = (Wall)wall.Copy();
+                chunk.WallMesh[coord] = newWall;
+                newWall.OnCreate();
             }
         }
 
@@ -354,7 +351,9 @@ public class Scene
                 var chunk = this.ChunkMesh[coord];
                 if (chunk is not null)
                 {
-                    chunk.WallMesh[coord] = new EmptyWall();
+                    var emptyWall = new EmptyWall();
+                    chunk.WallMesh[coord] = emptyWall;
+                    emptyWall.OnCreate();
                 }
             }
             else

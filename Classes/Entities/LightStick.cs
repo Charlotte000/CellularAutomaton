@@ -28,6 +28,8 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
     public float ThrowMag { get => 7; }
 
+    public IGameObject? ThrowOwner { get => this.Scene?.Entities[0]; }
+
     public bool IsLifeTimeActive { get => true; }
 
     public float LifeTimeStart { get; set; }
@@ -68,9 +70,14 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
         }
     }
 
-    public void Throw(IGameObject owner, Vector2f mousePosition)
+    public void Throw(Vector2f mousePosition)
     {
-        var ownerPosition = owner.CollisionBox.Position + (owner.CollisionBox.Size / 2);
+        if (this.ThrowOwner is null)
+        {
+            return;
+        }
+
+        var ownerPosition = this.ThrowOwner.CollisionBox.Position + (this.ThrowOwner.CollisionBox.Size / 2);
 
         this.CollisionBox.Position = ownerPosition;
 

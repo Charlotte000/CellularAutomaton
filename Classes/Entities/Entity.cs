@@ -34,8 +34,6 @@ public abstract class Entity : IGameObject
 
     public virtual bool IsCollidable { get => false; }
 
-    public bool IsOnWater { get; set; }
-
     public abstract IGameObject Copy();
 
     public virtual void Draw(RenderTarget target, RenderStates states)
@@ -66,6 +64,11 @@ public abstract class Entity : IGameObject
         {
             timedEntity.LifeTimeStart = this.Scene.Clock.ElapsedTime.AsSeconds();
             timedEntity.LifeTimeEnd = timedEntity.LifeTimeStart + timedEntity.LifeTime;
+        }
+
+        if (this is IThrowable throwable)
+        {
+            throwable.Throw((Vector2f)this.Scene.GetMouseCoords() * Block.Size);
         }
     }
 
