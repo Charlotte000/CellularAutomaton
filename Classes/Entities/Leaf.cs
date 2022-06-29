@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Entities;
 
+using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -37,9 +38,7 @@ public class Leaf : Entity
 
     public override void OnUpdate()
     {
-        this.Vel += new Vector2f(
-            (float)((Scene.RandomGenerator.NextDouble() * .5) - .25),
-            (float)((Scene.RandomGenerator.NextDouble() * .5) - .25));
+        this.Vel += VectorHelper.Random() * .25f;
         this.Angle += this.AngleVel;
 
         base.OnUpdate();
@@ -49,7 +48,7 @@ public class Leaf : Entity
             this.Vel *= 0;
         }
 
-        if (this.Vel.X == 0 && this.Vel.Y == 0)
+        if (this.Vel.XYEquals(0))
         {
             this.Scene.RemoveEntity(this);
             return;

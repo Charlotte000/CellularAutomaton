@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Entities;
 
+using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -41,9 +42,8 @@ public class Firefly : Entity, ILightSource
     public override void OnUpdate()
     {
         var magnitude = (float)(Scene.RandomGenerator.NextDouble() * 2) - 1;
-        this.Vel += new Vector2f(
-            (float)Scene.RandomGenerator.NextDouble() - .5f,
-            (float)Scene.RandomGenerator.NextDouble() - .5f) * 2 * magnitude;
+
+        this.Vel += VectorHelper.Random() * magnitude;
         this.Angle += this.AngleVel;
 
         base.OnUpdate();

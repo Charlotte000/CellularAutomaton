@@ -39,20 +39,14 @@ public static class AABBCollision
         {
             var coord = (Vector2i)((staticEntity.CollisionBox.Position / Block.Size) + normal);
             var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
-            if (neighbour is not null &&
-                neighbour.IsCollidable &&
-                neighbour.CollisionBox.Size.X == Block.Size &&
-                neighbour.CollisionBox.Size.Y == Block.Size)
+            if (neighbour is not null && neighbour.IsCollidable && neighbour.CollisionBox.Size.XYEquals(Block.Size))
             {
                 return false;
             }
 
             if (staticEntity.IsCollidable)
             {
-                dynamicEntity.Vel += AABBCollision.Mult(
-                    normal,
-                    new Vector2f(MathF.Abs(dynamicEntity.Vel.X), MathF.Abs(dynamicEntity.Vel.Y))) *
-                    (1 - contactTime);
+                dynamicEntity.Vel += normal.Mult(dynamicEntity.Vel.Abs()) * (1 - contactTime);
                 return true;
             }
         }
@@ -70,7 +64,7 @@ public static class AABBCollision
         contactTime = -1;
 
         // Check if dynamic rectangle is actually moving - we assume rectangles are NOT in collision to start
-        if (movingEntity.Vel.X == 0 && movingEntity.Vel.Y == 0)
+        if (movingEntity.Vel.XYEquals(0))
         {
             return false;
         }
@@ -104,18 +98,18 @@ public static class AABBCollision
         normal = new Vector2f(0, 0);
         tHitNear = -1;
 
-        if (rayDirection.X == 0 && rayDirection.Y == 0)
+        if (rayDirection.XYEquals(0))
         {
             return false;
         }
 
         // Cache division
-        var invDir = new Vector2f(1f / rayDirection.X, 1f / rayDirection.Y);
+        var invDir = new Vector2f(1, 1).Div(rayDirection);
 
         // Calculate intersections with rectangle bounding axes
-        Vector2f tNear = AABBCollision.Mult(target.Position - rayOrigin, invDir);
+        Vector2f tNear = invDir.Mult(target.Position - rayOrigin);
 
-        Vector2f tFar = AABBCollision.Mult(target.Position + target.Size - rayOrigin, invDir);
+        Vector2f tFar = invDir.Mult(target.Position + target.Size - rayOrigin);
 
         // Sort distances
         if (tNear.X > tFar.X)
@@ -155,7 +149,4 @@ public static class AABBCollision
 
         return true;
     }
-
-    private static Vector2f Mult(Vector2f a, Vector2f b)
-        => new (a.X * b.X, a.Y * b.Y);
 }

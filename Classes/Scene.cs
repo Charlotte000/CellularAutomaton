@@ -6,7 +6,6 @@ using CellularAutomaton.Classes.Menus;
 using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -168,11 +167,11 @@ public class Scene
 
     public Vector2i GetMouseCoords()
     {
-        var scale = new Vector2f(this.Camera.Size.X / this.Window.Size.X, this.Camera.Size.Y / this.Window.Size.Y);
+        var scale = this.Camera.Size.Div((Vector2f)this.Window.Size);
         var mousePos = (Vector2f)Mouse.GetPosition(this.Window);
-        var mouseWindow = new Vector2f(mousePos.X * scale.X, mousePos.Y * scale.Y);
+        var mouseWindow = mousePos.Mult(scale);
         var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / Block.Size;
-        return new Vector2i((int)Math.Floor(mouseCoord.X), (int)Math.Floor(mouseCoord.Y));
+        return mouseCoord.Floor();
     }
 
     public Block? TrySetBlock(Scene scene, Block block, Vector2i coords, bool saveToHistory = true)
@@ -184,7 +183,7 @@ public class Scene
         }
 
         var oldBlock = chunk.BlockMesh[coords];
-        block.CollisionBox.Position = new Vector2f(coords.X * Block.Size, coords.Y * Block.Size);
+        block.CollisionBox.Position = (Vector2f)coords * Block.Size;
 
         // Attempt to build up an existing block
         if (block is not Empty && (oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)

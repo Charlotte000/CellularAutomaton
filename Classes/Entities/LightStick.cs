@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Entities;
 
+using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -82,8 +83,6 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
         this.CollisionBox.Position = ownerPosition;
 
         var direction = mousePosition - ownerPosition;
-        var directionMag = MathF.Sqrt((direction.X * direction.X) + (direction.Y * direction.Y));
-
-        this.Vel = direction / directionMag * this.ThrowMag;
+        this.Vel = direction.Normalize() * this.ThrowMag;
     }
 }

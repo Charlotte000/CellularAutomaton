@@ -34,7 +34,7 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
             {
                 var a = new Vertex(
                     (Vector2f)(this.Coord * Block.Size) +
-                    new Vector2f((x * Block.Size) + (Block.Size / 2), (y * Block.Size) + (Block.Size / 2)));
+                    (new Vector2f(x, y) * Block.Size) + (new Vector2f(Block.Size, Block.Size) / 2));
                 var b = new Vertex(a.Position + (this.Grid[x, y] * 40));
 
                 target.Draw(new Vertex[] { a, b }, PrimitiveType.Lines);

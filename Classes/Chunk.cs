@@ -92,7 +92,5 @@ public class Chunk : IMonoBehaviour, Drawable, IEnumerable<(Block block, Wall wa
     }
 
     IEnumerator IEnumerable.GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+        => this.GetEnumerator();
 }
