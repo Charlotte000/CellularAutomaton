@@ -50,7 +50,7 @@ public class BlockMesh : Mesh<Block, Chunk>
 
     public override void DrawMesh(RenderTarget target)
     {
-        var border = new RectangleShape((Vector2f)Chunk.Size * Block.Size)
+        using var border = new RectangleShape((Vector2f)Chunk.Size * Block.Size)
         {
             FillColor = Color.Transparent,
             OutlineColor = Color.Red,

@@ -76,8 +76,7 @@ public class Scene
                 }
                 else
                 {
-                    var coord = this.GetMouseCoords();
-                    this.ChunkMesh[coord]?.BlockMesh[coord]?.OnClick();
+                    this.Nearest?.OnClick();
                 }
             }
         };

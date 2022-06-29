@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Classes.Walls;
 using SFML.Graphics;
 using SFML.System;
 
@@ -42,32 +41,10 @@ public class Door : Block
 
     public override void Draw(RenderTarget target, RenderStates states)
     {
-        if (this.upper is null)
+        if (this.upper is not null)
         {
-            return;
+            base.Draw(target, states);
         }
-
-        var light = this.Chunk.LightMesh[this.Coord];
-        if (light > 0)
-        {
-            target.Draw(this.Sprite, states);
-        }
-
-        Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall ?
-            new RectangleShape(this.CollisionBox)
-            {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-                Position = new Vector2f(0, 0),
-                Origin = new Vector2f(0, Block.Size),
-                Size = new Vector2f(Block.Size, Block.Size * 2),
-            }
-            :
-            new Sprite(this.Sprite)
-            {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-            };
-
-        target.Draw(shadow, states);
     }
 
     public override void OnCreate()

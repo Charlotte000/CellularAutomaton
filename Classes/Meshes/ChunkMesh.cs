@@ -162,7 +162,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
                         { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
                         if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
                         {
-                            if (time >= 0 && time < 1)
+                            if (time < 1)
                             {
                                 buffer.Add((time, gameObject));
                             }

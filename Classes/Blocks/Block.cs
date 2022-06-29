@@ -1,6 +1,5 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
-using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -33,25 +32,12 @@ public abstract class Block : IGameObject
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        var light = this.Chunk.LightMesh[this.Coord];
-        if (light > 0)
-        {
-            target.Draw(this.Sprite, states);
-        }
+        var light = MathF.Max(0, MathF.Min(1, this.Chunk.LightMesh[this.Coord] / 255f));
+        var color = this.Sprite.Color;
 
-        Drawable shadow = this.Chunk.WallMesh[this.Coord] is not EmptyWall && this.IsTransparent ?
-            new RectangleShape(this.CollisionBox)
-            {
-                FillColor = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-                Position = new Vector2f(0, 0),
-            }
-            :
-            new Sprite(this.Sprite)
-            {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - light))),
-            };
-
-        target.Draw(shadow, states);
+        using var sprite = new Sprite(this.Sprite)
+        { Color = new ((byte)(color.R * light), (byte)(color.G * light), (byte)(color.B * light)) };
+        target.Draw(sprite, states);
     }
 
     public virtual void OnCreate()

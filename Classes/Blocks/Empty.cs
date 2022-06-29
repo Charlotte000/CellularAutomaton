@@ -15,15 +15,6 @@ public class Empty : Block
 
     public override void Draw(RenderTarget target, RenderStates states)
     {
-        var wall = this.Chunk.WallMesh[this.Coord];
-        if (wall?.Sprite is not null)
-        {
-            var shadow = new Sprite(wall.Sprite)
-            {
-                Color = new Color(0, 0, 0, (byte)Math.Max(0, Math.Min(255, 255 - this.Chunk.LightMesh[this.Coord]))),
-            };
-            target.Draw(shadow, states);
-        }
     }
 
     public override Empty Copy()

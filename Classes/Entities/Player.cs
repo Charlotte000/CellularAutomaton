@@ -13,7 +13,8 @@ public class Player : Entity
     static Player()
     {
         using var renderTexture = new RenderTexture(19, 39);
-        renderTexture.Draw(new RectangleShape(new Vector2f(19, 39)) { FillColor = Color.Red });
+        using var shape = new RectangleShape(new Vector2f(19, 39)) { FillColor = Color.Red };
+        renderTexture.Draw(shape);
         renderTexture.Display();
         Player.SpriteSource = new Sprite(new Texture(renderTexture.Texture));
     }

@@ -84,7 +84,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
         this.CollisionBox.Position = ownerPosition;
 
-        var direction = mousePosition - ownerPosition;
-        this.Vel = direction.Normalize() * this.ThrowMag;
+        var direction = (mousePosition - ownerPosition) / 20;
+        this.Vel = direction.Constrain(this.ThrowMag);
     }
 }

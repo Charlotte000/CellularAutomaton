@@ -132,7 +132,7 @@ public static class AABBCollision // ToDo: rect origin
         }
 
         // Expand target rectangle by source dimensions
-        var expandedTarget = new RectangleShape(staticEntity.CollisionBox.Size + movingEntity.CollisionBox.Size)
+        using var expandedTarget = new RectangleShape(staticEntity.CollisionBox.Size + movingEntity.CollisionBox.Size)
         {
             Position = staticEntity.CollisionBox.Position - staticEntity.CollisionBox.Origin - (movingEntity.CollisionBox.Size / 2),
         };

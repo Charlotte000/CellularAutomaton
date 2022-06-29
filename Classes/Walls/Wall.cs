@@ -25,7 +25,12 @@ public abstract class Wall : IGameObject
 
     public virtual void Draw(RenderTarget target, RenderStates states)
     {
-        target.Draw(this.Sprite, states);
+        var light = MathF.Max(0, MathF.Min(1, this.Chunk.LightMesh[this.Coord] / 255f));
+        var color = this.Sprite.Color;
+
+        using var sprite = new Sprite(this.Sprite)
+        { Color = new ((byte)(color.R * light), (byte)(color.G * light), (byte)(color.B * light)) };
+        target.Draw(sprite, states);
     }
 
     public virtual void OnCreate()

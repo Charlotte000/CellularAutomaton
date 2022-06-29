@@ -61,9 +61,7 @@ public class Tree : Block, ITimedEntity
         if (Scene.RandomGenerator.Next(0, 40) == 0)
         {
             this.Chunk.Scene.AddEntity(
-                new Leaf(this.CollisionBox.Position - this.CollisionBox.Origin + new Vector2f(
-                    this.CollisionBox.Size.X / 2,
-                    0)));
+                new Leaf(this.CollisionBox.Position + new Vector2f(this.CollisionBox.Size.X / 2, -160)));
         }
     }
 
