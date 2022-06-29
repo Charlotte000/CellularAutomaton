@@ -54,9 +54,6 @@ public class Tree : Block, ITimedEntity
 
     public override bool IsCollidable { get => false; }
 
-    public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(40, 200))
-    { Origin = new Vector2f(Block.Size / 2, 200 - Block.Size) };
-
     public override void OnFixedUpdate()
     {
         base.OnFixedUpdate();

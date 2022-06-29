@@ -6,6 +6,8 @@ public class EmptyWall : Wall
 {
     public override Sprite Sprite { get; }
 
+    public override bool IsIndestructible { get => true; }
+
     public override void Draw(RenderTarget target, RenderStates states)
     {
     }

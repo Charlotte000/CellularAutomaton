@@ -11,7 +11,9 @@ public abstract class Wall : IGameObject
 
     public virtual Sprite Sprite { get => Wall.SpriteSource; }
 
-    public RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
+    public virtual bool IsIndestructible { get => false; }
+
+    public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
     public Vector2i Coord { get; set; }
 
@@ -43,7 +45,7 @@ public abstract class Wall : IGameObject
         this.CollisionBox.Dispose();
     }
 
-    public virtual void OnCollision(IGameObject entity, Vector2f? contactNormal)
+    public virtual void OnCollision(IGameObject gameObject, Vector2f? contactNormal)
     {
     }
 

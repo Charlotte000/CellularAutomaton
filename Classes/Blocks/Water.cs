@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -31,6 +32,8 @@ public class Water : Block
     public override bool IsTransparent { get => true; }
 
     public override bool IsCollidable { get => false; }
+
+    public override bool IsIndestructible { get => true; }
 
     public int Amount { get; set; } = Water.MaxAmount;
 
@@ -68,13 +71,13 @@ public class Water : Block
         }
     }
 
-    public override void OnCollision(IGameObject entity, Vector2f? normal)
+    public override void OnCollision(IGameObject gameObject, Vector2f? normal)
     {
-        base.OnCollision(entity, normal);
+        base.OnCollision(gameObject, normal);
 
-        if (entity is ILivingEntity livingEntity)
+        if (gameObject is Entity entity)
         {
-            livingEntity.IsOnWater = true;
+            entity.IsOnWater = true;
         }
     }
 

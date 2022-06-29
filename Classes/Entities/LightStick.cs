@@ -27,6 +27,8 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
     public override float AirResistance { get => .99f; }
 
+    public override float WaterResistance { get => .87f; }
+
     public float ThrowMag { get => 7; }
 
     public IGameObject? ThrowOwner { get => this.Scene?.Entities[0]; }
@@ -65,7 +67,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
     {
         base.OnUpdate();
 
-        if (this.Vel.Y != 0)
+        if (!this.IsOnGround)
         {
             this.Angle += this.AngleVel;
         }

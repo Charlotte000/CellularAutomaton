@@ -6,6 +6,7 @@ using CellularAutomaton.Classes.Menus;
 using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -139,6 +140,8 @@ public class Scene
 
     public View Camera { get; set; }
 
+    public IGameObject? Nearest { get; set; }
+
     public Vector2i Coord { get => this.ChunkMesh.Grid[0, 0].Coord; }
 
     public Clock Clock { get; set; } = new Clock();
@@ -186,43 +189,28 @@ public class Scene
         block.CollisionBox.Position = (Vector2f)coords * Block.Size;
 
         // Attempt to build up an existing block
-        if (block is not Empty && (oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
-        {
-            return null;
-        }
-
-        // Attempt to remove water
-        if (block is Empty && oldBlock is Water)
-        {
-            return null;
-        }
-
-        // Attempt to delete an empty block
-        if (block is Empty && oldBlock is Empty)
+        if ((oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
         {
             return null;
         }
 
         // Attempt to build a levitating block
-        if (block is not Empty)
+        var hasNeighbour = false;
+        foreach (var delta in Scene.Neighborhood)
         {
-            var hasNeighbour = false;
-            foreach (var delta in Scene.Neighborhood)
+            var neighbourChunk = scene.ChunkMesh[coords + delta];
+            var neighbourBlock = neighbourChunk?.BlockMesh[coords + delta];
+            var neighbourWall = neighbourChunk?.WallMesh[coords + delta];
+            if (neighbourBlock is not Empty || neighbourWall is not EmptyWall)
             {
-                var neighbourChunk = scene.ChunkMesh[coords + delta];
-                var neighbourBlock = neighbourChunk?.BlockMesh[coords + delta];
-                var neighbourWall = neighbourChunk?.WallMesh[coords + delta];
-                if (neighbourBlock is not Empty || neighbourWall is not EmptyWall)
-                {
-                    hasNeighbour = true;
-                    break;
-                }
+                hasNeighbour = true;
+                break;
             }
+        }
 
-            if (!hasNeighbour)
-            {
-                return null;
-            }
+        if (!hasNeighbour)
+        {
+            return null;
         }
 
         // Attempt to build up an entity
@@ -238,7 +226,7 @@ public class Scene
         }
 
         // Water ejection
-        if (block is not Empty && block is not Water && oldBlock is Water oldBlockWater)
+        if (block is not Water && oldBlock is Water oldBlockWater)
         {
             if (Water.Push(this, oldBlockWater))
             {
@@ -309,6 +297,13 @@ public class Scene
             this.Window.Draw(entity, renderState);
         }
 
+        if (this.Nearest is not null)
+        {
+            using var rect = new RectangleShape(this.Nearest.CollisionBox)
+            { FillColor = Color.Transparent, OutlineColor = Color.Yellow, OutlineThickness = 1 };
+            this.Window.Draw(rect);
+        }
+
         // UI
         this.Window.SetView(this.Window.DefaultView);
 
@@ -344,20 +339,26 @@ public class Scene
 
         if (Mouse.IsButtonPressed(Mouse.Button.Right))
         {
-            if (Keyboard.IsKeyPressed(Keyboard.Key.LShift))
+            var isWall = Keyboard.IsKeyPressed(Keyboard.Key.LShift);
+            if (this.Nearest is null)
             {
-                var coord = this.GetMouseCoords();
-                var chunk = this.ChunkMesh[coord];
-                if (chunk is not null)
-                {
-                    var emptyWall = new EmptyWall();
-                    chunk.WallMesh[coord] = emptyWall;
-                    emptyWall.OnCreate();
-                }
+                return;
+            }
+
+            if (isWall)
+            {
+                var wall = (Wall)this.Nearest;
+                var empty = new EmptyWall();
+                wall.Chunk.WallMesh[wall.Coord] = empty;
+                empty.OnCreate();
             }
             else
             {
-                this.TrySetBlock(this, new Empty(), this.GetMouseCoords())?.OnCreate();
+                var block = (Block)this.Nearest;
+                var empty = new Empty();
+                block.Chunk.BlockMesh[block.Coord] = empty;
+                empty.OnCreate();
+                this.BlockHistory.SaveBlock(empty.Chunk, empty);
             }
         }
     }

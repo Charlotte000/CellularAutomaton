@@ -6,7 +6,7 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-public class Player : Entity, ILivingEntity
+public class Player : Entity
 {
     private static readonly Sprite SpriteSource;
 
@@ -24,9 +24,11 @@ public class Player : Entity, ILivingEntity
     }
 
     public override Vector2f Gravity
-    { get => new Vector2f(0, 1) * (this.IsOnWater ? .2f : 1) * (this.IsClimbing ? 0 : 1); }
+    { get => new Vector2f(0, 1) * (this.IsClimbing ? 0 : 1); }
 
-    public override float AirResistance { get => this.IsOnWater || this.IsClimbing ? .8f : .87f; }
+    public override float AirResistance { get => this.IsClimbing ? .8f : .87f; }
+
+    public override Vector2f WaterLift { get => new (0, -.7f); }
 
     public override float PressureOut { get => .05f; }
 
@@ -36,10 +38,6 @@ public class Player : Entity, ILivingEntity
 
     public override bool IsCollidable { get => true; }
 
-    public bool IsOnGround { get; set; } = false;
-
-    public bool IsOnWater { get; set; } = false;
-
     public bool IsClimbing { get; set; } = false;
 
     public override void OnUpdate()
@@ -48,15 +46,20 @@ public class Player : Entity, ILivingEntity
         base.OnUpdate();
     }
 
-    public override void OnCollision(IGameObject entity, Vector2f? contactNormal)
+    public override void OnCollision(IGameObject gameObject, Vector2f? contactNormal)
     {
-        base.OnCollision(entity, contactNormal);
-        this.IsOnGround |= contactNormal?.Y == -1 && entity.IsCollidable;
-        this.IsClimbing |= entity is Block block && block.IsClimbable;
+        base.OnCollision(gameObject, contactNormal);
+        this.IsClimbing |= gameObject is Block block && block.IsClimbable;
     }
 
     public override IGameObject Copy()
         => new Player(this.CollisionBox.Position.X, this.CollisionBox.Position.Y);
+
+    internal override void Collision()
+    {
+        this.IsClimbing = false;
+        base.Collision();
+    }
 
     private void Control()
     {
@@ -77,10 +80,10 @@ public class Player : Entity, ILivingEntity
 
         if (Keyboard.IsKeyPressed(Keyboard.Key.W) && (this.IsClimbing || this.IsOnWater))
         {
-            this.Vel += new Vector2f(0, -.7f);
+            this.Vel += new Vector2f(0, -1.7f);
         }
 
-        if (Keyboard.IsKeyPressed(Keyboard.Key.S) && (this.IsClimbing || this.IsOnWater))
+        if (Keyboard.IsKeyPressed(Keyboard.Key.S) && this.IsClimbing)
         {
             this.Vel += new Vector2f(0, .7f);
         }

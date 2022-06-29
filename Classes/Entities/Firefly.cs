@@ -30,6 +30,8 @@ public class Firefly : Entity, ILightSource
 
     public override float AirResistance { get => .9f; }
 
+    public override Vector2f WaterLift { get => new (0, -.7f); }
+
     public float AngleVel { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 10) - 5;
 
     public float Angle { get; set; } = Scene.RandomGenerator.Next(0, 360);

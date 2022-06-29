@@ -13,7 +13,9 @@ public interface IGameObject : IMonoBehaviour
 
     public bool IsCollidable { get; }
 
-    public void OnCollision(IGameObject entity, Vector2f? contactNormal);
+    public bool IsIndestructible { get; }
+
+    public void OnCollision(IGameObject gameObject, Vector2f? contactNormal);
 
     public void OnClick();
 

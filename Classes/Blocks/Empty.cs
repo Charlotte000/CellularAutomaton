@@ -11,6 +11,8 @@ public class Empty : Block
 
     public override bool IsCollidable { get => false; }
 
+    public override bool IsIndestructible { get => true; }
+
     public override void Draw(RenderTarget target, RenderStates states)
     {
         var wall = this.Chunk.WallMesh[this.Coord];

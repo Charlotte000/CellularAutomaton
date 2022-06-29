@@ -19,6 +19,12 @@ public static class VectorHelper
     public static Vector2f Normalize(this Vector2f v)
         => v / v.Mag();
 
+    public static Vector2f Constrain(this Vector2f v, float mag)
+    {
+        var currentMag = v.Mag();
+        return currentMag <= mag ? v : v / currentMag * mag;
+    }
+
     public static Vector2f Abs(this Vector2f v)
         => new (MathF.Abs(v.X), MathF.Abs(v.Y));
 

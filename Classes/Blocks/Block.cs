@@ -21,6 +21,8 @@ public abstract class Block : IGameObject
 
     public virtual bool IsClimbable { get => false; }
 
+    public virtual bool IsIndestructible { get => false; }
+
     public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
     public Vector2i Coord { get; set; }
@@ -71,7 +73,7 @@ public abstract class Block : IGameObject
     {
     }
 
-    public virtual void OnCollision(IGameObject entity, Vector2f? normal)
+    public virtual void OnCollision(IGameObject gameObject, Vector2f? normal)
     {
     }
 
@@ -91,6 +93,21 @@ public abstract class Block : IGameObject
             var coord = this.Coord + delta;
             var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
             if (block is Empty || (block is not null && (block.IsTransparent || !block.IsCollidable)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool HasNeighbour()
+    {
+        foreach (var delta in Scene.Neighborhood)
+        {
+            var coord = this.Coord + delta;
+            var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+            if (block is not Empty)
             {
                 return true;
             }

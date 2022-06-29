@@ -3,10 +3,12 @@
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Classes.Walls;
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 
-public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Block block, Wall wall)>
+public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wall>, IEnumerable<(Block block, Wall wall)>
 {
     public ChunkMesh(Scene scene)
         : base(scene, new Vector2i(4, 4))
@@ -62,6 +64,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
     public override void OnUpdate()
     {
         this.Move();
+        this.UpdateNearest(!Keyboard.IsKeyPressed(Keyboard.Key.LShift));
 
         foreach (var chunk in this.Grid)
         {
@@ -76,6 +79,17 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
             foreach (var block in chunk.BlockMesh.Grid)
             {
                 yield return block;
+            }
+        }
+    }
+
+    IEnumerator<Wall> IEnumerable<Wall>.GetEnumerator()
+    {
+        foreach (var chunk in this.Grid)
+        {
+            foreach (var wall in chunk.WallMesh.Grid)
+            {
+                yield return wall;
             }
         }
     }
@@ -120,5 +134,45 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<(Bl
             ChunkMoveHelper.MoveChunksDown(this.Parent);
             return;
         }
+    }
+
+    private void UpdateNearest(bool isBlock = true)
+    {
+        var origin = this.Parent.Entities[0].CollisionBox.Position + (this.Parent.Entities[0].CollisionBox.Size / 2);
+        var direction = ((Vector2f)(this.Parent.GetMouseCoords() * Block.Size) +
+            (new Vector2f(Block.Size, Block.Size) / 2) - origin).Constrain(50);
+        var buffer = new List<(float time, IGameObject gameObject)>();
+
+        foreach (var chunk in this)
+        {
+            for (int x = 0; x < Chunk.Size.X; x++)
+            {
+                for (int y = 0; y < Chunk.Size.Y; y++)
+                {
+                    var block = chunk.BlockMesh.Grid[x, y];
+                    if (!isBlock && !block.IsTransparent)
+                    {
+                        continue;
+                    }
+
+                    IGameObject gameObject = isBlock ? block : chunk.WallMesh.Grid[x, y];
+                    if (chunk.VisibilityMesh.Grid[x, y] && !gameObject.IsIndestructible)
+                    {
+                        using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
+                        { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
+                        if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
+                        {
+                            if (time >= 0 && time < 1)
+                            {
+                                buffer.Add((time, gameObject));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        buffer.Sort((item1, item2) => item1.time.CompareTo(item2.time));
+        this.Parent.Nearest = buffer.Count > 0 ? buffer[0].gameObject : null;
     }
 }

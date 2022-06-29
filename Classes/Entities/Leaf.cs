@@ -30,6 +30,8 @@ public class Leaf : Entity
 
     public override float AirResistance { get => .7f; }
 
+    public override float WaterResistance { get => .5f; }
+
     public override float PressureIn { get => 1; }
 
     public float AngleVel { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 10) - 5;

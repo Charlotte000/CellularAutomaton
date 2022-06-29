@@ -16,11 +16,23 @@ public abstract class Entity : IGameObject
 
     public virtual float AirResistance { get => .8f; }
 
+    public virtual float WaterResistance { get => .75f; }
+
+    public virtual Vector2f WaterLift { get => new (0, 0); }
+
     public virtual Vector2f Gravity { get => new (0, .1f); }
 
     public virtual Sprite Sprite { get => Entity.SpriteSource; }
 
     public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(20, 20));
+
+    public virtual bool IsCollidable { get => false; }
+
+    public virtual bool IsIndestructible { get => false; }
+
+    public bool IsOnWater { get; set; }
+
+    public bool IsOnGround { get; set; }
 
     public Vector2f Vel { get; set; }
 
@@ -31,8 +43,6 @@ public abstract class Entity : IGameObject
         get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
         set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
     }
-
-    public virtual bool IsCollidable { get => false; }
 
     public abstract IGameObject Copy();
 
@@ -54,8 +64,9 @@ public abstract class Entity : IGameObject
     {
     }
 
-    public virtual void OnCollision(IGameObject entity, Vector2f? contactNormal)
+    public virtual void OnCollision(IGameObject gameObject, Vector2f? contactNormal)
     {
+        this.IsOnGround |= contactNormal?.Y == -1 && gameObject.IsCollidable;
     }
 
     public virtual void OnCreate()
@@ -92,7 +103,7 @@ public abstract class Entity : IGameObject
             }
         }
 
-        this.Vel += this.Gravity;
+        this.Vel += this.Gravity + (this.IsOnWater ? this.WaterLift : new (0, 0));
 
         var coord = this.Coord;
         if (this.PressureIn != 0)
@@ -100,7 +111,7 @@ public abstract class Entity : IGameObject
             this.Vel += this.Scene.ChunkMesh[coord]?.PressureMesh[coord] * this.PressureIn ?? new Vector2f(0, 0);
         }
 
-        this.Vel *= this.AirResistance;
+        this.Vel *= this.IsOnWater ? this.WaterResistance : this.AirResistance;
 
         this.Collision();
         this.CollisionBox.Position += this.Vel;
@@ -115,14 +126,10 @@ public abstract class Entity : IGameObject
         }
     }
 
-    internal void Collision()
+    internal virtual void Collision()
     {
-        if (this is ILivingEntity living)
-        {
-            living.IsOnGround = false;
-            living.IsOnWater = false;
-            living.IsClimbing = false;
-        }
+        this.IsOnWater = false;
+        this.IsOnGround = false;
 
         var entities = new List<IGameObject>();
         var coord = (this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size;
