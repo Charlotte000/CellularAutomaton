@@ -41,7 +41,8 @@ public abstract class Entity : IGameObject
     public Vector2i Coord
     {
         get => (Vector2i)((this.CollisionBox.Position + (this.CollisionBox.Size / 2)) / Block.Size);
-        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) - (this.CollisionBox.Size / 2);
+        set => this.CollisionBox.Position = (Vector2f)(value * Block.Size) -
+            (this.CollisionBox.Size / 2) + (new Vector2f(Block.Size, Block.Size) / 2);
     }
 
     public abstract IGameObject Copy();

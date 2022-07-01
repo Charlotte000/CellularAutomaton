@@ -37,7 +37,7 @@ public class Scene
     {
         this.TerrainGenerator.Scene = this;
 
-        this.AddEntity(new Player(0, 0));
+        this.AddEntity(new Player());
 
         // Generate terrain
         this.ChunkMesh = new (this);
@@ -60,7 +60,15 @@ public class Scene
             new FPSMenu(this.Window, new Vector2f(0, 0), new Vector2f(20, 20)),
         };
 
-        // Click event listener
+        // Event listener
+        this.Window.KeyPressed += (s, e) =>
+        {
+            if (e.Code == Keyboard.Key.LControl)
+            {
+                this.DiggerMode = !this.DiggerMode;
+            }
+        };
+
         this.Window.MouseButtonPressed += (s, e) =>
         {
             if (e.Button == Mouse.Button.Left)
@@ -71,7 +79,6 @@ public class Scene
                     var coord = this.GetMouseCoords();
                     var newMoving = (Entity)moving.Copy();
                     newMoving.Coord = coord;
-
                     this.AddEntity(newMoving);
                 }
                 else
@@ -144,6 +151,12 @@ public class Scene
     public Vector2i Coord { get => this.ChunkMesh.Grid[0, 0].Coord; }
 
     public Clock Clock { get; set; } = new Clock();
+
+    public bool WallMode { get => Keyboard.IsKeyPressed(Keyboard.Key.LShift); }
+
+    public bool DiggerMode { get; set; } = true;
+
+    public float BuildingDistance { get => 100; }
 
     public void Run()
     {
@@ -249,8 +262,13 @@ public class Scene
         return block;
     }
 
-    public void AddEntity(Entity entity)
+    public void AddEntity(Entity entity, Vector2f? position = null)
     {
+        if (position.HasValue)
+        {
+            entity.CollisionBox.Position = position.Value;
+        }
+
         entity.Scene = this;
         this.Entities.Add(entity);
         entity.OnCreate();
@@ -338,22 +356,14 @@ public class Scene
 
         if (Mouse.IsButtonPressed(Mouse.Button.Right))
         {
-            var isWall = Keyboard.IsKeyPressed(Keyboard.Key.LShift);
-            if (this.Nearest is null)
+            if (this.Nearest is Wall wall)
             {
-                return;
-            }
-
-            if (isWall)
-            {
-                var wall = (Wall)this.Nearest;
                 var empty = new EmptyWall();
                 wall.Chunk.WallMesh[wall.Coord] = empty;
                 empty.OnCreate();
             }
-            else
+            else if (this.Nearest is Block block)
             {
-                var block = (Block)this.Nearest;
                 var empty = new Empty();
                 block.Chunk.BlockMesh[block.Coord] = empty;
                 empty.OnCreate();

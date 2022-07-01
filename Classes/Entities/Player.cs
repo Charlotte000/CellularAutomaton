@@ -19,15 +19,10 @@ public class Player : Entity
         Player.SpriteSource = new Sprite(new Texture(renderTexture.Texture));
     }
 
-    public Player(float x, float y)
-    {
-        this.CollisionBox.Position = new Vector2f(x, y);
-    }
-
     public override Vector2f Gravity
     { get => new Vector2f(0, 1) * (this.IsClimbing ? 0 : 1); }
 
-    public override float AirResistance { get => this.IsClimbing ? .8f : .87f; }
+    public override float AirResistance { get => this.IsClimbing ? .7f : .87f; }
 
     public override Vector2f WaterLift { get => new (0, -.7f); }
 
@@ -54,7 +49,7 @@ public class Player : Entity
     }
 
     public override IGameObject Copy()
-        => new Player(this.CollisionBox.Position.X, this.CollisionBox.Position.Y);
+        => new Player();
 
     internal override void Collision()
     {

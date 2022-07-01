@@ -10,11 +10,6 @@ public class Leaf : Entity
     private static readonly Sprite SpriteSource = new (Scene.Texture, new (320, 84, 5, 5))
     { Origin = new (2.5f, 2.5f) };
 
-    public Leaf(Vector2f position)
-    {
-        this.CollisionBox.Position = position;
-    }
-
     public override Sprite Sprite
     {
         get
@@ -68,5 +63,5 @@ public class Leaf : Entity
     }
 
     public override IGameObject Copy()
-        => new Leaf(this.CollisionBox.Position);
+        => new Leaf();
 }

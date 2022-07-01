@@ -25,7 +25,7 @@ public class BlockMesh : Mesh<Block, Chunk>
         {
             if (this.IsValidCoord(x, y))
             {
-                this[x, y]?.OnDestroy();
+                this.Grid[x - this.Coord.X, y - this.Coord.Y]?.OnDestroy();
 
                 value!.Coord = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
@@ -62,6 +62,8 @@ public class BlockMesh : Mesh<Block, Chunk>
 
     public override void OnUpdate()
     {
+        base.OnUpdate();
+
         foreach (var block in this.Grid)
         {
             block.WasUpdated = false;
@@ -79,6 +81,8 @@ public class BlockMesh : Mesh<Block, Chunk>
 
     public override void OnFixedUpdate()
     {
+        base.OnFixedUpdate();
+
         foreach (var block in this.Grid)
         {
             block.WasUpdated = false;
@@ -96,6 +100,8 @@ public class BlockMesh : Mesh<Block, Chunk>
 
     public override void OnDestroy()
     {
+        base.OnDestroy();
+
         foreach (var block in this.Grid)
         {
             block.OnDestroy();

@@ -19,6 +19,7 @@ public abstract class Mesh<TValue, TParent> : IMesh, IEnumerable<TValue>, Drawab
     {
         this.Grid = new TValue[size.X, size.Y];
         this.Parent = parent;
+        this.OnCreate();
     }
 
     public TParent Parent { get; set; }

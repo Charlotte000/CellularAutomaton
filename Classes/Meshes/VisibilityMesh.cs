@@ -13,6 +13,8 @@ public class VisibilityMesh : Mesh<bool, Chunk>
 
     public override void OnUpdate()
     {
+        base.OnUpdate();
+
         var blockSize = new Vector2f(Block.Size, Block.Size);
         var viewRect = new FloatRect(
             this.Parent.Scene.Camera.Center - (this.Parent.Scene.Camera.Size / 2) - blockSize,

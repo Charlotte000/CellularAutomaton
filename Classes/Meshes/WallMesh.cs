@@ -25,7 +25,7 @@ public class WallMesh : Mesh<Wall, Chunk>
         {
             if (this.IsValidCoord(x, y))
             {
-                this[x, y]?.OnDestroy();
+                this.Grid[x - this.Coord.X, y - this.Coord.Y]?.OnDestroy();
 
                 value!.Coord = new Vector2i(x, y);
                 value.CollisionBox.Position = (Vector2f)value.Coord * Block.Size;
@@ -41,17 +41,23 @@ public class WallMesh : Mesh<Wall, Chunk>
         {
             for (int y = 0; y < this.Height; y++)
             {
-                if (this.Parent.VisibilityMesh.Grid[x, y])
+                if (this.Parent.VisibilityMesh.Grid[x, y] && this.Parent.BlockMesh.Grid[x, y].IsTransparent)
                 {
-                    var block = this.Parent.BlockMesh.Grid[x, y];
-                    if (block.IsTransparent)
-                    {
-                        var wallRenderState = new RenderStates(states);
-                        wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coord * Block.Size);
-                        target.Draw(this.Grid[x, y], wallRenderState);
-                    }
+                    var wallRenderState = new RenderStates(states);
+                    wallRenderState.Transform.Translate((Vector2f)this.Grid[x, y].Coord * Block.Size);
+                    target.Draw(this.Grid[x, y], wallRenderState);
                 }
             }
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        foreach (var wall in this.Grid)
+        {
+            wall.OnDestroy();
         }
     }
 }

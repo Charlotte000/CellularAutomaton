@@ -57,7 +57,7 @@ public class TerrainGenerator
                 {
                     if (Scene.RandomGenerator.Next(0, 1000) == 0)
                     {
-                        chunk.Scene.AddEntity(new Firefly(new Vector2f(x + chunk.Coord.X, y) * Block.Size));
+                        chunk.Scene.AddEntity(new Firefly(), new Vector2f(x + chunk.Coord.X, y) * Block.Size);
                     }
                 }
             }

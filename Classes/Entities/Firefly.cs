@@ -10,11 +10,6 @@ public class Firefly : Entity, ILightSource
     private static readonly Sprite SpriteSource = new (Scene.Texture, new (330, 80, 4, 4))
     { Origin = new Vector2f(2, 2) };
 
-    public Firefly(Vector2f position)
-    {
-        this.CollisionBox.Position = position;
-    }
-
     public override Sprite Sprite
     {
         get
@@ -39,7 +34,7 @@ public class Firefly : Entity, ILightSource
     public int Brightness { get => 200; }
 
     public override IGameObject Copy()
-        => new Firefly(this.CollisionBox.Position);
+        => new Firefly();
 
     public override void OnUpdate()
     {

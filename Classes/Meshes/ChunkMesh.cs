@@ -53,22 +53,36 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
         }
     }
 
+    public override void OnUpdate()
+    {
+        base.OnUpdate();
+
+        this.Move();
+        this.UpdateNearest();
+
+        foreach (var chunk in this.Grid)
+        {
+            chunk.OnUpdate();
+        }
+    }
+
     public override void OnFixedUpdate()
     {
+        base.OnFixedUpdate();
+
         foreach (var chunk in this.Grid)
         {
             chunk.OnFixedUpdate();
         }
     }
 
-    public override void OnUpdate()
+    public override void OnDestroy()
     {
-        this.Move();
-        this.UpdateNearest(!Keyboard.IsKeyPressed(Keyboard.Key.LShift));
+        base.OnDestroy();
 
         foreach (var chunk in this.Grid)
         {
-            chunk.OnUpdate();
+            chunk.OnDestroy();
         }
     }
 
@@ -136,37 +150,58 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
         }
     }
 
-    private void UpdateNearest(bool isBlock = true)
+    private void UpdateNearest()
     {
+        var wallMode = this.Parent.WallMode;
+
         var origin = this.Parent.Entities[0].CollisionBox.Position + (this.Parent.Entities[0].CollisionBox.Size / 2);
-        var direction = ((Vector2f)(this.Parent.GetMouseCoords() * Block.Size) +
-            (new Vector2f(Block.Size, Block.Size) / 2) - origin).Constrain(50);
+        var direction = (Vector2f)(this.Parent.GetMouseCoords() * Block.Size) +
+            (new Vector2f(Block.Size, Block.Size) / 2) - origin;
+
+        if (!this.Parent.DiggerMode)
+        {
+            if (direction.MagSq() <= this.Parent.BuildingDistance * this.Parent.BuildingDistance)
+            {
+                var coord = this.Parent.GetMouseCoords();
+                var block = this[coord]?.BlockMesh[coord];
+                if (block is null || (wallMode && !block.IsTransparent))
+                {
+                    this.Parent.Nearest = null;
+                    return;
+                }
+
+                IGameObject? gameObject = !wallMode ? block.Chunk?.BlockMesh[coord] : block.Chunk?.WallMesh[coord];
+                this.Parent.Nearest = gameObject is null || !gameObject.IsIndestructible ? gameObject : null;
+            }
+            else
+            {
+                this.Parent.Nearest = null;
+            }
+
+            return;
+        }
+
+        direction = direction.Constrain(this.Parent.BuildingDistance);
         var buffer = new List<(float time, IGameObject gameObject)>();
 
-        foreach (var chunk in this)
+        foreach (var block in this as IEnumerable<Block>)
         {
-            for (int x = 0; x < Chunk.Size.X; x++)
+            if (wallMode && !block.IsTransparent)
             {
-                for (int y = 0; y < Chunk.Size.Y; y++)
-                {
-                    var block = chunk.BlockMesh.Grid[x, y];
-                    if (!isBlock && !block.IsTransparent)
-                    {
-                        continue;
-                    }
+                continue;
+            }
 
-                    IGameObject gameObject = isBlock ? block : chunk.WallMesh.Grid[x, y];
-                    if (chunk.VisibilityMesh.Grid[x, y] && !gameObject.IsIndestructible)
+            var localCoord = block.Coord - block.Chunk.Coord;
+            IGameObject gameObject = !wallMode ? block : block.Chunk.WallMesh.Grid[localCoord.X, localCoord.Y];
+            if (block.Chunk.VisibilityMesh.Grid[localCoord.X, localCoord.Y] && !gameObject.IsIndestructible)
+            {
+                using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
+                { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
+                if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
+                {
+                    if (time < 1)
                     {
-                        using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
-                        { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
-                        if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
-                        {
-                            if (time < 1)
-                            {
-                                buffer.Add((time, gameObject));
-                            }
-                        }
+                        buffer.Add((time, gameObject));
                     }
                 }
             }
