@@ -1,5 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
@@ -89,6 +90,11 @@ public abstract class Block : IGameObject
 
     public bool HasNeighbour()
     {
+        if (this.Chunk.WallMesh[this.Coord] is not EmptyWall)
+        {
+            return true;
+        }
+
         foreach (var delta in Scene.Neighborhood)
         {
             var coord = this.Coord + delta;

@@ -37,15 +37,22 @@ public class Water : Block
 
     public int Amount { get; set; } = Water.MaxAmount;
 
-    public static bool Push(Scene scene, Water water)
+    public bool Push()
     {
-        var coord = water.Coord + new Vector2i(0, -1);
-        var block = scene.ChunkMesh[coord]?.BlockMesh[coord];
-        if (block is Empty || block is Water)
+        for (var dy = -1; dy > -10; dy--)
         {
-            if (Water.Push(scene, block, water.Amount))
+            var coord = this.Coord + new Vector2i(0, dy);
+            var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
+
+            if (block is null || block.IsCollidable)
             {
-                water.Chunk.BlockMesh[water.Coord] = new Empty();
+                return false;
+            }
+
+            if (block is Empty)
+            {
+                block.Chunk.BlockMesh[block.Coord] = this.Copy();
+                this.Chunk.BlockMesh[this.Coord] = new Empty();
                 return true;
             }
         }
@@ -88,42 +95,6 @@ public class Water : Block
             Amount = this.Amount,
             WasUpdated = this.WasUpdated,
         };
-
-    private static bool Push(Scene scene, Block block, int amount)
-    {
-        if (amount <= 0)
-        {
-            return true;
-        }
-
-        if (block is Empty)
-        {
-            block.Chunk.BlockMesh[block.Coord] = new Water() { WasUpdated = true, Amount = amount };
-            return true;
-        }
-
-        if (block is Water waterBlock)
-        {
-            if (waterBlock.Amount + amount <= Water.MaxAmount)
-            {
-                waterBlock.Amount += amount;
-                return true;
-            }
-
-            var coord = block.Coord + new Vector2i(0, -1);
-            var neighbour = scene.ChunkMesh[coord]?.BlockMesh[coord];
-            if (neighbour is Water || neighbour is Empty)
-            {
-                if (Water.Push(scene, neighbour, amount - Water.MaxAmount + waterBlock.Amount))
-                {
-                    waterBlock.Amount = Water.MaxAmount;
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     private bool FallDown()
     {

@@ -198,7 +198,9 @@ public class Scene
         }
 
         var oldBlock = chunk.BlockMesh[coords];
+        block.Coord = coords;
         block.CollisionBox.Position = (Vector2f)coords * Block.Size;
+        block.Chunk = chunk;
 
         // Attempt to build up an existing block
         if ((oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
@@ -207,20 +209,7 @@ public class Scene
         }
 
         // Attempt to build a levitating block
-        var hasNeighbour = false;
-        foreach (var delta in Scene.Neighborhood)
-        {
-            var neighbourChunk = scene.ChunkMesh[coords + delta];
-            var neighbourBlock = neighbourChunk?.BlockMesh[coords + delta];
-            var neighbourWall = neighbourChunk?.WallMesh[coords + delta];
-            if (neighbourBlock is not Empty || neighbourWall is not EmptyWall)
-            {
-                hasNeighbour = true;
-                break;
-            }
-        }
-
-        if (!hasNeighbour)
+        if (!block.HasNeighbour())
         {
             return null;
         }
@@ -240,16 +229,10 @@ public class Scene
         // Water ejection
         if (block is not Water && oldBlock is Water oldBlockWater)
         {
-            if (Water.Push(this, oldBlockWater))
+            if (!oldBlockWater.Push())
             {
-                chunk.BlockMesh[coords] = block;
-                if (saveToHistory)
-                {
-                    this.BlockHistory.SaveBlock(oldBlock.Chunk, block);
-                }
+                return null;
             }
-
-            return block;
         }
 
         // Creating block
