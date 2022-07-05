@@ -6,7 +6,6 @@ using CellularAutomaton.Classes.Walls;
 using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
 
 public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wall>, IEnumerable<(Block block, Wall wall)>
 {
@@ -182,6 +181,9 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
         }
 
         direction = direction.Constrain(this.Parent.BuildingDistance);
+
+        var minTime = float.MaxValue;
+        IGameObject? selected = null;
         var buffer = new List<(float time, IGameObject gameObject)>();
 
         foreach (var block in this as IEnumerable<Block>)
@@ -199,15 +201,15 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
                 { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
                 if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
                 {
-                    if (time < 1)
+                    if (time < 1 && time < minTime)
                     {
-                        buffer.Add((time, gameObject));
+                        minTime = time;
+                        selected = gameObject;
                     }
                 }
             }
         }
 
-        buffer.Sort((item1, item2) => item1.time.CompareTo(item2.time));
-        this.Parent.Nearest = buffer.Count > 0 ? buffer[0].gameObject : null;
+        this.Parent.Nearest = selected;
     }
 }

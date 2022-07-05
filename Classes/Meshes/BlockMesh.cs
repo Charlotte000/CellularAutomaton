@@ -1,7 +1,6 @@
 ﻿namespace CellularAutomaton.Classes.Meshes;
 
 using CellularAutomaton.Classes.Blocks;
-using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
