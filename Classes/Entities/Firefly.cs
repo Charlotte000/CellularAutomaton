@@ -31,7 +31,7 @@ public class Firefly : Entity, ILightSource
 
     public float Angle { get; set; } = Scene.RandomGenerator.Next(0, 360);
 
-    public int Brightness { get => 200; }
+    public int Brightness { get => 200 + Scene.RandomGenerator.Next(0, 20); }
 
     public override IGameObject Copy()
         => new Firefly();

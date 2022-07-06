@@ -189,21 +189,20 @@ public class Scene
         return mouseCoord.Floor();
     }
 
-    public Block? TrySetBlock(Scene scene, Block block, Vector2i coords, bool saveToHistory = true)
+    public Block? TrySetBlock(Block block, Vector2i coords)
     {
-        var chunk = this.ChunkMesh[coords];
-        if (chunk is null)
+        var oldBlock = this.ChunkMesh[coords]?.BlockMesh[coords];
+        if (oldBlock is null)
         {
             return null;
         }
 
-        var oldBlock = chunk.BlockMesh[coords];
         block.Coord = coords;
         block.CollisionBox.Position = (Vector2f)coords * Block.Size;
-        block.Chunk = chunk;
+        block.Chunk = oldBlock.Chunk;
 
         // Attempt to build up an existing block
-        if ((oldBlock is null || oldBlock is not Empty) && oldBlock is not Water)
+        if (oldBlock is not Empty && oldBlock is not Empty)
         {
             return null;
         }
@@ -236,12 +235,8 @@ public class Scene
         }
 
         // Creating block
-        chunk.BlockMesh[coords] = block;
-        if (saveToHistory)
-        {
-            this.BlockHistory.SaveBlock(chunk, block);
-        }
-
+        oldBlock.Chunk.BlockMesh[coords] = block;
+        this.BlockHistory.SaveBlock(oldBlock.Chunk, block);
         return block;
     }
 
@@ -327,7 +322,7 @@ public class Scene
             var entity = ((InventoryMenu)this.menu[0]).GetValue();
             if (entity is Block block)
             {
-                this.TrySetBlock(this, (Block)block.Copy(), coord)?.OnCreate();
+                this.TrySetBlock((Block)block.Copy(), coord)?.OnCreate();
             }
             else if (entity is Wall wall)
             {

@@ -51,7 +51,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
         {
             var deltaFull = this.LifeTimeEnd - this.LifeTimeStart;
             var delta = this.LifeTimeEnd - this.Scene.Clock.ElapsedTime.AsSeconds();
-            return (int)(300 * delta / deltaFull);
+            return (int)((300 * delta / deltaFull) + Scene.RandomGenerator.Next(0, 5));
         }
     }
 
