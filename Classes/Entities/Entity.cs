@@ -77,7 +77,7 @@ public abstract class Entity : IGameObject
 
         if (this is IThrowable throwable)
         {
-            throwable.Throw((Vector2f)this.Scene.GetMouseCoords() * Block.Size);
+            throwable.Throw(this.Scene.GetMousePosition());
         }
     }
 

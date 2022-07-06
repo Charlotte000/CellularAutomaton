@@ -37,7 +37,7 @@ public class Scene
     {
         this.TerrainGenerator.Scene = this;
 
-        this.AddEntity(new Player());
+        this.AddEntity(new Player(), new (0, 0));
 
         // Generate terrain
         this.ChunkMesh = new (this);
@@ -76,10 +76,7 @@ public class Scene
                 var entity = ((InventoryMenu)this.menu[0]).GetValue();
                 if (entity is Entity moving)
                 {
-                    var coord = this.GetMouseCoords();
-                    var newMoving = (Entity)moving.Copy();
-                    newMoving.Coord = coord;
-                    this.AddEntity(newMoving);
+                    this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
                 }
                 else
                 {
@@ -189,6 +186,14 @@ public class Scene
         return mouseCoord.Floor();
     }
 
+    public Vector2f GetMousePosition()
+    {
+        var scale = this.Camera.Size.Div((Vector2f)this.Window.Size);
+        var mousePos = (Vector2f)Mouse.GetPosition(this.Window);
+        var mouseWindow = mousePos.Mult(scale);
+        return mouseWindow + this.Camera.Center - (this.Camera.Size / 2);
+    }
+
     public Block? TrySetBlock(Block block, Vector2i coords)
     {
         var oldBlock = this.ChunkMesh[coords]?.BlockMesh[coords];
@@ -240,13 +245,9 @@ public class Scene
         return block;
     }
 
-    public void AddEntity(Entity entity, Vector2f? position = null)
+    public void AddEntity(Entity entity, Vector2f position)
     {
-        if (position.HasValue)
-        {
-            entity.CollisionBox.Position = position.Value;
-        }
-
+        entity.CollisionBox.Position = position;
         entity.Scene = this;
         this.Entities.Add(entity);
         entity.OnCreate();

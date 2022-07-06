@@ -154,8 +154,7 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
         var wallMode = this.Parent.WallMode;
 
         var origin = this.Parent.Entities[0].CollisionBox.Position + (this.Parent.Entities[0].CollisionBox.Size / 2);
-        var direction = (Vector2f)(this.Parent.GetMouseCoords() * Block.Size) +
-            (new Vector2f(Block.Size, Block.Size) / 2) - origin;
+        var direction = this.Parent.GetMousePosition() - origin;
 
         if (!this.Parent.DiggerMode)
         {
@@ -184,8 +183,6 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
 
         var minTime = float.MaxValue;
         IGameObject? selected = null;
-        var buffer = new List<(float time, IGameObject gameObject)>();
-
         foreach (var block in this as IEnumerable<Block>)
         {
             if (wallMode && !block.IsTransparent)
