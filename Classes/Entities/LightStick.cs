@@ -60,8 +60,8 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
         this.Scene.RemoveEntity(this);
     }
 
-    public override IGameObject Copy()
-        => new LightStick();
+    public override LightStick Copy()
+        => new ();
 
     public override void OnUpdate()
     {
@@ -80,7 +80,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
             return;
         }
 
-        var ownerPosition = this.ThrowOwner.CollisionBox.Position + (this.ThrowOwner.CollisionBox.Size / 2);
+        var ownerPosition = this.ThrowOwner.Center;
 
         this.CollisionBox.Position = ownerPosition;
 

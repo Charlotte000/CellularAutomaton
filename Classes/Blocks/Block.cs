@@ -27,6 +27,11 @@ public abstract class Block : IGameObject
 
     public Vector2i Coord { get; set; }
 
+    public Vector2f Center
+    {
+        get => this.CollisionBox.Position - this.CollisionBox.Origin + (this.CollisionBox.Size / 2);
+    }
+
     public bool WasUpdated { get; set; } = false;
 
     public Chunk Chunk { get; set; }

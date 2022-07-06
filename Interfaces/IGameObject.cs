@@ -11,6 +11,8 @@ public interface IGameObject : IMonoBehaviour
 
     public Vector2i Coord { get; set; }
 
+    public Vector2f Center { get; }
+
     public bool IsCollidable { get; }
 
     public bool IsIndestructible { get; }

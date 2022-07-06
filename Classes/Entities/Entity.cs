@@ -45,6 +45,12 @@ public abstract class Entity : IGameObject
             (this.CollisionBox.Size / 2) + (new Vector2f(Block.Size, Block.Size) / 2);
     }
 
+    public Vector2f Center
+    {
+        get => this.CollisionBox.Position - this.CollisionBox.Origin + (this.CollisionBox.Size / 2);
+        set => this.CollisionBox.Position = value + this.CollisionBox.Origin - (this.CollisionBox.Size / 2);
+    }
+
     public abstract IGameObject Copy();
 
     public virtual void Draw(RenderTarget target, RenderStates states)

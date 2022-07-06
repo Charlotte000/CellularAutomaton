@@ -17,6 +17,11 @@ public abstract class Wall : IGameObject
 
     public Vector2i Coord { get; set; }
 
+    public Vector2f Center
+    {
+        get => this.CollisionBox.Position - this.CollisionBox.Origin + (this.CollisionBox.Size / 2);
+    }
+
     public bool IsCollidable { get => false; }
 
     public Chunk Chunk { get; set; }
