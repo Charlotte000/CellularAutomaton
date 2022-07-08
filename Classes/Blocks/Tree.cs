@@ -5,7 +5,7 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Tree : Block, ITimedEntity
+public class Tree : Block, ITimedEntity, IClickable
 {
     private static readonly List<Sprite> SpriteSource = new ()
     {
@@ -66,15 +66,6 @@ public class Tree : Block, ITimedEntity
         }
     }
 
-    public override void OnClick()
-    {
-        base.OnClick();
-
-        this.isCutDown = true;
-        this.LifeTimeStart = this.Chunk.Scene.Clock.ElapsedTime.AsSeconds();
-        this.LifeTimeEnd = this.LifeTimeStart + this.LifeTime;
-    }
-
     public override Tree Copy()
         => new ()
         {
@@ -87,5 +78,12 @@ public class Tree : Block, ITimedEntity
     public void OnTimeOut()
     {
         this.isCutDown = false;
+    }
+
+    public void OnClick()
+    {
+        this.isCutDown = true;
+        this.LifeTimeStart = this.Chunk.Scene.Clock.ElapsedTime.AsSeconds();
+        this.LifeTimeEnd = this.LifeTimeStart + this.LifeTime;
     }
 }

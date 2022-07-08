@@ -2,9 +2,11 @@
 
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Interfaces;
+using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
 
+[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 public abstract class Wall : IGameObject
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new IntRect(60, 20, 20, 20));
@@ -15,6 +17,7 @@ public abstract class Wall : IGameObject
 
     public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size));
 
+    [JsonRequired]
     public Vector2i Coord { get; set; }
 
     public Vector2f Center
@@ -56,10 +59,6 @@ public abstract class Wall : IGameObject
     }
 
     public virtual void OnCollision(IGameObject gameObject, Vector2f? contactNormal)
-    {
-    }
-
-    public virtual void OnClick()
     {
     }
 }

@@ -1,9 +1,10 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public class Door : Block
+public class Door : Block, IClickable
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
@@ -74,33 +75,6 @@ public class Door : Block
         }
     }
 
-    public override void OnClick()
-    {
-        base.OnClick();
-
-        if (this.IsOpened)
-        {
-            foreach (var entity in this.Chunk.Scene.Entities)
-            {
-                if (entity.CollisionBox.GetGlobalBounds().Intersects(this.CollisionBox.GetGlobalBounds()))
-                {
-                    return;
-                }
-            }
-        }
-
-        this.IsOpened = !this.IsOpened;
-        if (this.upper is not null)
-        {
-            this.upper.IsOpened = this.IsOpened;
-        }
-
-        if (this.lower is not null)
-        {
-            this.lower.IsOpened = this.IsOpened;
-        }
-    }
-
     public override void OnDestroy()
     {
         base.OnDestroy();
@@ -129,4 +103,29 @@ public class Door : Block
             upper = this.upper,
             lower = this.lower,
         };
+
+    public void OnClick()
+    {
+        if (this.IsOpened)
+        {
+            foreach (var entity in this.Chunk.Scene.Entities)
+            {
+                if (entity.CollisionBox.GetGlobalBounds().Intersects(this.CollisionBox.GetGlobalBounds()))
+                {
+                    return;
+                }
+            }
+        }
+
+        this.IsOpened = !this.IsOpened;
+        if (this.upper is not null)
+        {
+            this.upper.IsOpened = this.IsOpened;
+        }
+
+        if (this.lower is not null)
+        {
+            this.lower.IsOpened = this.IsOpened;
+        }
+    }
 }

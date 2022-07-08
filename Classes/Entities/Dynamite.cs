@@ -63,7 +63,9 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
             {
                 if ((block.Center - dynamiteCenter).MagSq() <= blastRadiusSq)
                 {
-                    block.Chunk.BlockMesh[block.Coord] = new Empty();
+                    var empty = new Empty();
+                    block.Chunk.BlockMesh[block.Coord] = empty;
+                    this.Scene.BlockHistory.SaveBlock(block.Chunk, empty);
                 }
             }
         }

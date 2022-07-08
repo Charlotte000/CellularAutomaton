@@ -2,6 +2,7 @@
 
 using CellularAutomaton.Classes.Entities;
 using CellularAutomaton.Interfaces;
+using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
 
@@ -35,6 +36,7 @@ public class Water : Block
 
     public override bool IsIndestructible { get => true; }
 
+    [JsonRequired]
     public int Amount { get; set; } = Water.MaxAmount;
 
     public bool Push()

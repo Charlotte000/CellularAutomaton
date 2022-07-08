@@ -64,10 +64,6 @@ public abstract class Entity : IGameObject
         target.Draw(sprite, states);
     }
 
-    public virtual void OnClick()
-    {
-    }
-
     public virtual void OnCollision(IGameObject gameObject, Vector2f? contactNormal)
     {
         this.IsOnGround |= contactNormal?.Y == -1 && gameObject.IsCollidable;

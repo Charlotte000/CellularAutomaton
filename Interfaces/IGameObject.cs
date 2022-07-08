@@ -19,7 +19,5 @@ public interface IGameObject : IMonoBehaviour
 
     public void OnCollision(IGameObject gameObject, Vector2f? contactNormal);
 
-    public void OnClick();
-
     public IGameObject Copy();
 }

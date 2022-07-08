@@ -44,23 +44,28 @@ public class Scene
         foreach (var chunk in this.ChunkMesh)
         {
             this.TerrainGenerator.Generate(chunk);
+            this.BlockHistory.LoadChunk(chunk);
         }
 
         // Init window
         this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
         this.Window.SetFramerateLimit(60);
-        this.Window.Closed += (obj, e) => this.Window.Close();
 
         this.Camera = new View(this.Window.GetView());
 
         this.menu = new ()
         {
             new InventoryMenu(this.Window, new Vector2f(0, this.Window.Size.Y - 50), new Vector2f(this.Window.Size.X, 50)),
-            new PauseMenu(this.Window, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
+            new PauseMenu(this, this.Window, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
             new FPSMenu(this.Window, new Vector2f(0, 0), new Vector2f(20, 20)),
         };
 
         // Event listener
+        this.Window.Closed += (obj, e) =>
+        {
+            this.Window.Close();
+        };
+
         this.Window.KeyPressed += (s, e) =>
         {
             if (e.Code == Keyboard.Key.LControl)
@@ -73,14 +78,17 @@ public class Scene
         {
             if (e.Button == Mouse.Button.Left)
             {
-                var entity = ((InventoryMenu)this.menu[0]).GetValue();
-                if (entity is Entity moving)
+                if (this.Nearest is IClickable clickable)
                 {
-                    this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
+                    clickable.OnClick();
                 }
                 else
                 {
-                    this.Nearest?.OnClick();
+                    var entity = ((InventoryMenu)this.menu[0]).GetValue();
+                    if (entity is Entity moving)
+                    {
+                        this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
+                    }
                 }
             }
         };
@@ -129,7 +137,7 @@ public class Scene
         }) { IsBackground = true }.Start();
     }
 
-    public BlockHistory BlockHistory { get; set; } = new ();
+    public History BlockHistory { get; set; } = new ("data");
 
     public TerrainGenerator TerrainGenerator { get; set; } = new () { Seed = 125 };
 
@@ -207,7 +215,7 @@ public class Scene
         block.Chunk = oldBlock.Chunk;
 
         // Attempt to build up an existing block
-        if (oldBlock is not Empty && oldBlock is not Empty)
+        if (oldBlock is not Empty && oldBlock is not Water)
         {
             return null;
         }
@@ -313,23 +321,26 @@ public class Scene
     {
         if (Mouse.IsButtonPressed(Mouse.Button.Left))
         {
-            var coord = this.GetMouseCoords();
-            var chunk = this.ChunkMesh[coord];
-            if (chunk is null)
+            if (this.Nearest is not IClickable)
             {
-                return;
-            }
+                var coord = this.GetMouseCoords();
+                var chunk = this.ChunkMesh[coord];
+                if (chunk is null)
+                {
+                    return;
+                }
 
-            var entity = ((InventoryMenu)this.menu[0]).GetValue();
-            if (entity is Block block)
-            {
-                this.TrySetBlock((Block)block.Copy(), coord)?.OnCreate();
-            }
-            else if (entity is Wall wall)
-            {
-                var newWall = (Wall)wall.Copy();
-                chunk.WallMesh[coord] = newWall;
-                newWall.OnCreate();
+                var entity = ((InventoryMenu)this.menu[0]).GetValue();
+                if (entity is Block block)
+                {
+                    this.TrySetBlock((Block)block.Copy(), coord)?.OnCreate();
+                }
+                else if (entity is Wall wall)
+                {
+                    var newWall = (Wall)wall.Copy();
+                    chunk.WallMesh[coord] = newWall;
+                    newWall.OnCreate();
+                }
             }
         }
 

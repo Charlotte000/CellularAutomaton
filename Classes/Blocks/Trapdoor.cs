@@ -1,9 +1,11 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Interfaces;
+using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
 
-public class Trapdoor : Block
+public class Trapdoor : Block, IClickable
 {
     private static readonly Sprite[] SpriteSource = new Sprite[]
     {
@@ -23,12 +25,20 @@ public class Trapdoor : Block
 
     public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(Block.Size, Block.Size / 5));
 
+    [JsonRequired]
     public bool IsOpened { get; set; } = true;
 
-    public override void OnClick()
+    public override Trapdoor Copy()
+    => new ()
     {
-        base.OnClick();
+        CollisionBox = new RectangleShape(this.CollisionBox),
+        Coord = this.Coord,
+        WasUpdated = this.WasUpdated,
+        IsOpened = this.IsOpened,
+    };
 
+    public void OnClick()
+    {
         if (this.IsOpened)
         {
             foreach (var entity in this.Chunk.Scene.Entities)
@@ -44,13 +54,4 @@ public class Trapdoor : Block
 
         this.Chunk.Scene.BlockHistory.SaveBlock(this.Chunk, this);
     }
-
-    public override Trapdoor Copy()
-    => new ()
-    {
-        CollisionBox = new RectangleShape(this.CollisionBox),
-        Coord = this.Coord,
-        WasUpdated = this.WasUpdated,
-        IsOpened = this.IsOpened,
-    };
 }
