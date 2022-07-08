@@ -18,7 +18,7 @@ public class PauseMenu : Menu
             this,
             () =>
             {
-                scene.BlockHistory.SaveHistory(scene.ChunkMesh);
+                scene.History.SaveHistory();
                 this.IsActive = false;
             },
             "Save"));

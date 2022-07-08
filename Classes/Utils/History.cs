@@ -1,40 +1,55 @@
 ﻿namespace CellularAutomaton.Classes.Utils;
 
 using CellularAutomaton.Classes.Blocks;
-using CellularAutomaton.Classes.Meshes;
 using CellularAutomaton.Classes.Walls;
 using Newtonsoft.Json;
 using SFML.System;
+
+using BlockDictionary = Dictionary<SFML.System.Vector2i, Dictionary<SFML.System.Vector2i, Blocks.Block>>;
+using WallDictionary = Dictionary<SFML.System.Vector2i, Dictionary<SFML.System.Vector2i, Walls.Wall>>;
+
+using BlockPairs = IEnumerable<KeyValuePair<SFML.System.Vector2i, KeyValuePair<SFML.System.Vector2i, Blocks.Block>[]>>;
+using WallPairs = IEnumerable<KeyValuePair<SFML.System.Vector2i, KeyValuePair<SFML.System.Vector2i, Walls.Wall>[]>>;
 
 public class History
 {
     private static readonly JsonSerializerSettings Settings = new ()
     { TypeNameHandling = TypeNameHandling.Objects };
 
-    private readonly Dictionary<Vector2i, Dictionary<Vector2i, Block>> blockHistory = new ();
+    private readonly Scene scene;
 
-    public History(string? saveName = null)
+    private readonly BlockDictionary blockHistory = new ();
+
+    private readonly WallDictionary wallHistory = new ();
+
+    public History(Scene scene, string? saveName = null)
     {
-        if (saveName is null)
-        {
-            return;
-        }
+        this.scene = scene;
 
-        var data = File.ReadAllText(@$"..\..\..\Data\Saves\{saveName}.txt");
-        this.blockHistory = JsonConvert
-            .DeserializeObject<KeyValuePair<Vector2i, KeyValuePair<Vector2i, Block>[]>[]>(data, History.Settings) !
-            .ToDictionary(kv => kv.Key, kv => kv.Value.ToDictionary(kv2 => kv2.Key, kv2 => kv2.Value));
+        if (saveName is not null)
+        {
+            var data = File.ReadAllText(@$"..\..\..\Data\Saves\{saveName}.txt");
+            var (blocks, walls, seed, playerPosition) =
+                JsonConvert
+                .DeserializeObject<
+                    (BlockPairs blocks, WallPairs walls, long seed, Vector2f player)>(data, History.Settings);
+
+            this.blockHistory = History.ToDictionary(blocks);
+            this.wallHistory = History.ToDictionary(walls);
+            this.scene.TerrainSeed = seed;
+            this.scene.Entities[0].CollisionBox.Position = playerPosition;
+        }
     }
 
     public void SaveChunk(Chunk chunk)
     {
         if (this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory))
         {
-            foreach (var block in chunkHistory)
+            foreach (var (coord, block) in chunkHistory)
             {
-                if (block.Value is Water || block.Value is Tree)
+                if (block is Water || block is Tree)
                 {
-                    chunkHistory.Remove(block.Key);
+                    chunkHistory[coord] = new Empty();
                 }
             }
         }
@@ -47,55 +62,74 @@ public class History
         {
             if (block is Water || block is Tree)
             {
-                chunkHistory.Remove(block.Coord);
-                chunkHistory.Add(block.Coord, (Block)block.Copy());
+                chunkHistory[block.Coord] = (Block)block.Copy();
             }
         }
 
-        this.blockHistory.Remove(chunk.Coord);
-        this.blockHistory.Add(chunk.Coord, chunkHistory);
+        this.blockHistory[chunk.Coord] = chunkHistory;
     }
 
     public void LoadChunk(Chunk chunk)
     {
-        if (this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory))
+        if (this.blockHistory.TryGetValue(chunk.Coord, out var blocks))
         {
-            foreach (var (coord, block) in chunkHistory)
+            foreach (var (coord, block) in blocks)
             {
                 chunk.BlockMesh[coord] = (Block)block.Copy();
             }
         }
+
+        if (this.wallHistory.TryGetValue(chunk.Coord, out var walls))
+        {
+            foreach (var (coord, wall) in walls)
+            {
+                chunk.WallMesh[coord] = (Wall)wall.Copy();
+            }
+        }
     }
 
-    public void SaveBlock(Chunk chunk, Block block)
+    public void SaveBlock(Block block)
     {
-        this.blockHistory.TryGetValue(chunk.Coord, out var chunkHistory);
+        this.blockHistory.TryGetValue(block.Chunk.Coord, out var chunkHistory);
         if (chunkHistory is null)
         {
             chunkHistory = new ();
         }
 
-        chunkHistory.Remove(block.Coord);
-        chunkHistory.Add(block.Coord, (Block)block.Copy());
-
-        this.blockHistory.Remove(chunk.Coord);
-        this.blockHistory.Add(chunk.Coord, chunkHistory);
+        chunkHistory[block.Coord] = (Block)block.Copy();
+        this.blockHistory[block.Chunk.Coord] = chunkHistory;
     }
 
-    public void SaveHistory(ChunkMesh chunkMesh)
+    public void SaveWall(Wall wall)
     {
-        foreach (var chunk in chunkMesh)
+        this.wallHistory.TryGetValue(wall.Chunk.Coord, out var chunkHistory);
+        if (chunkHistory is null)
+        {
+            chunkHistory = new ();
+        }
+
+        chunkHistory[wall.Coord] = (Wall)wall.Copy();
+        this.wallHistory[wall.Chunk.Coord] = chunkHistory;
+    }
+
+    public void SaveHistory()
+    {
+        foreach (var chunk in this.scene.ChunkMesh)
         {
             this.SaveChunk(chunk);
         }
 
         var data = JsonConvert.SerializeObject(
-            this.blockHistory
-                .ToArray()
-                .Select(item =>
-                    new KeyValuePair<Vector2i, KeyValuePair<Vector2i, Block>[]>(item.Key, item.Value.ToArray())),
+            (History.ToPair(this.blockHistory), History.ToPair(this.wallHistory), this.scene.ChunkMesh.Parent.TerrainSeed, this.scene.ChunkMesh.Parent.Entities[0].CollisionBox.Position),
+            Formatting.Indented,
             History.Settings);
 
         File.WriteAllText(@"..\..\..\Data\Saves\data.txt", data);
     }
+
+    private static IEnumerable<KeyValuePair<Vector2i, KeyValuePair<Vector2i, T>[]>> ToPair<T>(Dictionary<Vector2i, Dictionary<Vector2i, T>> dict)
+        => dict.ToArray().Select(item => new KeyValuePair<Vector2i, KeyValuePair<Vector2i, T>[]>(item.Key, item.Value.ToArray()));
+
+    private static Dictionary<Vector2i, Dictionary<Vector2i, T>> ToDictionary<T>(IEnumerable<KeyValuePair<Vector2i, KeyValuePair<Vector2i, T>[]>> pairs)
+        => pairs.ToDictionary(kv => kv.Key, kv => kv.Value.ToDictionary(kv2 => kv2.Key, kv2 => kv2.Value));
 }

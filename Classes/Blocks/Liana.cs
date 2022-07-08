@@ -47,7 +47,7 @@ public class Liana : Block
 
             var newLiana = new Liana();
             chunk!.BlockMesh[coord] = newLiana;
-            this.Chunk.Scene.BlockHistory.SaveBlock(chunk, newLiana);
+            this.Chunk.Scene.History.SaveBlock(newLiana);
         }
     }
 }

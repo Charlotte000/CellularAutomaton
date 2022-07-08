@@ -65,7 +65,7 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
                 {
                     var empty = new Empty();
                     block.Chunk.BlockMesh[block.Coord] = empty;
-                    this.Scene.BlockHistory.SaveBlock(block.Chunk, empty);
+                    this.Scene.History.SaveBlock(empty);
                 }
             }
         }

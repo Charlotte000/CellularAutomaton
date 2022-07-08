@@ -33,7 +33,9 @@ public class Grass : Block
                 {
                     if (block.IsBoundary())
                     {
-                        block.Chunk.BlockMesh[block.Coord] = new Grass();
+                        var grass = new Grass();
+                        block.Chunk.BlockMesh[block.Coord] = grass;
+                        this.Chunk.Scene.History.SaveBlock(grass);
                         return;
                     }
                 }

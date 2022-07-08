@@ -45,7 +45,7 @@ public class Ladder : Block
 
             var newLadder = new Ladder();
             block.Chunk.BlockMesh[block.Coord] = newLadder;
-            this.Chunk.Scene.BlockHistory.SaveBlock(block.Chunk, newLadder);
+            this.Chunk.Scene.History.SaveBlock(newLadder);
         }
     }
 }

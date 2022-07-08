@@ -14,9 +14,12 @@ public class TerrainGenerator
 
     private readonly Level stone = new () { Average = 40, Dispersion = 25 };
 
-    public long Seed { get; set; }
+    private readonly long seed;
 
-    public Scene Scene { get; set; }
+    public TerrainGenerator(long seed)
+    {
+        this.seed = seed;
+    }
 
     public void Generate(Chunk chunk)
     {
@@ -29,9 +32,9 @@ public class TerrainGenerator
         var w = chunk.BlockMesh.Width;
         var h = chunk.BlockMesh.Height;
 
-        var heightGenerator = new NoiseGenerator(this.Seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
-        var vegetationGenerator = new NoiseGenerator(this.Seed + 1, .5, 3, new[] { 5, 3 }, false, Interpolations.Linear);
-        var stoneGenerator = new NoiseGenerator(this.Seed + 12, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
+        var heightGenerator = new NoiseGenerator(this.seed, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
+        var vegetationGenerator = new NoiseGenerator(this.seed + 1, .5, 3, new[] { 5, 3 }, false, Interpolations.Linear);
+        var stoneGenerator = new NoiseGenerator(this.seed + 12, .5, 3, new[] { 2, 2 }, false, Interpolations.Linear);
 
         var heightMap = new double[w, 1];
         heightGenerator.Fill(heightMap, new long[] { chunk.Coord.X / w, 0 });
@@ -116,7 +119,7 @@ public class TerrainGenerator
         var h = chunk.BlockMesh.Height;
 
         // Making caves
-        var caveGenerator = new NoiseGenerator(this.Seed + 123, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
+        var caveGenerator = new NoiseGenerator(this.seed + 123, .5, 3, new[] { 3, 5 }, false, Interpolations.Linear);
         var caveMap = new double[w, h];
 
         caveGenerator.Fill(caveMap, new long[] { chunk.Coord.X / w, chunk.Coord.Y / h });
@@ -132,7 +135,7 @@ public class TerrainGenerator
         }
 
         // Putting vegetation
-        var vegetationGenerator = new NoiseGenerator(this.Seed + 1234, .5, 3, new[] { 3, 3 }, false, Interpolations.Linear);
+        var vegetationGenerator = new NoiseGenerator(this.seed + 1234, .5, 3, new[] { 3, 3 }, false, Interpolations.Linear);
         var vegetationMap = new double[w, h];
 
         vegetationGenerator.Fill(vegetationMap, new long[] { chunk.Coord.X / w, chunk.Coord.Y / h });

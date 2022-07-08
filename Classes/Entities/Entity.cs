@@ -3,9 +3,11 @@
 using CellularAutomaton.Classes.Blocks;
 using CellularAutomaton.Classes.Utils;
 using CellularAutomaton.Interfaces;
+using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
 
+[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 public abstract class Entity : IGameObject
 {
     private static readonly Sprite SpriteSource = new (Scene.Texture, new (60, 20, 20, 20));
@@ -24,6 +26,7 @@ public abstract class Entity : IGameObject
 
     public virtual Sprite Sprite { get => Entity.SpriteSource; }
 
+    [JsonRequired]
     public virtual RectangleShape CollisionBox { get; set; } = new (new Vector2f(20, 20));
 
     public virtual bool IsCollidable { get => false; }
@@ -34,6 +37,7 @@ public abstract class Entity : IGameObject
 
     public bool IsOnGround { get; set; }
 
+    [JsonRequired]
     public Vector2f Vel { get; set; }
 
     public Scene Scene { get; set; }

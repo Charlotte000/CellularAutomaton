@@ -10,7 +10,7 @@ public static class ChunkMoveHelper
             {
                 if (x == scene.ChunkMesh.Width - 1)
                 {
-                    scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, y]);
+                    scene.History.SaveChunk(scene.ChunkMesh.Grid[x, y]);
                     scene.ChunkMesh.Grid[x, y].OnDestroy();
                 }
 
@@ -22,7 +22,7 @@ public static class ChunkMoveHelper
                     var oldY = scene.ChunkMesh.Grid[0, y].Coord.Y;
                     scene.ChunkMesh.Grid[0, y] = new Chunk(newX, oldY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[0, y]);
-                    scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[0, y]);
+                    scene.History.LoadChunk(scene.ChunkMesh.Grid[0, y]);
                 }
             }
         }
@@ -36,7 +36,7 @@ public static class ChunkMoveHelper
             {
                 if (x == 0)
                 {
-                    scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[0, y]);
+                    scene.History.SaveChunk(scene.ChunkMesh.Grid[0, y]);
                     scene.ChunkMesh.Grid[0, y].OnDestroy();
                 }
 
@@ -48,7 +48,7 @@ public static class ChunkMoveHelper
                     var oldY = scene.ChunkMesh.Grid[x + 1, y].Coord.Y;
                     scene.ChunkMesh.Grid[x + 1, y] = new Chunk(newX, oldY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x + 1, y]);
-                    scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x + 1, y]);
+                    scene.History.LoadChunk(scene.ChunkMesh.Grid[x + 1, y]);
                 }
             }
         }
@@ -62,7 +62,7 @@ public static class ChunkMoveHelper
             {
                 if (y == scene.ChunkMesh.Height - 1)
                 {
-                    scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, y]);
+                    scene.History.SaveChunk(scene.ChunkMesh.Grid[x, y]);
                     scene.ChunkMesh.Grid[x, y].OnDestroy();
                 }
 
@@ -74,7 +74,7 @@ public static class ChunkMoveHelper
                     var newY = scene.ChunkMesh.Grid[x, 0].Coord.Y - Chunk.Size.Y;
                     scene.ChunkMesh.Grid[x, 0] = new Chunk(oldX, newY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x, 0]);
-                    scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x, 0]);
+                    scene.History.LoadChunk(scene.ChunkMesh.Grid[x, 0]);
                 }
             }
         }
@@ -88,7 +88,7 @@ public static class ChunkMoveHelper
             {
                 if (y == 0)
                 {
-                    scene.BlockHistory.SaveChunk(scene.ChunkMesh.Grid[x, 0]);
+                    scene.History.SaveChunk(scene.ChunkMesh.Grid[x, 0]);
                     scene.ChunkMesh.Grid[x, 0].OnDestroy();
                 }
 
@@ -100,7 +100,7 @@ public static class ChunkMoveHelper
                     var newY = scene.ChunkMesh.Grid[x, y + 1].Coord.Y + Chunk.Size.Y;
                     scene.ChunkMesh.Grid[x, y + 1] = new Chunk(oldX, newY) { Scene = scene };
                     scene.TerrainGenerator.Generate(scene.ChunkMesh.Grid[x, y + 1]);
-                    scene.BlockHistory.LoadChunk(scene.ChunkMesh.Grid[x, y + 1]);
+                    scene.History.LoadChunk(scene.ChunkMesh.Grid[x, y + 1]);
                 }
             }
         }

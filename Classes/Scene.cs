@@ -35,16 +35,17 @@ public class Scene
 
     public Scene(uint windowWidth, uint windowHeight)
     {
-        this.TerrainGenerator.Scene = this;
-
         this.AddEntity(new Player(), new (0, 0));
 
+        this.History = new (this, "data");
+
         // Generate terrain
+        this.TerrainGenerator = new (this.TerrainSeed);
         this.ChunkMesh = new (this);
         foreach (var chunk in this.ChunkMesh)
         {
             this.TerrainGenerator.Generate(chunk);
-            this.BlockHistory.LoadChunk(chunk);
+            this.History.LoadChunk(chunk);
         }
 
         // Init window
@@ -137,9 +138,11 @@ public class Scene
         }) { IsBackground = true }.Start();
     }
 
-    public History BlockHistory { get; set; } = new ("data");
+    public History History { get; set; }
 
-    public TerrainGenerator TerrainGenerator { get; set; } = new () { Seed = 125 };
+    public long TerrainSeed { get; set; } = 125;
+
+    public TerrainGenerator TerrainGenerator { get; set; }
 
     public float Daylight { get; set; } = 1;
 
@@ -249,7 +252,7 @@ public class Scene
 
         // Creating block
         oldBlock.Chunk.BlockMesh[coords] = block;
-        this.BlockHistory.SaveBlock(oldBlock.Chunk, block);
+        this.History.SaveBlock(block);
         return block;
     }
 
@@ -340,6 +343,7 @@ public class Scene
                     var newWall = (Wall)wall.Copy();
                     chunk.WallMesh[coord] = newWall;
                     newWall.OnCreate();
+                    this.History.SaveWall(newWall);
                 }
             }
         }
@@ -351,13 +355,14 @@ public class Scene
                 var empty = new EmptyWall();
                 wall.Chunk.WallMesh[wall.Coord] = empty;
                 empty.OnCreate();
+                this.History.SaveWall(empty);
             }
             else if (this.Nearest is Block block)
             {
                 var empty = new Empty();
                 block.Chunk.BlockMesh[block.Coord] = empty;
                 empty.OnCreate();
-                this.BlockHistory.SaveBlock(empty.Chunk, empty);
+                this.History.SaveBlock(empty);
             }
         }
     }

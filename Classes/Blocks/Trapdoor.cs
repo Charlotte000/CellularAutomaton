@@ -52,6 +52,6 @@ public class Trapdoor : Block, IClickable
 
         this.IsOpened = !this.IsOpened;
 
-        this.Chunk.Scene.BlockHistory.SaveBlock(this.Chunk, this);
+        this.Chunk.Scene.History.SaveBlock(this);
     }
 }
