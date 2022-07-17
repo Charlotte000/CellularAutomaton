@@ -59,11 +59,9 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
         var blastRadiusSq = this.BlastRadius * this.BlastRadius;
         foreach (var block in this.Scene.ChunkMesh as IEnumerable<Block>)
         {
-            var delta = block.Center - dynamiteCenter;
-            if (delta.MagSq() <= blastRadiusSq)
+            if (!block.IsIndestructible)
             {
-                block.Chunk.PressureMesh[block.Coord] += delta.Normalize() * 2;
-                if (!block.IsIndestructible)
+                if ((block.Center - dynamiteCenter).MagSq() <= blastRadiusSq)
                 {
                     var empty = new Empty();
                     block.Chunk.BlockMesh[block.Coord] = empty;
