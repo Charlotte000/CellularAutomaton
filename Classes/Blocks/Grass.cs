@@ -23,9 +23,9 @@ public class Grass : Block
     {
         base.OnFixedUpdate();
 
-        if (Scene.RandomGenerator.Next(0, 3) == 0)
+        if (Application.RandomGenerator.Next(0, 3) == 0)
         {
-            foreach (var delta in Scene.ExpandedNeighborhood)
+            foreach (var delta in Application.ExpandedNeighborhood)
             {
                 var coord = this.Coord + delta;
                 var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];

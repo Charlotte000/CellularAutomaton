@@ -49,7 +49,7 @@ public class PressureMesh : Mesh<Vector2f, Chunk>
         var pressure = new Vector2f(0, 0);
         var count = 0;
 
-        foreach (var delta in Scene.Neighborhood)
+        foreach (var delta in Application.Neighborhood)
         {
             var neighbour = this.Parent.Scene.ChunkMesh[coord + delta]?.PressureMesh[coord + delta];
             if (neighbour.HasValue)

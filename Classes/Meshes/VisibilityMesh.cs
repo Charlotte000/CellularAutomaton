@@ -17,8 +17,8 @@ public class VisibilityMesh : Mesh<bool, Chunk>
 
         var blockSize = new Vector2f(Block.Size, Block.Size);
         var viewRect = new FloatRect(
-            this.Parent.Scene.Camera.Center - (this.Parent.Scene.Camera.Size / 2) - blockSize,
-            this.Parent.Scene.Camera.Size + (blockSize * 2));
+            this.Parent.Scene.Application.Camera.Center - (this.Parent.Scene.Application.Camera.Size / 2) - blockSize,
+            this.Parent.Scene.Application.Camera.Size + (blockSize * 2));
 
         for (int x = 0; x < this.Width; x++)
         {

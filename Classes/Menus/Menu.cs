@@ -16,11 +16,11 @@ public abstract class Menu : IMonoBehaviour, Drawable
 
     internal readonly Menu Parent;
 
-    internal readonly Scene Scene;
+    internal readonly Application Application;
 
     private bool isActive = true;
 
-    public Menu(Scene scene, Vector2f position, Vector2f size, Menu? parent = null)
+    public Menu(Application application, Vector2f position, Vector2f size, Menu? parent = null)
     {
         this.Shape = new (size)
         {
@@ -30,7 +30,7 @@ public abstract class Menu : IMonoBehaviour, Drawable
             OutlineThickness = 3,
         };
 
-        this.Scene = scene;
+        this.Application = application;
         this.Parent = parent;
         this.AddEvents();
     }

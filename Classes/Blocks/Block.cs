@@ -79,7 +79,7 @@ public abstract class Block : IGameObject
 
     public bool IsBoundary()
     {
-        foreach (var delta in Scene.ExpandedNeighborhood)
+        foreach (var delta in Application.ExpandedNeighborhood)
         {
             var coord = this.Coord + delta;
             var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];
@@ -99,7 +99,7 @@ public abstract class Block : IGameObject
             return true;
         }
 
-        foreach (var delta in Scene.Neighborhood)
+        foreach (var delta in Application.Neighborhood)
         {
             var coord = this.Coord + delta;
             var block = this.Chunk.Scene.ChunkMesh[coord]?.BlockMesh[coord];

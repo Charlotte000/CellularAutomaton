@@ -10,14 +10,14 @@ public class Button : Menu
 
     private readonly Action onClicked;
 
-    public Button(Scene scene, Vector2f position, Vector2f size, Menu parent, Action onClicked)
-    : base(scene, position, size, parent)
+    public Button(Application application, Vector2f position, Vector2f size, Menu parent, Action onClicked)
+    : base(application, position, size, parent)
     {
         this.onClicked = onClicked;
     }
 
-    public Button(Scene scene, Vector2f position, Vector2f size, Menu parent, Action onClicked, Sprite sprite)
-        : base(scene, position, size, parent)
+    public Button(Application application, Vector2f position, Vector2f size, Menu parent, Action onClicked, Sprite sprite)
+        : base(application, position, size, parent)
     {
         this.sprite = sprite;
         this.sprite.Origin = new Vector2f(0, 0);
@@ -36,28 +36,28 @@ public class Button : Menu
     }
 
     public Button(
-        Scene scene,
+        Application application,
         Vector2f position,
         Vector2f size,
         Menu parent,
         Action onClicked,
         string str,
         uint fontSize = 30)
-        : this(scene, position, size, parent, onClicked)
+        : this(application, position, size, parent, onClicked)
     {
-        this.Childs.Add(new Label(this.Scene, size / 2, this, str, fontSize));
+        this.Childs.Add(new Label(this.Application, size / 2, this, str, fontSize));
     }
 
     public override void AddEvents()
     {
-        this.Scene.Window.MouseButtonPressed += this.OnMouseButtonPressed;
-        this.Scene.Window.MouseMoved += this.OnMouseMoved;
+        this.Application.Window.MouseButtonPressed += this.OnMouseButtonPressed;
+        this.Application.Window.MouseMoved += this.OnMouseMoved;
     }
 
     public override void DeleteEvents()
     {
-        this.Scene.Window.MouseButtonPressed -= this.OnMouseButtonPressed;
-        this.Scene.Window.MouseMoved -= this.OnMouseMoved;
+        this.Application.Window.MouseButtonPressed -= this.OnMouseButtonPressed;
+        this.Application.Window.MouseMoved -= this.OnMouseMoved;
     }
 
     public override void Draw(RenderTarget target, RenderStates states)

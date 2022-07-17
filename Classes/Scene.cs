@@ -11,28 +11,16 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 
-public class Scene
+public class Scene : IMonoBehaviour
 {
     public static readonly Texture Texture = new (@"..\..\..\Data\textures.png");
 
-    public static readonly Vector2i[] Neighborhood = new Vector2i[]
-    {
-        new (-1, 0), new (1, 0), new (0, -1), new (0, 1),
-    };
-
-    public static readonly Vector2i[] ExpandedNeighborhood = new Vector2i[]
-    {
-        new (-1, 0), new (1, 0), new (0, -1), new (0, 1), new (-1, -1), new (1, -1), new (1, 1), new (-1, 1),
-    };
-
     public static readonly int DayDuration = 3600;
 
-    public static readonly Random RandomGenerator = new ();
-
-    private readonly Mutex mutex = new ();
-
-    public Scene(uint windowWidth, uint windowHeight)
+    public Scene(Application application)
     {
+        this.Application = application;
+
         this.History = new (this);
 
         // Generate terrain
@@ -43,63 +31,11 @@ public class Scene
             this.TerrainGenerator.Generate(chunk);
             this.History.LoadChunk(chunk);
         }
-
-        // Init window
-        this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
-        this.Window.Closed += (obj, e) => this.Window.Close();
-        this.Window.SetFramerateLimit(60);
-        this.Camera = new View(this.Window.GetView());
-
-        this.Menus = new ()
-        { new MainMenu(this, new (0, 0), new (windowWidth, windowHeight)) };
-
-        // Fixed update thread
-        new Thread(() =>
-        {
-            while (this.Window.IsOpen)
-            {
-                // Light update
-                this.mutex.WaitOne();
-
-                LightMesh.OnFixedUpdate(this.ChunkMesh);
-
-                this.mutex.ReleaseMutex();
-
-                // Meshes update
-                this.mutex.WaitOne();
-
-                this.ChunkMesh.OnFixedUpdate();
-
-                this.mutex.ReleaseMutex();
-
-                // Menus update
-                this.mutex.WaitOne();
-
-                foreach (var menu in this.Menus)
-                {
-                    menu.OnFixedUpdate();
-                }
-
-                this.mutex.ReleaseMutex();
-
-                // Entities update
-                this.mutex.WaitOne();
-
-                foreach (var entity in this.Entities)
-                {
-                    entity.OnFixedUpdate();
-                }
-
-                this.mutex.ReleaseMutex();
-
-                Thread.Sleep(100);
-            }
-        }) { IsBackground = true }.Start();
     }
 
     public History History { get; set; }
 
-    public long TerrainSeed { get; set; } = Scene.RandomGenerator.Next(0, 5000);
+    public long TerrainSeed { get; set; } = Application.RandomGenerator.Next(0, 5000);
 
     public TerrainGenerator TerrainGenerator { get; set; }
 
@@ -109,13 +45,11 @@ public class Scene
 
     public List<Entity> Entities { get; set; } = new ();
 
-    public RenderWindow Window { get; set; }
-
-    public View Camera { get; set; }
+    public Application Application { get; set; }
 
     public IGameObject? Nearest { get; set; }
 
-    public IGameObject? Selected { get => (this.Menus[0] as InventoryMenu)?.GetValue(); }
+    public IGameObject? Selected { get => (this.Application.Menus[0] as InventoryMenu)?.GetValue(); }
 
     public IGameObject? CameraFollow { get; set; } = null;
 
@@ -128,8 +62,6 @@ public class Scene
     public bool DiggerMode { get; set; } = true;
 
     public float BuildingDistance { get => 100; }
-
-    public List<Menu> Menus { get; set; }
 
     public void Init(string saveName)
     {
@@ -149,15 +81,15 @@ public class Scene
         }
 
         // Init menus
-        this.Menus = new ()
+        this.Application.Menus = new ()
         {
-            new InventoryMenu(this, new Vector2f(0, this.Window.Size.Y - 50), new Vector2f(this.Window.Size.X, 50)),
-            new PauseMenu(this, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
-            new FPSMenu(this, new Vector2f(0, 0), new Vector2f(20, 20)),
+            new InventoryMenu(this.Application, new Vector2f(0, this.Application.Size.Y - 50), new Vector2f(this.Application.Size.X, 50)),
+            new PauseMenu(this.Application, new Vector2f(50, 50), (Vector2f)this.Application.Size - new Vector2f(100, 150)),
+            new FPSMenu(this.Application, new Vector2f(0, 0), new Vector2f(20, 20)),
         };
 
         // Event listener
-        this.Window.KeyPressed += (s, e) =>
+        this.Application.Window.KeyPressed += (s, e) =>
         {
             if (e.Code == Keyboard.Key.LControl)
             {
@@ -165,7 +97,7 @@ public class Scene
             }
         };
 
-        this.Window.MouseButtonPressed += (s, e) =>
+        this.Application.Window.MouseButtonPressed += (s, e) =>
         {
             if (e.Button == Mouse.Button.Right)
             {
@@ -177,50 +109,98 @@ public class Scene
                 {
                     if (this.Selected is Entity moving)
                     {
-                        this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
+                        this.AddEntity((Entity)moving.Copy(), this.Application.GetMousePosition());
                     }
                 }
             }
         };
     }
 
-    public void Run()
+    public void OnCreate()
     {
-        while (this.Window.IsOpen)
+    }
+
+    public void OnUpdate()
+    {
+        this.Application.Mutex.WaitOne();
+
+        this.KeyListen();
+
+        this.ChunkMesh.OnUpdate();
+
+        for (int i = 0; i < this.Entities.Count; i++)
         {
-            this.Window.DispatchEvents();
-
-            this.mutex.WaitOne();
-
-            this.KeyListen();
-
-            this.MoveCamera();
-
-            this.Update();
-
-            this.Draw();
-
-            this.mutex.ReleaseMutex();
-
-            this.Window.Display();
+            this.Entities[i].OnUpdate();
         }
+
+        this.Application.Mutex.ReleaseMutex();
     }
 
-    public Vector2i GetMouseCoords()
+    public void OnFixedUpdate()
     {
-        var scale = this.Camera.Size.Div((Vector2f)this.Window.Size);
-        var mousePos = (Vector2f)Mouse.GetPosition(this.Window);
-        var mouseWindow = mousePos.Mult(scale);
-        var mouseCoord = (mouseWindow + this.Camera.Center - (this.Camera.Size / 2)) / Block.Size;
-        return mouseCoord.Floor();
+        this.Application.Mutex.WaitOne();
+
+        LightMesh.OnFixedUpdate(this.ChunkMesh);
+
+        this.Application.Mutex.ReleaseMutex();
+
+        // Meshes update
+        this.Application.Mutex.WaitOne();
+
+        this.ChunkMesh.OnFixedUpdate();
+
+        this.Application.Mutex.ReleaseMutex();
+
+        // Entities update
+        this.Application.Mutex.WaitOne();
+
+        foreach (var entity in this.Entities)
+        {
+            entity.OnFixedUpdate();
+        }
+
+        this.Application.Mutex.ReleaseMutex();
     }
 
-    public Vector2f GetMousePosition()
+    public void Draw(RenderTarget renderTarget, RenderStates states)
     {
-        var scale = this.Camera.Size.Div((Vector2f)this.Window.Size);
-        var mousePos = (Vector2f)Mouse.GetPosition(this.Window);
-        var mouseWindow = mousePos.Mult(scale);
-        return mouseWindow + this.Camera.Center - (this.Camera.Size / 2);
+        this.Application.Mutex.WaitOne();
+
+        // Sky
+        renderTarget.Clear(new Color(
+            (byte)(100 * this.Daylight),
+            (byte)(150 * this.Daylight),
+            (byte)(255 * this.Daylight)));
+
+        // Chunks
+        renderTarget.Draw(this.ChunkMesh, states);
+
+        // Entitues
+        foreach (var entity in this.Entities)
+        {
+            var renderState = new RenderStates(states);
+            renderState.Transform.Translate(entity.CollisionBox.Position);
+            renderTarget.Draw(entity, renderState);
+        }
+
+        if (this.Nearest is not null)
+        {
+            using var rect = new RectangleShape(this.Nearest.CollisionBox)
+            { FillColor = Color.Transparent, OutlineColor = Color.Yellow, OutlineThickness = 1 };
+            renderTarget.Draw(rect, states);
+        }
+
+        this.Application.Mutex.ReleaseMutex();
+    }
+
+    public void OnDestroy()
+    {
+        foreach (var entity in this.Entities)
+        {
+            entity.OnDestroy();
+        }
+
+        this.ChunkMesh.OnDestroy();
     }
 
     public Block? TrySetBlock(Block block, Vector2i coords)
@@ -288,56 +268,6 @@ public class Scene
         this.Entities.Remove(entity);
     }
 
-    private void Update()
-    {
-        this.ChunkMesh.OnUpdate();
-
-        for (int i = 0; i < this.Entities.Count; i++)
-        {
-            this.Entities[i].OnUpdate();
-        }
-
-        foreach (var menu in this.Menus)
-        {
-            menu.OnUpdate();
-        }
-    }
-
-    private void Draw()
-    {
-        // Sky
-        this.Window.Clear(new Color(
-            (byte)(100 * this.Daylight),
-            (byte)(150 * this.Daylight),
-            (byte)(255 * this.Daylight)));
-
-        // Chunks
-        this.Window.Draw(this.ChunkMesh);
-
-        // Entitues
-        foreach (var entity in this.Entities)
-        {
-            var renderState = RenderStates.Default;
-            renderState.Transform.Translate(entity.CollisionBox.Position);
-            this.Window.Draw(entity, renderState);
-        }
-
-        if (this.Nearest is not null)
-        {
-            using var rect = new RectangleShape(this.Nearest.CollisionBox)
-            { FillColor = Color.Transparent, OutlineColor = Color.Yellow, OutlineThickness = 1 };
-            this.Window.Draw(rect);
-        }
-
-        // UI
-        this.Window.SetView(this.Window.DefaultView);
-
-        foreach (var m in this.Menus)
-        {
-            this.Window.Draw(m);
-        }
-    }
-
     private void KeyListen()
     {
         if (Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -362,7 +292,7 @@ public class Scene
         {
             if (this.Nearest is not IClickable)
             {
-                var coord = this.GetMouseCoords();
+                var coord = this.Application.GetMouseCoords();
                 var chunk = this.ChunkMesh[coord];
                 if (chunk is null)
                 {
@@ -383,37 +313,5 @@ public class Scene
                 }
             }
         }
-    }
-
-    private void MoveCamera()
-    {
-        if (this.CameraFollow is null)
-        {
-            return;
-        }
-
-        const int offsetX = 20;
-        const int offsetY = 20;
-        var follow = this.CameraFollow.Center;
-
-        if (follow.X - this.Camera.Center.X > offsetX)
-        {
-            this.Camera.Move(new Vector2f(MathF.Round(follow.X - this.Camera.Center.X - offsetX), 0));
-        }
-        else if (this.Camera.Center.X - follow.X > offsetX)
-        {
-            this.Camera.Move(new Vector2f(MathF.Round(follow.X - this.Camera.Center.X + offsetX), 0));
-        }
-
-        if (follow.Y - this.Camera.Center.Y > offsetY)
-        {
-            this.Camera.Move(new Vector2f(0, MathF.Round(follow.Y - this.Camera.Center.Y - offsetY)));
-        }
-        else if (this.Camera.Center.Y - follow.Y > offsetY)
-        {
-            this.Camera.Move(new Vector2f(0, MathF.Round(follow.Y - this.Camera.Center.Y + offsetY)));
-        }
-
-        this.Window.SetView(this.Camera);
     }
 }

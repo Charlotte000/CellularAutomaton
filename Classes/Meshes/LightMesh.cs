@@ -71,7 +71,7 @@ public class LightMesh : Mesh<int, Chunk>
                     {
                         if (chunk.LightMesh.Grid[x, y] == currentLight)
                         {
-                            foreach (var delta in Scene.Neighborhood)
+                            foreach (var delta in Application.Neighborhood)
                             {
                                 var coord = new Vector2i(x, y) + chunk.Coord + delta;
                                 var neighbourChunk = chunkMesh[coord];

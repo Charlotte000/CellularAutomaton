@@ -9,8 +9,8 @@ public class FPSMenu : Menu
 
     private int framesCount = 0;
 
-    public FPSMenu(Scene scene, Vector2f position, Vector2f size)
-        : base(scene, position, size)
+    public FPSMenu(Application application, Vector2f position, Vector2f size)
+        : base(application, position, size)
     {
         this.FPS = new ("60", Menu.Font, 15) { FillColor = Color.Yellow, Position = position + (size / 2) };
         this.Shape.OutlineThickness = 0;

@@ -164,13 +164,13 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
         var wallMode = this.Parent.WallMode;
 
         var origin = this.Parent.CameraFollow.Center;
-        var direction = this.Parent.GetMousePosition() - origin;
+        var direction = this.Parent.Application.GetMousePosition() - origin;
 
         if (!this.Parent.DiggerMode)
         {
             if (direction.MagSq() <= this.Parent.BuildingDistance * this.Parent.BuildingDistance)
             {
-                var coord = this.Parent.GetMouseCoords();
+                var coord = this.Parent.Application.GetMouseCoords();
                 var block = this[coord]?.BlockMesh[coord];
                 if (block is null || (wallMode && !block.IsTransparent))
                 {

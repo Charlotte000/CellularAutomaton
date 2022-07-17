@@ -73,7 +73,7 @@ public class Water : Block
         }
 
         // Spread Out
-        var deltaX = (Scene.RandomGenerator.Next(0, 2) * -2) + 1;
+        var deltaX = (Application.RandomGenerator.Next(0, 2) * -2) + 1;
         if (this.SpreadOut(deltaX))
         {
             return;

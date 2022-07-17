@@ -27,18 +27,18 @@ public class Firefly : Entity, ILightSource
 
     public override Vector2f WaterLift { get => new (0, -.7f); }
 
-    public float AngleVel { get; set; } = (float)(Scene.RandomGenerator.NextDouble() * 10) - 5;
+    public float AngleVel { get; set; } = (float)(Application.RandomGenerator.NextDouble() * 10) - 5;
 
-    public float Angle { get; set; } = Scene.RandomGenerator.Next(0, 360);
+    public float Angle { get; set; } = Application.RandomGenerator.Next(0, 360);
 
-    public int Brightness { get => 200 + Scene.RandomGenerator.Next(0, 20); }
+    public int Brightness { get => 200 + Application.RandomGenerator.Next(0, 20); }
 
     public override IGameObject Copy()
         => new Firefly();
 
     public override void OnUpdate()
     {
-        var magnitude = (float)(Scene.RandomGenerator.NextDouble() * 2) - 1;
+        var magnitude = (float)(Application.RandomGenerator.NextDouble() * 2) - 1;
 
         this.Vel += VectorHelper.Random() * magnitude;
         this.Angle += this.AngleVel;

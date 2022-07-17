@@ -7,8 +7,8 @@ public class Label : Menu
 {
     private readonly Text text;
 
-    public Label(Scene scene, Vector2f position, Menu parent, string text, uint fontSize = 30)
-        : base(scene, position, new Vector2f(0, 0), parent)
+    public Label(Application application, Vector2f position, Menu parent, string text, uint fontSize = 30)
+        : base(application, position, new Vector2f(0, 0), parent)
     {
         this.Shape.OutlineThickness = 0;
 

@@ -41,9 +41,9 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
     public float LifeTime { get => 20; }
 
-    public float AngleVel { get; set; } = (float)((Scene.RandomGenerator.NextDouble() * 20) - 10);
+    public float AngleVel { get; set; } = (float)((Application.RandomGenerator.NextDouble() * 20) - 10);
 
-    public float Angle { get; set; } = Scene.RandomGenerator.Next(0, 360);
+    public float Angle { get; set; } = Application.RandomGenerator.Next(0, 360);
 
     public int Brightness
     {
@@ -51,7 +51,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
         {
             var deltaFull = this.LifeTimeEnd - this.LifeTimeStart;
             var delta = this.LifeTimeEnd - this.Scene.Clock.ElapsedTime.AsSeconds();
-            return (int)((300 * delta / deltaFull) + Scene.RandomGenerator.Next(0, 5));
+            return (int)((300 * delta / deltaFull) + Application.RandomGenerator.Next(0, 5));
         }
     }
 
