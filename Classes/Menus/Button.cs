@@ -10,14 +10,14 @@ public class Button : Menu
 
     private readonly Action onClicked;
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, Menu parent, Action onClicked)
-    : base(window, position, size, parent)
+    public Button(Scene scene, Vector2f position, Vector2f size, Menu parent, Action onClicked)
+    : base(scene, position, size, parent)
     {
         this.onClicked = onClicked;
     }
 
-    public Button(RenderWindow window, Vector2f position, Vector2f size, Menu parent, Action onClicked, Sprite sprite)
-        : base(window, position, size, parent)
+    public Button(Scene scene, Vector2f position, Vector2f size, Menu parent, Action onClicked, Sprite sprite)
+        : base(scene, position, size, parent)
     {
         this.sprite = sprite;
         this.sprite.Origin = new Vector2f(0, 0);
@@ -36,28 +36,28 @@ public class Button : Menu
     }
 
     public Button(
-        RenderWindow window,
+        Scene scene,
         Vector2f position,
         Vector2f size,
         Menu parent,
         Action onClicked,
         string str,
         uint fontSize = 30)
-        : this(window, position, size, parent, onClicked)
+        : this(scene, position, size, parent, onClicked)
     {
-        this.Childs.Add(new Label(window, size / 2, this, str, fontSize));
+        this.Childs.Add(new Label(this.Scene, size / 2, this, str, fontSize));
     }
 
     public override void AddEvents()
     {
-        this.Window.MouseButtonPressed += this.OnMouseButtonPressed;
-        this.Window.MouseMoved += this.OnMouseMoved;
+        this.Scene.Window.MouseButtonPressed += this.OnMouseButtonPressed;
+        this.Scene.Window.MouseMoved += this.OnMouseMoved;
     }
 
     public override void DeleteEvents()
     {
-        this.Window.MouseButtonPressed -= this.OnMouseButtonPressed;
-        this.Window.MouseMoved -= this.OnMouseMoved;
+        this.Scene.Window.MouseButtonPressed -= this.OnMouseButtonPressed;
+        this.Scene.Window.MouseMoved -= this.OnMouseMoved;
     }
 
     public override void Draw(RenderTarget target, RenderStates states)

@@ -31,13 +31,9 @@ public class Scene
 
     private readonly Mutex mutex = new ();
 
-    private readonly List<Menu> menu;
-
     public Scene(uint windowWidth, uint windowHeight)
     {
-        this.AddEntity(new Player(), new (0, 0));
-
-        this.History = new (this, "data");
+        this.History = new (this);
 
         // Generate terrain
         this.TerrainGenerator = new (this.TerrainSeed);
@@ -50,49 +46,12 @@ public class Scene
 
         // Init window
         this.Window = new RenderWindow(new VideoMode(windowWidth, windowHeight), "Cellular Automaton");
+        this.Window.Closed += (obj, e) => this.Window.Close();
         this.Window.SetFramerateLimit(60);
-
         this.Camera = new View(this.Window.GetView());
 
-        this.menu = new ()
-        {
-            new InventoryMenu(this.Window, new Vector2f(0, this.Window.Size.Y - 50), new Vector2f(this.Window.Size.X, 50)),
-            new PauseMenu(this, this.Window, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
-            new FPSMenu(this.Window, new Vector2f(0, 0), new Vector2f(20, 20)),
-        };
-
-        // Event listener
-        this.Window.Closed += (obj, e) =>
-        {
-            this.Window.Close();
-        };
-
-        this.Window.KeyPressed += (s, e) =>
-        {
-            if (e.Code == Keyboard.Key.LControl)
-            {
-                this.DiggerMode = !this.DiggerMode;
-            }
-        };
-
-        this.Window.MouseButtonPressed += (s, e) =>
-        {
-            if (e.Button == Mouse.Button.Left)
-            {
-                if (this.Nearest is IClickable clickable)
-                {
-                    clickable.OnClick();
-                }
-                else
-                {
-                    var entity = ((InventoryMenu)this.menu[0]).GetValue();
-                    if (entity is Entity moving)
-                    {
-                        this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
-                    }
-                }
-            }
-        };
+        this.Menus = new ()
+        { new MainMenu(this, new (0, 0), new (windowWidth, windowHeight)) };
 
         // Fixed update thread
         new Thread(() =>
@@ -116,7 +75,7 @@ public class Scene
                 // Menus update
                 this.mutex.WaitOne();
 
-                foreach (var menu in this.menu)
+                foreach (var menu in this.Menus)
                 {
                     menu.OnFixedUpdate();
                 }
@@ -140,7 +99,7 @@ public class Scene
 
     public History History { get; set; }
 
-    public long TerrainSeed { get; set; } = 125;
+    public long TerrainSeed { get; set; } = Scene.RandomGenerator.Next(0, 5000);
 
     public TerrainGenerator TerrainGenerator { get; set; }
 
@@ -156,6 +115,10 @@ public class Scene
 
     public IGameObject? Nearest { get; set; }
 
+    public IGameObject? Selected { get => (this.Menus[0] as InventoryMenu)?.GetValue(); }
+
+    public IGameObject? CameraFollow { get; set; } = null;
+
     public Vector2i Coord { get => this.ChunkMesh.Grid[0, 0].Coord; }
 
     public Clock Clock { get; set; } = new Clock();
@@ -165,6 +128,61 @@ public class Scene
     public bool DiggerMode { get; set; } = true;
 
     public float BuildingDistance { get => 100; }
+
+    public List<Menu> Menus { get; set; }
+
+    public void Init(string saveName)
+    {
+        this.Entities.Clear();
+        var player = new Player();
+        this.AddEntity(player, new (0, 0));
+        this.CameraFollow = player;
+        this.History = new (this, saveName);
+
+        // Generate terrain
+        this.TerrainGenerator = new (this.TerrainSeed);
+        this.ChunkMesh = new (this);
+        foreach (var chunk in this.ChunkMesh)
+        {
+            this.TerrainGenerator.Generate(chunk);
+            this.History.LoadChunk(chunk);
+        }
+
+        // Init menus
+        this.Menus = new ()
+        {
+            new InventoryMenu(this, new Vector2f(0, this.Window.Size.Y - 50), new Vector2f(this.Window.Size.X, 50)),
+            new PauseMenu(this, new Vector2f(50, 50), (Vector2f)this.Window.Size - new Vector2f(100, 150)),
+            new FPSMenu(this, new Vector2f(0, 0), new Vector2f(20, 20)),
+        };
+
+        // Event listener
+        this.Window.KeyPressed += (s, e) =>
+        {
+            if (e.Code == Keyboard.Key.LControl)
+            {
+                this.DiggerMode = !this.DiggerMode;
+            }
+        };
+
+        this.Window.MouseButtonPressed += (s, e) =>
+        {
+            if (e.Button == Mouse.Button.Right)
+            {
+                if (this.Nearest is IClickable clickable)
+                {
+                    clickable.OnClick();
+                }
+                else
+                {
+                    if (this.Selected is Entity moving)
+                    {
+                        this.AddEntity((Entity)moving.Copy(), this.GetMousePosition());
+                    }
+                }
+            }
+        };
+    }
 
     public void Run()
     {
@@ -279,7 +297,7 @@ public class Scene
             this.Entities[i].OnUpdate();
         }
 
-        foreach (var menu in this.menu)
+        foreach (var menu in this.Menus)
         {
             menu.OnUpdate();
         }
@@ -314,7 +332,7 @@ public class Scene
         // UI
         this.Window.SetView(this.Window.DefaultView);
 
-        foreach (var m in this.menu)
+        foreach (var m in this.Menus)
         {
             this.Window.Draw(m);
         }
@@ -323,32 +341,6 @@ public class Scene
     private void KeyListen()
     {
         if (Mouse.IsButtonPressed(Mouse.Button.Left))
-        {
-            if (this.Nearest is not IClickable)
-            {
-                var coord = this.GetMouseCoords();
-                var chunk = this.ChunkMesh[coord];
-                if (chunk is null)
-                {
-                    return;
-                }
-
-                var entity = ((InventoryMenu)this.menu[0]).GetValue();
-                if (entity is Block block)
-                {
-                    this.TrySetBlock((Block)block.Copy(), coord)?.OnCreate();
-                }
-                else if (entity is Wall wall)
-                {
-                    var newWall = (Wall)wall.Copy();
-                    chunk.WallMesh[coord] = newWall;
-                    newWall.OnCreate();
-                    this.History.SaveWall(newWall);
-                }
-            }
-        }
-
-        if (Mouse.IsButtonPressed(Mouse.Button.Right))
         {
             if (this.Nearest is Wall wall)
             {
@@ -365,13 +357,44 @@ public class Scene
                 this.History.SaveBlock(empty);
             }
         }
+
+        if (Mouse.IsButtonPressed(Mouse.Button.Right))
+        {
+            if (this.Nearest is not IClickable)
+            {
+                var coord = this.GetMouseCoords();
+                var chunk = this.ChunkMesh[coord];
+                if (chunk is null)
+                {
+                    return;
+                }
+
+                var entity = this.Selected;
+                if (entity is Block block)
+                {
+                    this.TrySetBlock((Block)block.Copy(), coord)?.OnCreate();
+                }
+                else if (entity is Wall wall)
+                {
+                    var newWall = (Wall)wall.Copy();
+                    chunk.WallMesh[coord] = newWall;
+                    newWall.OnCreate();
+                    this.History.SaveWall(newWall);
+                }
+            }
+        }
     }
 
     private void MoveCamera()
     {
+        if (this.CameraFollow is null)
+        {
+            return;
+        }
+
         const int offsetX = 20;
         const int offsetY = 20;
-        var follow = this.Entities[0].CollisionBox.Position + (this.Entities[0].CollisionBox.Size / 2);
+        var follow = this.CameraFollow.Center;
 
         if (follow.X - this.Camera.Center.X > offsetX)
         {

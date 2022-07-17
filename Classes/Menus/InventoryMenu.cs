@@ -14,8 +14,8 @@ public class InventoryMenu : Menu
 
     private int selected;
 
-    public InventoryMenu(RenderWindow window, Vector2f position, Vector2f size)
-        : base(window, position, size)
+    public InventoryMenu(Scene scene, Vector2f position, Vector2f size)
+        : base(scene, position, size)
     {
         this.AddItem(new Dirt());
         this.AddItem(new Grass());
@@ -38,14 +38,14 @@ public class InventoryMenu : Menu
 
     public override void AddEvents()
     {
-        this.Window.MouseWheelScrolled += this.OnMouseScrolled;
-        this.Window.KeyPressed += this.OnKeyPressed;
+        this.Scene.Window.MouseWheelScrolled += this.OnMouseScrolled;
+        this.Scene.Window.KeyPressed += this.OnKeyPressed;
     }
 
     public override void DeleteEvents()
     {
-        this.Window.MouseWheelScrolled -= this.OnMouseScrolled;
-        this.Window.KeyPressed -= this.OnKeyPressed;
+        this.Scene.Window.MouseWheelScrolled -= this.OnMouseScrolled;
+        this.Scene.Window.KeyPressed -= this.OnKeyPressed;
     }
 
     public IGameObject GetValue()
@@ -84,7 +84,7 @@ public class InventoryMenu : Menu
     private void AddItem(IGameObject entity)
     {
         var item = new InventoryItem(
-            this.Window,
+            this.Scene,
             new Vector2f(Menu.Margin + (this.Shape.Size.Y * this.items.Count), Menu.Margin),
             new Vector2f(
                 this.Shape.Size.Y - (InventoryMenu.Margin * 2),
@@ -100,16 +100,16 @@ public class InventoryMenu : Menu
         private readonly int index;
 
         public InventoryItem(
-            RenderWindow window,
+            Scene scene,
             Vector2f position,
             Vector2f size,
             InventoryMenu parent,
             IGameObject entity)
-            : base(window, position, size, parent)
+            : base(scene, position, size, parent)
         {
             this.index = parent.items.Count;
             this.Childs.Add(new Button(
-                window,
+                this.Scene,
                 new Vector2f(0, 0),
                 this.Shape.Size,
                 this,

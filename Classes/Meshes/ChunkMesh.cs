@@ -123,7 +123,12 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
 
     private void Move()
     {
-        var cameraCoord = this.Parent.Entities[0].CollisionBox.Position / Block.Size;
+        if (this.Parent.CameraFollow is null)
+        {
+            return;
+        }
+
+        var cameraCoord = this.Parent.CameraFollow.Center / Block.Size;
         if (cameraCoord.X < this.Grid[1, 0].Coord.X)
         {
             ChunkMoveHelper.MoveChunksLeft(this.Parent);
@@ -151,9 +156,14 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
 
     private void UpdateNearest()
     {
+        if (this.Parent.CameraFollow is null)
+        {
+            return;
+        }
+
         var wallMode = this.Parent.WallMode;
 
-        var origin = this.Parent.Entities[0].CollisionBox.Position + (this.Parent.Entities[0].CollisionBox.Size / 2);
+        var origin = this.Parent.CameraFollow.Center;
         var direction = this.Parent.GetMousePosition() - origin;
 
         if (!this.Parent.DiggerMode)
