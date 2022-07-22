@@ -23,7 +23,7 @@ public class Grass : Block
     {
         base.OnFixedUpdate();
 
-        if (Application.RandomGenerator.Next(0, 3) == 0)
+        if (Random.Shared.Next(0, 3) == 0)
         {
             foreach (var delta in Application.ExpandedNeighborhood)
             {

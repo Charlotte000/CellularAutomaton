@@ -58,7 +58,7 @@ public class TerrainGenerator
             {
                 for (int y = 10; y < Math.Min(terrainHeight, this.sea.Average); y++)
                 {
-                    if (Application.RandomGenerator.Next(0, 1000) == 0)
+                    if (Random.Shared.Next(0, 1000) == 0)
                     {
                         chunk.Scene.AddEntity(new Firefly(), new Vector2f(x + chunk.Coord.X, y) * Block.Size);
                     }

@@ -21,7 +21,7 @@ public class Liana : Block
     public override void OnCreate()
     {
         base.OnCreate();
-        this.Expand(Application.RandomGenerator.Next(3, 10));
+        this.Expand(Random.Shared.Next(3, 10));
     }
 
     public override Liana Copy()

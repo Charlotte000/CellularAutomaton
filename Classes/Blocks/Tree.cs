@@ -34,7 +34,7 @@ public class Tree : Block, ITimedEntity, IClickable
         new (Scene.Texture, new IntRect(280, 280, 40, 20)) { Origin = new Vector2f(10, 0) },
     };
 
-    private int treeType = Application.RandomGenerator.Next(0, 8);
+    private int treeType = Random.Shared.Next(0, 8);
 
     private bool isCutDown = false;
 
@@ -58,7 +58,7 @@ public class Tree : Block, ITimedEntity, IClickable
     {
         base.OnFixedUpdate();
 
-        if (Application.RandomGenerator.Next(0, 40) == 0)
+        if (Random.Shared.Next(0, 40) == 0)
         {
             this.Chunk.Scene.AddEntity(
                 new Leaf(),

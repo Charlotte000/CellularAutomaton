@@ -34,7 +34,7 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
 
     public IGameObject? ThrowOwner { get => this.Scene?.Entities[0]; }
 
-    public int Brightness { get => 200 + Application.RandomGenerator.Next(0, 50); }
+    public int Brightness { get => 200 + Random.Shared.Next(0, 50); }
 
     public bool IsLifeTimeActive { get => true; }
 
@@ -44,9 +44,9 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
 
     public float LifeTime { get => 5; }
 
-    public float AngleVel { get; set; } = (float)((Application.RandomGenerator.NextDouble() * 20) - 10);
+    public float AngleVel { get; set; } = (float)((Random.Shared.NextDouble() * 20) - 10);
 
-    public float Angle { get; set; } = Application.RandomGenerator.Next(0, 360);
+    public float Angle { get; set; } = Random.Shared.Next(0, 360);
 
     public float BlastRadius { get => 100; }
 

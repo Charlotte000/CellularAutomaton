@@ -15,7 +15,7 @@ public class Torch : Block, ILightSource
 
     public override bool IsCollidable { get => false; }
 
-    public int Brightness { get => 300 + Application.RandomGenerator.Next(0, 5); }
+    public int Brightness { get => 300 + Random.Shared.Next(0, 5); }
 
     public override Torch Copy()
         => new ()

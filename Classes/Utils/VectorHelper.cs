@@ -36,6 +36,6 @@ public static class VectorHelper
 
     public static Vector2f Random()
         => new (
-            (float)(Application.RandomGenerator.NextDouble() * 2) - 1,
-            (float)(Application.RandomGenerator.NextDouble() * 2) - 1);
+            (float)(System.Random.Shared.NextDouble() * 2) - 1,
+            (float)(System.Random.Shared.NextDouble() * 2) - 1);
 }

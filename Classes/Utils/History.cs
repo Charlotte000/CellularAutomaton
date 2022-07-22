@@ -47,7 +47,7 @@ public class History
         {
             foreach (var (coord, block) in chunkHistory)
             {
-                if (block is Water || block is Tree)
+                if (block is Liquid || block is Tree)
                 {
                     chunkHistory[coord] = new Empty();
                 }
@@ -60,7 +60,7 @@ public class History
 
         foreach (var block in chunk.BlockMesh)
         {
-            if (block is Water || block is Tree)
+            if (block is Liquid || block is Tree)
             {
                 chunkHistory[block.Coord] = (Block)block.Copy();
             }

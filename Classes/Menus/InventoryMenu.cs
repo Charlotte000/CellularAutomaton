@@ -32,6 +32,7 @@ public class InventoryMenu : Menu
         this.AddItem(new StoneWall());
         this.AddItem(new LightStick() { Angle = 0 });
         this.AddItem(new Dynamite() { Angle = 0 });
+        this.AddItem(new Lava());
 
         this.selected = 0;
     }

@@ -22,20 +22,18 @@ public class Scene : IMonoBehaviour
         this.Application = application;
 
         this.History = new (this);
-
-        // Generate terrain
         this.TerrainGenerator = new (this.TerrainSeed);
         this.ChunkMesh = new (this);
+
         foreach (var chunk in this.ChunkMesh)
         {
             this.TerrainGenerator.Generate(chunk);
-            this.History.LoadChunk(chunk);
         }
     }
 
     public History History { get; set; }
 
-    public long TerrainSeed { get; set; } = Application.RandomGenerator.Next(0, 5000);
+    public long TerrainSeed { get; set; } = Random.Shared.Next(0, 5000);
 
     public TerrainGenerator TerrainGenerator { get; set; }
 
@@ -63,17 +61,17 @@ public class Scene : IMonoBehaviour
 
     public float BuildingDistance { get => 100; }
 
-    public void Init(string saveName)
+    public string SaveFile { get; set; }
+
+    public void OnCreate()
     {
-        this.Entities.Clear();
-        var player = new Player();
-        this.AddEntity(player, new (0, 0));
-        this.CameraFollow = player;
-        this.History = new (this, saveName);
+        this.Entities = new ();
+        this.AddEntity(new Player(), new (0, 0));
+        this.CameraFollow = this.Entities[0];
 
         // Generate terrain
+        this.History = new (this, this.SaveFile);
         this.TerrainGenerator = new (this.TerrainSeed);
-        this.ChunkMesh = new (this);
         foreach (var chunk in this.ChunkMesh)
         {
             this.TerrainGenerator.Generate(chunk);
@@ -114,10 +112,6 @@ public class Scene : IMonoBehaviour
                 }
             }
         };
-    }
-
-    public void OnCreate()
-    {
     }
 
     public void OnUpdate()
@@ -216,7 +210,7 @@ public class Scene : IMonoBehaviour
         block.Chunk = oldBlock.Chunk;
 
         // Attempt to build up an existing block
-        if (oldBlock is not Empty && oldBlock is not Water)
+        if (oldBlock is not Empty && oldBlock is not Liquid)
         {
             return null;
         }
@@ -239,10 +233,10 @@ public class Scene : IMonoBehaviour
             }
         }
 
-        // Water ejection
-        if (block is not Water && oldBlock is Water oldBlockWater)
+        // Liquid ejection
+        if (block is not Liquid && oldBlock is Liquid oldLiquid)
         {
-            if (!oldBlockWater.Push())
+            if (!oldLiquid.Push())
             {
                 return null;
             }

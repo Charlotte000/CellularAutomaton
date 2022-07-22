@@ -9,8 +9,6 @@ using SFML.Window;
 
 public class Application
 {
-    public static readonly Random RandomGenerator = new ();
-
     public static readonly Vector2i[] Neighborhood = new Vector2i[]
     {
         new (-1, 0), new (1, 0), new (0, -1), new (0, 1),
@@ -32,8 +30,7 @@ public class Application
 
         this.Scene = new (this);
 
-        this.Menus = new ()
-        { new MainMenu(this, new (0, 0), new (this.Size.X, this.Size.X)) };
+        this.Menus.Add(new MainMenu(this, new (0, 0), new (this.Size.X, this.Size.X)));
     }
 
     public Mutex Mutex { get; } = new ();
