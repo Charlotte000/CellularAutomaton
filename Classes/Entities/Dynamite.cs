@@ -42,9 +42,9 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
 
     public float LifeTimeEnd { get; set; }
 
-    public float LifeTime { get => 5; }
+    public float LifeTime { get; set; } = 5;
 
-    public float AngleVel { get; set; } = (float)((Random.Shared.NextDouble() * 20) - 10);
+    public float AngleVel { get; set; } = (Random.Shared.NextSingle() * 20) - 10;
 
     public float Angle { get; set; } = Random.Shared.Next(0, 360);
 
@@ -74,7 +74,7 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
         {
             var effect = new ExplosionParticle();
             this.Scene.AddEntity(effect, dynamiteCenter);
-            effect.Vel = VectorHelper.Random() * 5;
+            effect.Vel = VectorHelper.Random() * Random.Shared.NextSingle() * 2;
         }
 
         this.Scene.RemoveEntity(this);

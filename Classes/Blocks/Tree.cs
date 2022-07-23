@@ -44,7 +44,7 @@ public class Tree : Block, ITimedEntity, IClickable
 
     public float LifeTimeEnd { get; set; }
 
-    public float LifeTime { get => 1; }
+    public float LifeTime { get; set; } = 1 + Random.Shared.NextSingle() * 2;
 
     public override Sprite Sprite { get => Tree.SpriteSource[(this.treeType * 2) + (this.isCutDown ? 1 : 0)]; }
 

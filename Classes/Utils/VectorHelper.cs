@@ -35,7 +35,5 @@ public static class VectorHelper
         => v.X == value && v.Y == value;
 
     public static Vector2f Random()
-        => new (
-            (float)(System.Random.Shared.NextDouble() * 2) - 1,
-            (float)(System.Random.Shared.NextDouble() * 2) - 1);
+        => new Vector2f(System.Random.Shared.NextSingle() - .5f, System.Random.Shared.NextSingle() - .5f).Normalize();
 }

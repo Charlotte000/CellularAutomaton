@@ -8,7 +8,7 @@ public interface ITimedEntity : IGameObject
 
     public float LifeTimeEnd { get; set; }
 
-    public float LifeTime { get; }
+    public float LifeTime { get; set; }
 
     public void OnTimeOut();
 }

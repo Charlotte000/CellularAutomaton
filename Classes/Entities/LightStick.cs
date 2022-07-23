@@ -39,9 +39,9 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
     public float LifeTimeEnd { get; set; }
 
-    public float LifeTime { get => 20; }
+    public float LifeTime { get; set; } = 20;
 
-    public float AngleVel { get; set; } = (float)((Random.Shared.NextDouble() * 20) - 10);
+    public float AngleVel { get; set; } = (Random.Shared.NextSingle() * 20) - 10;
 
     public float Angle { get; set; } = Random.Shared.Next(0, 360);
 

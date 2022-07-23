@@ -29,7 +29,7 @@ public class Leaf : Entity
 
     public override float PressureIn { get => 1; }
 
-    public float AngleVel { get; set; } = (float)(Random.Shared.NextDouble() * 10) - 5;
+    public float AngleVel { get; set; } = (Random.Shared.NextSingle() * 10) - 5;
 
     public float Angle { get; set; } = Random.Shared.Next(0, 360);
 

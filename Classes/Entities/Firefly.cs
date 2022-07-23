@@ -27,7 +27,7 @@ public class Firefly : Entity, ILightSource
 
     public override Vector2f LiquidLift { get => new (0, -.7f); }
 
-    public float AngleVel { get; set; } = (float)(Random.Shared.NextDouble() * 10) - 5;
+    public float AngleVel { get; set; } = (Random.Shared.NextSingle() * 10) - 5;
 
     public float Angle { get; set; } = Random.Shared.Next(0, 360);
 
@@ -38,7 +38,7 @@ public class Firefly : Entity, ILightSource
 
     public override void OnUpdate()
     {
-        var magnitude = (float)(Random.Shared.NextDouble() * 2) - 1;
+        var magnitude = (Random.Shared.NextSingle() * 2) - 1;
 
         this.Vel += VectorHelper.Random() * magnitude;
         this.Angle += this.AngleVel;
