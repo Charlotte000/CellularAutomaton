@@ -56,13 +56,12 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
     {
         base.OnUpdate();
 
-        this.Move();
-        this.UpdateNearest();
-
         foreach (var chunk in this.Grid)
         {
             chunk.OnUpdate();
         }
+
+        this.Move();
     }
 
     public override void OnFixedUpdate()
@@ -152,71 +151,5 @@ public class ChunkMesh : Mesh<Chunk, Scene>, IEnumerable<Block>, IEnumerable<Wal
             ChunkMoveHelper.MoveChunksDown(this.Parent);
             return;
         }
-    }
-
-    private void UpdateNearest()
-    {
-        if (this.Parent.CameraFollow is null)
-        {
-            return;
-        }
-
-        var wallMode = this.Parent.WallMode;
-
-        var origin = this.Parent.CameraFollow.Center;
-        var direction = this.Parent.Application.GetMousePosition() - origin;
-
-        if (!this.Parent.DiggerMode)
-        {
-            if (direction.MagSq() <= this.Parent.BuildingDistance * this.Parent.BuildingDistance)
-            {
-                var coord = this.Parent.Application.GetMouseCoords();
-                var block = this[coord]?.BlockMesh[coord];
-                if (block is null || (wallMode && !block.IsTransparent))
-                {
-                    this.Parent.Nearest = null;
-                    return;
-                }
-
-                IGameObject? gameObject = !wallMode ? block.Chunk?.BlockMesh[coord] : block.Chunk?.WallMesh[coord];
-                this.Parent.Nearest = gameObject is null || !gameObject.IsIndestructible ? gameObject : null;
-            }
-            else
-            {
-                this.Parent.Nearest = null;
-            }
-
-            return;
-        }
-
-        direction = direction.Constrain(this.Parent.BuildingDistance);
-
-        var minTime = float.MaxValue;
-        IGameObject? selected = null;
-        foreach (var block in this as IEnumerable<Block>)
-        {
-            if (wallMode && !block.IsTransparent)
-            {
-                continue;
-            }
-
-            var localCoord = block.Coord - block.Chunk.Coord;
-            IGameObject gameObject = !wallMode ? block : block.Chunk.WallMesh.Grid[localCoord.X, localCoord.Y];
-            if (block.Chunk.VisibilityMesh.Grid[localCoord.X, localCoord.Y] && !gameObject.IsIndestructible)
-            {
-                using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
-                { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
-                if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
-                {
-                    if (time < 1 && time < minTime)
-                    {
-                        minTime = time;
-                        selected = gameObject;
-                    }
-                }
-            }
-        }
-
-        this.Parent.Nearest = selected;
     }
 }

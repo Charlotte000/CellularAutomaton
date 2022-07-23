@@ -117,7 +117,6 @@ public class Scene : IMonoBehaviour
     public void OnUpdate()
     {
         this.Application.Mutex.WaitOne();
-
         this.KeyListen();
 
         this.ChunkMesh.OnUpdate();
@@ -159,6 +158,7 @@ public class Scene : IMonoBehaviour
     public void Draw(RenderTarget renderTarget, RenderStates states)
     {
         this.Application.Mutex.WaitOne();
+        this.UpdateNearest();
 
         // Sky
         renderTarget.Clear(new Color(
@@ -177,7 +177,7 @@ public class Scene : IMonoBehaviour
             renderTarget.Draw(entity, renderState);
         }
 
-        if (this.Nearest is not null)
+        if (this.Nearest is not null) // ToDo: nearest collision box
         {
             using var rect = new RectangleShape(this.Nearest.CollisionBox)
             { FillColor = Color.Transparent, OutlineColor = Color.Yellow, OutlineThickness = 1 };
@@ -307,5 +307,71 @@ public class Scene : IMonoBehaviour
                 }
             }
         }
+    }
+
+    private void UpdateNearest()
+    {
+        if (this.CameraFollow is null)
+        {
+            return;
+        }
+
+        var wallMode = this.WallMode;
+
+        var origin = this.CameraFollow.Center;
+        var direction = this.Application.GetMousePosition() - origin;
+
+        if (!this.DiggerMode)
+        {
+            if (direction.MagSq() <= this.BuildingDistance * this.BuildingDistance)
+            {
+                var coord = this.Application.GetMouseCoords();
+                var block = this.ChunkMesh[coord]?.BlockMesh[coord];
+                if (block is null || (wallMode && !block.IsTransparent))
+                {
+                    this.Nearest = null;
+                    return;
+                }
+
+                IGameObject? gameObject = !wallMode ? block.Chunk?.BlockMesh[coord] : block.Chunk?.WallMesh[coord];
+                this.Nearest = gameObject is null || !gameObject.IsIndestructible ? gameObject : null;
+            }
+            else
+            {
+                this.Nearest = null;
+            }
+
+            return;
+        }
+
+        direction = direction.Constrain(this.BuildingDistance);
+
+        var minTime = float.MaxValue;
+        IGameObject? selected = null;
+        foreach (var block in this.ChunkMesh as IEnumerable<Block>)
+        {
+            if (wallMode && !block.IsTransparent)
+            {
+                continue;
+            }
+
+            var localCoord = block.Coord - block.Chunk.Coord;
+            IGameObject gameObject = !wallMode ? block : block.Chunk.WallMesh.Grid[localCoord.X, localCoord.Y];
+            if (block.Chunk.VisibilityMesh.Grid[localCoord.X, localCoord.Y] && !gameObject.IsIndestructible)
+            {
+                using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
+                { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
+                if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
+                {
+                    if (time < 1 && time < minTime)
+                    {
+                        minTime = time;
+                        selected = gameObject;
+                    }
+                }
+            }
+        }
+
+        this.Nearest = selected;
     }
 }

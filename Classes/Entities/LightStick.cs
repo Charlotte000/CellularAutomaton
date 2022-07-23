@@ -27,7 +27,7 @@ public class LightStick : Entity, ILightSource, IThrowable, ITimedEntity
 
     public override float AirResistance { get => .99f; }
 
-    public override float WaterResistance { get => .87f; }
+    public override float LiquidResistance { get => .87f; }
 
     public float ThrowMag { get => 7; }
 

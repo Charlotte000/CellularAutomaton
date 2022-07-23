@@ -19,7 +19,7 @@ public class ExplosionParticle : Entity, ILightSource
 
     public override float AirResistance { get => .99f; }
 
-    public override float WaterResistance { get => .87f; }
+    public override float LiquidResistance { get => .87f; }
 
     public int Brightness { get => 300; }
 

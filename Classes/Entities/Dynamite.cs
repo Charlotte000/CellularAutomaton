@@ -17,7 +17,7 @@ public class Dynamite : Entity, IThrowable, ILightSource, ITimedEntity
 
     public override float AirResistance { get => .99f; }
 
-    public override float WaterResistance { get => .87f; }
+    public override float LiquidResistance { get => .87f; }
 
     public override RectangleShape CollisionBox { get; set; } = new (new Vector2f(5, 5));
 

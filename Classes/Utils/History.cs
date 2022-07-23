@@ -124,7 +124,7 @@ public class History
             Formatting.Indented,
             History.Settings);
 
-        File.WriteAllText(@"..\..\..\Data\Saves\data.txt", data);
+        File.WriteAllText(@"..\..\..\Data\Saves\data.txt", data); // ToDo: save file name
     }
 
     private static IEnumerable<KeyValuePair<Vector2i, KeyValuePair<Vector2i, T>[]>> ToPair<T>(Dictionary<Vector2i, Dictionary<Vector2i, T>> dict)

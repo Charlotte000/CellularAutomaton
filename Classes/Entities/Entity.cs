@@ -18,9 +18,9 @@ public abstract class Entity : IGameObject
 
     public virtual float AirResistance { get => .8f; }
 
-    public virtual float WaterResistance { get => .75f; }
+    public virtual float LiquidResistance { get => .75f; }
 
-    public virtual Vector2f WaterLift { get => new (0, 0); }
+    public virtual Vector2f LiquidLift { get => new (0, 0); }
 
     public virtual Vector2f Gravity { get => new (0, .1f); }
 
@@ -33,7 +33,7 @@ public abstract class Entity : IGameObject
 
     public virtual bool IsIndestructible { get => false; }
 
-    public bool IsOnWater { get; set; }
+    public bool IsOnLiquid { get; set; }
 
     public bool IsOnGround { get; set; }
 
@@ -107,7 +107,7 @@ public abstract class Entity : IGameObject
             }
         }
 
-        this.Vel += this.Gravity + (this.IsOnWater ? this.WaterLift : new (0, 0));
+        this.Vel += this.Gravity + (this.IsOnLiquid ? this.LiquidLift : new (0, 0));
 
         var coord = this.Coord;
         if (this.PressureIn != 0)
@@ -115,7 +115,7 @@ public abstract class Entity : IGameObject
             this.Vel += this.Scene.ChunkMesh[coord]?.PressureMesh[coord] * this.PressureIn ?? new Vector2f(0, 0);
         }
 
-        this.Vel *= this.IsOnWater ? this.WaterResistance : this.AirResistance;
+        this.Vel *= this.IsOnLiquid ? this.LiquidResistance : this.AirResistance;
 
         this.Collision();
         this.CollisionBox.Position += this.Vel;
@@ -132,7 +132,7 @@ public abstract class Entity : IGameObject
 
     internal virtual void Collision()
     {
-        this.IsOnWater = false;
+        this.IsOnLiquid = false;
         this.IsOnGround = false;
 
         var entities = new List<IGameObject>();

@@ -25,7 +25,7 @@ public class Leaf : Entity
 
     public override float AirResistance { get => .7f; }
 
-    public override float WaterResistance { get => .5f; }
+    public override float LiquidResistance { get => .5f; }
 
     public override float PressureIn { get => 1; }
 

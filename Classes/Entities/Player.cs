@@ -24,7 +24,7 @@ public class Player : Entity
 
     public override float AirResistance { get => this.IsClimbing ? .7f : .87f; }
 
-    public override Vector2f WaterLift { get => new (0, -.7f); }
+    public override Vector2f LiquidLift { get => new (0, -.7f); }
 
     public override float PressureOut { get => .05f; }
 
@@ -74,7 +74,7 @@ public class Player : Entity
             this.Vel += new Vector2f(0, -15f);
         }
 
-        if (Keyboard.IsKeyPressed(Keyboard.Key.W) && (this.IsClimbing || this.IsOnWater))
+        if (Keyboard.IsKeyPressed(Keyboard.Key.W) && (this.IsClimbing || this.IsOnLiquid))
         {
             this.Vel += new Vector2f(0, -1.7f);
         }

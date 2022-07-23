@@ -1,5 +1,7 @@
 ﻿namespace CellularAutomaton.Classes.Blocks;
 
+using CellularAutomaton.Classes.Entities;
+using CellularAutomaton.Interfaces;
 using Newtonsoft.Json;
 using SFML.Graphics;
 using SFML.System;
@@ -48,6 +50,16 @@ public abstract class Liquid : Block
         if (this.SpreadOut(deltaX))
         {
             return;
+        }
+    }
+
+    public override void OnCollision(IGameObject gameObject, Vector2f? normal)
+    {
+        base.OnCollision(gameObject, normal);
+
+        if (gameObject is Entity entity)
+        {
+            entity.IsOnLiquid = true;
         }
     }
 

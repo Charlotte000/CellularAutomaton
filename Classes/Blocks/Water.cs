@@ -13,16 +13,6 @@ public class Water : Liquid
 
     public override int LightDiffusion { get => 25; }
 
-    public override void OnCollision(IGameObject gameObject, Vector2f? normal)
-    {
-        base.OnCollision(gameObject, normal);
-
-        if (gameObject is Entity entity)
-        {
-            entity.IsOnWater = true;
-        }
-    }
-
     public override Water Copy()
         => new ()
         {

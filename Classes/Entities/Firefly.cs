@@ -25,7 +25,7 @@ public class Firefly : Entity, ILightSource
 
     public override float AirResistance { get => .9f; }
 
-    public override Vector2f WaterLift { get => new (0, -.7f); }
+    public override Vector2f LiquidLift { get => new (0, -.7f); }
 
     public float AngleVel { get; set; } = (float)(Random.Shared.NextDouble() * 10) - 5;
 
