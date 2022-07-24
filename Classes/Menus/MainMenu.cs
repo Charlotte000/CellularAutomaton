@@ -23,7 +23,7 @@ public class MainMenu : Menu
                 {
                     this.IsActive = false;
                     this.Application.Scene = new Scene(this.Application)
-                    { SaveFile = saveName! };
+                    { SaveFile = saveName };
                     this.Application.Scene.OnCreate();
                 },
                 saveName ?? "Create New World"));

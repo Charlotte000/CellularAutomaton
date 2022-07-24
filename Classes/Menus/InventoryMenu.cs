@@ -122,11 +122,11 @@ public class InventoryMenu : Menu
 
         public IGameObject Entity { get; set; }
 
-        public override void Draw(RenderTarget target, RenderStates states)
+        public override void OnUpdate()
         {
+            base.OnUpdate();
             this.Childs[0].Shape.FillColor = this.index == ((InventoryMenu)this.Parent!).selected ?
                 new Color(150, 150, 150) : new Color(100, 100, 100);
-            base.Draw(target, states);
         }
 
         public override void OnDestroy()

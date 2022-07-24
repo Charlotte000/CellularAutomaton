@@ -61,7 +61,7 @@ public class Scene : IMonoBehaviour
 
     public float BuildingDistance { get => 100; }
 
-    public string SaveFile { get; set; }
+    public string? SaveFile { get; set; }
 
     public void OnCreate()
     {

@@ -5,7 +5,7 @@ using SFML.System;
 
 public class Label : Menu
 {
-    private readonly Text text;
+    private Text text;
 
     public Label(Application application, Vector2f position, Menu parent, string text, uint fontSize = 30)
         : base(application, position, new Vector2f(0, 0), parent)
@@ -20,6 +20,17 @@ public class Label : Menu
 
         var bound = this.text.GetLocalBounds();
         this.text.Origin = new Vector2f((bound.Left * 2) + bound.Width, (bound.Top * 2) + bound.Height) / 2;
+    }
+
+    public string Text
+    {
+        get => this.text.DisplayedString;
+        set
+        {
+            this.text.DisplayedString = value;
+            var bound = this.text.GetLocalBounds();
+            this.text.Origin = new Vector2f((bound.Left * 2) + bound.Width, (bound.Top * 2) + bound.Height) / 2;
+        }
     }
 
     public override void Draw(RenderTarget target, RenderStates states)

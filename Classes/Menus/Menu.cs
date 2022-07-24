@@ -14,7 +14,7 @@ public abstract class Menu : IMonoBehaviour, Drawable
 
     internal readonly List<Menu> Childs = new ();
 
-    internal readonly Menu Parent;
+    internal readonly Menu? Parent;
 
     internal readonly Application Application;
 
@@ -35,7 +35,7 @@ public abstract class Menu : IMonoBehaviour, Drawable
         this.AddEvents();
     }
 
-    public bool IsActive
+    public virtual bool IsActive
     {
         get => this.isActive;
         set
@@ -43,7 +43,7 @@ public abstract class Menu : IMonoBehaviour, Drawable
             this.isActive = value;
             foreach (var child in this.Childs)
             {
-                child.isActive = value;
+                child.IsActive = value;
             }
         }
     }
@@ -75,10 +75,18 @@ public abstract class Menu : IMonoBehaviour, Drawable
 
     public virtual void OnUpdate()
     {
+        foreach (var child in this.Childs)
+        {
+            child.OnUpdate();
+        }
     }
 
     public virtual void OnFixedUpdate()
     {
+        foreach (var child in this.Childs)
+        {
+            child.OnFixedUpdate();
+        }
     }
 
     public virtual void OnDestroy()
