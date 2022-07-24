@@ -34,6 +34,7 @@ public class PauseMenu : Menu
                 }
                 else
                 {
+                    this.Application.Scene.SaveFile = this.saveName.Value;
                     this.Application.Scene.History.SaveHistory();
                     this.IsActive = false;
                 }

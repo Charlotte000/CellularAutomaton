@@ -22,17 +22,16 @@ public class History
 
     private readonly WallDictionary wallHistory = new ();
 
-    public History(Scene scene, string? saveName = null)
+    public History(Scene scene)
     {
         this.scene = scene;
 
-        if (saveName is not null)
+        if (scene.SaveFile is not null)
         {
-            var data = File.ReadAllText(@$"..\..\..\Data\Saves\{saveName}.txt");
+            var data = File.ReadAllText(@$"..\..\..\Data\Saves\{scene.SaveFile}.txt");
             var (blocks, walls, seed, playerPosition) =
                 JsonConvert
-                .DeserializeObject<
-                    (BlockPairs blocks, WallPairs walls, long seed, Vector2f player)>(data, History.Settings);
+                .DeserializeObject<(BlockPairs blocks, WallPairs walls, long seed, Vector2f player)>(data, History.Settings);
 
             this.blockHistory = History.ToDictionary(blocks);
             this.wallHistory = History.ToDictionary(walls);
@@ -124,7 +123,7 @@ public class History
             Formatting.Indented,
             History.Settings);
 
-        File.WriteAllText(@"..\..\..\Data\Saves\data.txt", data); // ToDo: save file name
+        File.WriteAllText($@"..\..\..\Data\Saves\{this.scene.SaveFile!}.txt", data);
     }
 
     private static IEnumerable<KeyValuePair<Vector2i, KeyValuePair<Vector2i, T>[]>> ToPair<T>(Dictionary<Vector2i, Dictionary<Vector2i, T>> dict)

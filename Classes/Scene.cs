@@ -70,7 +70,7 @@ public class Scene : IMonoBehaviour
         this.CameraFollow = this.Entities[0];
 
         // Generate terrain
-        this.History = new (this, this.SaveFile);
+        this.History = new (this);
         this.TerrainGenerator = new (this.TerrainSeed);
         foreach (var chunk in this.ChunkMesh)
         {
@@ -177,7 +177,7 @@ public class Scene : IMonoBehaviour
             renderTarget.Draw(entity, renderState);
         }
 
-        if (this.Nearest is not null) // ToDo: nearest collision box
+        if (this.Nearest is not null)
         {
             using var rect = new RectangleShape(this.Nearest.CollisionBox)
             { FillColor = Color.Transparent, OutlineColor = Color.Yellow, OutlineThickness = 1 };
@@ -359,9 +359,7 @@ public class Scene : IMonoBehaviour
             IGameObject gameObject = !wallMode ? block : block.Chunk.WallMesh.Grid[localCoord.X, localCoord.Y];
             if (block.Chunk.VisibilityMesh.Grid[localCoord.X, localCoord.Y] && !gameObject.IsIndestructible)
             {
-                using var box = new RectangleShape(new Vector2f(Block.Size, Block.Size))
-                { Position = gameObject.CollisionBox.Position - gameObject.CollisionBox.Origin };
-                if (AABBCollision.RayVsRect(origin, direction, box, out _, out var time))
+                if (AABBCollision.RayVsRect(origin, direction, gameObject.CollisionBox, out _, out var time))
                 {
                     if (time < 1 && time < minTime)
                     {

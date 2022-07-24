@@ -6,7 +6,7 @@ using CellularAutomaton.Interfaces;
 using SFML.Graphics;
 using SFML.System;
 
-public static class AABBCollision // ToDo: rect origin
+public static class AABBCollision
 {
     public static void Collision(Scene scene, Entity dynamicEntity, List<IGameObject> staticEntities)
     {
@@ -34,6 +34,7 @@ public static class AABBCollision // ToDo: rect origin
     {
         normal = new Vector2f(0, 0);
         tHitNear = -1;
+        using var targetNormal = new RectangleShape(target) { Position = target.Position - target.Origin };
 
         if (rayDirection.XYEquals(0))
         {
@@ -44,9 +45,9 @@ public static class AABBCollision // ToDo: rect origin
         var invDir = new Vector2f(1, 1).Div(rayDirection);
 
         // Calculate intersections with rectangle bounding axes
-        Vector2f tNear = invDir.Mult(target.Position - rayOrigin);
+        Vector2f tNear = invDir.Mult(targetNormal.Position - rayOrigin);
 
-        Vector2f tFar = invDir.Mult(target.Position + target.Size - rayOrigin);
+        Vector2f tFar = invDir.Mult(targetNormal.Position + targetNormal.Size - rayOrigin);
 
         // Sort distances
         if (tNear.X > tFar.X)
